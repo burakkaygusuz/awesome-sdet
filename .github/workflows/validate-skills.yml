@@ -1,0 +1,34 @@
+name: Awesome SDET - Validate & Audit Skills
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Schema Linter
+        run: pnpm run lint:skills
+
+      - name: Run Skills Check CI
+        uses: voodootikigod/skills-check@v1.2.1
+        with:
+          commands: audit,lint
+          skills-dir: ./skills

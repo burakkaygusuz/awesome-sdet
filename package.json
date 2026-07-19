@@ -1,0 +1,18 @@
+{
+  "name": "awesome-sdet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Skills and agents registry for SDETs",
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "lint:skills": "node scripts/validate_skills.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "skills-check": "^1.2.1",
+    "typescript": "^7.0.2"
+  },
+  "type": "module"
+}
+
