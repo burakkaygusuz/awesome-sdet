@@ -9,7 +9,7 @@ interface SkillMetadata {
 function parseSimpleYAML(yamlStr: string): SkillMetadata {
   const metadata: SkillMetadata = {};
   const lines = yamlStr.split(/\r?\n/);
-  
+
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) {
@@ -19,7 +19,7 @@ function parseSimpleYAML(yamlStr: string): SkillMetadata {
     if (colonIndex !== -1) {
       const key = trimmed.slice(0, colonIndex).trim();
       const value = trimmed.slice(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
-      
+
       if (key === 'name') {
         metadata.name = value;
       } else if (key === 'description') {
@@ -27,7 +27,7 @@ function parseSimpleYAML(yamlStr: string): SkillMetadata {
       }
     }
   }
-  
+
   return metadata;
 }
 
@@ -49,7 +49,7 @@ for (const item of items) {
   if (item.name.startsWith('.')) {
     continue;
   }
-  
+
   if (item.isDirectory()) {
     const skillDir = path.join(skillsPath, item.name);
     const skillMdPath = path.join(skillDir, 'SKILL.md');
@@ -62,7 +62,7 @@ for (const item of items) {
       }
 
       const content = fs.readFileSync(skillMdPath, 'utf8').replace(/^\uFEFF/, '');
-      const frontmatterMatch = content.match(/^---\r?\n([\s\S]+?)\r?\n---(?:\r?\n|$)/);
+      const frontmatterMatch = new RegExp(/^---\r?\n([\s\S]+?)\r?\n---(?:\r?\n|$)/).exec(content);
 
       if (!frontmatterMatch) {
         console.error(`Error: Missing or invalid YAML frontmatter in skills/${item.name}/SKILL.md`);
