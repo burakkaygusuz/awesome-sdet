@@ -1,6 +1,7 @@
 ---
 name: selenium-java-explicit-waits
 description: "Reference and implementation guide for Selenium Java explicit waits using WebDriverWait and ExpectedConditions (org.openqa.selenium.support.ui.ExpectedConditions). Use when writing or debugging Selenium or Appium Java tests involving test synchronization, replacing Thread.sleep, resolving flaky tests, or handling exceptions like StaleElementReferenceException, ElementNotInteractableException, and ElementClickInterceptedException."
+keywords: ["selenium", "java", "explicit-waits", "expected-conditions", "webdriverwait", "testing"]
 ---
 
 # Selenium ExpectedConditions (Java)

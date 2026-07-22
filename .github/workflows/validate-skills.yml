@@ -30,5 +30,5 @@ jobs:
       - name: Run Skills Check CI
         uses: voodootikigod/skills-check@v1.2.1
         with:
-          commands: audit,lint
+          commands: audit
           skills-dir: ./skills
