@@ -18,7 +18,10 @@ function parseSimpleYAML(yamlStr: string): SkillMetadata {
     const colonIndex = trimmed.indexOf(':');
     if (colonIndex !== -1) {
       const key = trimmed.slice(0, colonIndex).trim();
-      const value = trimmed.slice(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
+      const value = trimmed
+        .slice(colonIndex + 1)
+        .trim()
+        .replace(/^["']|["']$/g, '');
 
       if (key === 'name') {
         metadata.name = value;
@@ -72,15 +75,19 @@ for (const item of items) {
 
       const metadata = parseSimpleYAML(frontmatterMatch[1]);
       if (!metadata.name) {
-        console.error(`Error: Frontmatter 'name' key is missing or invalid in skills/${item.name}/SKILL.md`);
+        console.error(
+          `Error: Frontmatter 'name' key is missing or invalid in skills/${item.name}/SKILL.md`
+        );
         hasErrors = true;
       }
       if (!metadata.description) {
-        console.error(`Error: Frontmatter 'description' key is missing or invalid in skills/${item.name}/SKILL.md`);
+        console.error(
+          `Error: Frontmatter 'description' key is missing or invalid in skills/${item.name}/SKILL.md`
+        );
         hasErrors = true;
       }
     } catch (e: unknown) {
-      let msg = 'Unknown error';
+      let msg: string;
       if (e instanceof Error) {
         msg = e.message;
       } else if (typeof e === 'string') {

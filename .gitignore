@@ -1,2 +1,18 @@
 # Superpowers specs and plans must never be committed
 docs/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Husky generated files
+.husky/_/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
