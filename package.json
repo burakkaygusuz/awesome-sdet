@@ -7,12 +7,17 @@
   "scripts": {
     "lint:skills": "node scripts/validate_skills.ts"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@eslint/markdown": "^8.0.3",
     "@types/node": "^20.11.0",
+    "eslint": "^10.7.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-markdownlint": "^0.10.1",
+    "prettier": "^3.9.5",
     "skills-check": "^1.2.1",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.64.0"
   },
   "type": "module"
 }
-
