@@ -97,11 +97,31 @@ export async function handleStatelessHttpRequest(reqBody: string) {
                 urlPattern: { type: 'string' },
                 action: {
                   type: 'string',
-                  enum: ['mockResponse', 'blockRequest', 'continueRequest', 'modifyHeaders'],
+                  enum: [
+                    'mockResponse',
+                    'blockRequest',
+                    'failRequest',
+                    'continueRequest',
+                    'modifyHeaders',
+                    'injectBasicAuth',
+                    'recordTraffic',
+                  ],
                 },
                 mockStatus: { type: 'number' },
                 mockResponseBody: { type: 'string' },
                 headers: { type: 'object' },
+                authCredentials: {
+                  type: 'object',
+                  properties: {
+                    username: { type: 'string' },
+                    password: { type: 'string' },
+                  },
+                  required: ['username', 'password'],
+                },
+                errorReason: {
+                  type: 'string',
+                  enum: ['Failed', 'Aborted', 'AccessDenied', 'ConnectionRefused'],
+                },
               },
               required: ['targetUrl', 'urlPattern', 'action'],
             },
