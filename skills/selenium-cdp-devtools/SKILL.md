@@ -230,13 +230,9 @@ wait.until(_d -> completed.get());
 ## Picking a CDP version
 
 Command/event domain classes (`Network`, `Performance`, `Browser`, `Page`, ...) live under a
-Chrome-version-pinned package, e.g. `org.openqa.selenium.devtools.v150.network.Network`. Selenium
-supports the 3 most recent Chrome versions at a time, and the version number in the package path
-changes as Selenium releases catch up to Chrome releases — **check the installed Selenium
-version's Javadoc for the current `vNNN` package** rather than hard-coding one from memory or an
-older example. `CdpVersionFinder`/`CdpInfo` (see [`references/api-references.md`](references/api-references.md)) handle this
-matching automatically inside `getDevTools()` — you only need the version number when importing
-the domain classes directly, as in Recipes 2 and 8.
+Chrome-version-pinned package (e.g. `org.openqa.selenium.devtools.v150.network.Network`) or the stable alias package `org.openqa.selenium.devtools.latest.*` (provided by the `selenium-devtools-latest` artifact, e.g. `import org.openqa.selenium.devtools.latest.network.Network;`).
+
+Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating import paths on every Chrome version bump. If using version-pinned packages directly, Selenium supports the 3 most recent Chrome versions at a time — check the installed Selenium version's Javadoc for the active `vNNN` package. `CdpVersionFinder`/`CdpInfo` (see [`references/api-references.md`](references/api-references.md)) handle this matching automatically inside `getDevTools()`.
 
 ## Cleanup checklist
 

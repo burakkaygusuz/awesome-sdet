@@ -51,7 +51,7 @@
 | `titleIs(String title)`                                                    | `Boolean`          | Checks that the page title matches the expected string exactly.                   |
 | `urlContains(String fraction)`                                             | `Boolean`          | Checks that the current URL contains specific text.                               |
 | `urlMatches(String regex)`                                                 | `Boolean`          | Checks that the current URL matches a specific regular expression.                |
-| `urlMatches(Pattern pattern)`                                              | `Pattern`          | Checks that the current URL matches a specific `Pattern` object.                  |
+| `urlMatches(Pattern pattern)`                                              | `Boolean`          | Checks that the current URL matches a specific `Pattern` object.                  |
 | `urlToBe(String url)`                                                      | `Boolean`          | Checks that the current URL is exactly the specified string.                      |
 | `visibilityOf(WebElement element)`                                         | `WebElement`       | Checks that an element, known to be present, is visible.                          |
 | `visibilityOfAllElements(List<WebElement> elements)`                       | `List<WebElement>` | Checks that all elements in the provided list are visible.                        |
