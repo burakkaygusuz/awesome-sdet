@@ -79,7 +79,7 @@ devTools.send(
 ```
 
 `Network`, `Performance`, `Browser`, etc. come from a version-pinned package — see
-[Picking a CDP version](SKILL.md#picking-a-cdp-version) below.
+[Picking a CDP version](#picking-a-cdp-version) below.
 
 ## Recipe 3 — Capturing console logs and JS exceptions
 

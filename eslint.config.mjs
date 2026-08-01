@@ -25,7 +25,7 @@ export default defineConfig([
       'markdownlint/md001': 'error',
       'markdownlint/md022': 'error',
       'markdownlint/md024': ['error', { siblings_only: true }],
-      'markdownlint/md033': 'error',
+      'markdownlint/md033': ['error', { allowed_elements: ['a'] }],
     },
   },
   eslintConfigPrettier,
