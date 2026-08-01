@@ -1,5 +1,10 @@
 import http from 'node:http';
-import { handleSeleniumWait, type SeleniumWaitArgs } from '@/selenium/index.js';
+import {
+  handleCdpNetworkInterception,
+  handleSeleniumWait,
+  type CdpNetworkInterceptionArgs,
+  type SeleniumWaitArgs,
+} from '@/selenium/index.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -81,6 +86,26 @@ export async function handleStatelessHttpRequest(reqBody: string) {
               required: ['targetUrl', 'condition', 'locator'],
             },
           },
+          {
+            name: 'execute_cdp_network_interception',
+            description:
+              'Statelessly configures or verifies Chrome DevTools Protocol (CDP) network request interception',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                targetUrl: { type: 'string' },
+                urlPattern: { type: 'string' },
+                action: {
+                  type: 'string',
+                  enum: ['mockResponse', 'blockRequest', 'continueRequest', 'modifyHeaders'],
+                },
+                mockStatus: { type: 'number' },
+                mockResponseBody: { type: 'string' },
+                headers: { type: 'object' },
+              },
+              required: ['targetUrl', 'urlPattern', 'action'],
+            },
+          },
         ],
       },
     };
@@ -90,6 +115,14 @@ export async function handleStatelessHttpRequest(reqBody: string) {
     const { name, arguments: args } = params;
     if (name === 'execute_selenium_wait') {
       const toolResult = handleSeleniumWait(args as SeleniumWaitArgs);
+      return {
+        jsonrpc: '2.0',
+        id,
+        result: toolResult,
+      };
+    }
+    if (name === 'execute_cdp_network_interception') {
+      const toolResult = handleCdpNetworkInterception(args as CdpNetworkInterceptionArgs);
       return {
         jsonrpc: '2.0',
         id,

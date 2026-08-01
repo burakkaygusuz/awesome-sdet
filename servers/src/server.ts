@@ -1,5 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { handleSeleniumWait, SeleniumWaitSchema } from '@/selenium/index.js';
+import {
+  handleCdpNetworkInterception,
+  handleSeleniumWait,
+  CdpNetworkInterceptionSchema,
+  SeleniumWaitSchema,
+} from '@/selenium/index.js';
 
 export function createSdetMcpServer(): McpServer {
   const server = new McpServer({
@@ -14,6 +19,16 @@ export function createSdetMcpServer(): McpServer {
       inputSchema: SeleniumWaitSchema.shape,
     },
     async (args) => handleSeleniumWait(args)
+  );
+
+  server.registerTool(
+    'execute_cdp_network_interception',
+    {
+      description:
+        'Statelessly configures or verifies Chrome DevTools Protocol (CDP) network request interception',
+      inputSchema: CdpNetworkInterceptionSchema.shape,
+    },
+    async (args) => handleCdpNetworkInterception(args)
   );
 
   return server;
