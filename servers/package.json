@@ -1,0 +1,20 @@
+{
+  "name": "awesome-sdet-selenium-mcp",
+  "version": "1.0.0",
+  "description": "Modular, test-framework-based MCP server following official modelcontextprotocol/servers architecture",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^6.0.3"
+  }
+}
