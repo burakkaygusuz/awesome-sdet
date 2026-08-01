@@ -251,4 +251,4 @@ Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating imp
 
 ## Dynamic Tool Schemas & API Reference
 
-Complete tool schemas, input parameters, and CDP domain specifications are exposed dynamically via the `awesome-sdet-selenium-mcp` server (`tools/list`).
+Complete tool schemas, input parameters, and CDP domain specifications are exposed dynamically via the `sdet-mcp` server (`tools/list`).

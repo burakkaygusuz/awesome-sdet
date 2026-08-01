@@ -75,9 +75,9 @@ test('MCP HTTP transport protocol tests', async (t) => {
     assert.equal(data.jsonrpc, '2.0');
     assert.equal(data.id, 2);
     assert.ok(data.result);
-    const toolNames = data.result.tools.map((t) => t.name);
-    assert.ok(toolNames.includes('execute_selenium_wait'));
-    assert.ok(toolNames.includes('execute_cdp_network_interception'));
+    const toolNames = new Set(data.result.tools.map((t) => t.name));
+    assert.ok(toolNames.has('execute_se_explicit_wait'));
+    assert.ok(toolNames.has('execute_se_cdp_intercept'));
   });
 
   await t.test('tools/call - valid call', async () => {
@@ -89,7 +89,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 3,
         method: 'tools/call',
         params: {
-          name: 'execute_selenium_wait',
+          name: 'execute_se_explicit_wait',
           arguments: {
             targetUrl: 'https://example.com',
             condition: 'elementToBeClickable',
@@ -118,7 +118,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 4,
         method: 'tools/call',
         params: {
-          name: 'execute_selenium_wait',
+          name: 'execute_se_explicit_wait',
           arguments: {
             targetUrl: 12345,
             condition: 'elementToBeClickable',
@@ -177,7 +177,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 5,
         method: 'tools/call',
         params: {
-          name: 'execute_cdp_network_interception',
+          name: 'execute_se_cdp_intercept',
           arguments: {
             targetUrl: 'https://example.com',
             urlPattern: '*://api.example.com/*',
@@ -208,7 +208,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 10,
         method: 'tools/call',
         params: {
-          name: 'execute_selenium_wait',
+          name: 'execute_se_explicit_wait',
           arguments: {
             targetUrl: SENTINEL_URL,
             condition: 'elementToBeClickable',
@@ -233,7 +233,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 11,
         method: 'tools/call',
         params: {
-          name: 'execute_selenium_wait',
+          name: 'execute_se_explicit_wait',
           arguments: {
             targetUrl: longUrl,
             condition: 'elementToBeClickable',
@@ -256,7 +256,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 12,
         method: 'tools/call',
         params: {
-          name: 'execute_selenium_wait',
+          name: 'execute_se_explicit_wait',
           arguments: {
             targetUrl: 'https://example.com',
             condition: 'elementToBeClickable',
@@ -279,7 +279,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 13,
         method: 'tools/call',
         params: {
-          name: 'execute_cdp_network_interception',
+          name: 'execute_se_cdp_intercept',
           arguments: {
             targetUrl: 'https://example.com',
             urlPattern: '*/' + 'p'.repeat(1024),
@@ -302,7 +302,7 @@ test('MCP HTTP transport protocol tests', async (t) => {
         id: 14,
         method: 'tools/call',
         params: {
-          name: 'execute_cdp_network_interception',
+          name: 'execute_se_cdp_intercept',
           arguments: {
             targetUrl: 'https://example.com',
             urlPattern: '*/api/*',

@@ -1,5 +1,5 @@
 {
-  "name": "awesome-sdet-selenium-mcp",
+  "name": "sdet-mcp",
   "version": "1.0.0",
   "description": "Modular, test-framework-based MCP server following official modelcontextprotocol/servers architecture",
   "type": "module",

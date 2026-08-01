@@ -5,15 +5,16 @@ import {
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
 } from './selenium/index.js';
+import { handlePageFactoryApiReference, PageFactoryApiQuerySchema } from './pagefactory/index.js';
 
 export function createSdetMcpServer(): McpServer {
   const server = new McpServer({
-    name: 'awesome-sdet-selenium-mcp',
+    name: 'sdet-mcp',
     version: '1.0.0',
   });
 
   server.registerTool(
-    'execute_selenium_wait',
+    'execute_se_explicit_wait',
     {
       description:
         'Statelessly validates and reports requests for a Selenium ExpectedConditions explicit wait without executing a browser',
@@ -23,13 +24,23 @@ export function createSdetMcpServer(): McpServer {
   );
 
   server.registerTool(
-    'execute_cdp_network_interception',
+    'execute_se_cdp_intercept',
     {
       description:
         'Statelessly validates and reports requests for Chrome DevTools Protocol (CDP) network request interception without executing a browser',
       inputSchema: CdpNetworkInterceptionSchema.shape,
     },
     async () => handleCdpNetworkInterception()
+  );
+
+  server.registerTool(
+    'read_pagefactory_docs',
+    {
+      description:
+        'Looks up complete API references for Selenium PageFactory, annotations, and locator factories',
+      inputSchema: PageFactoryApiQuerySchema.shape,
+    },
+    async (args) => handlePageFactoryApiReference(args)
   );
 
   return server;
