@@ -1,2 +1,2 @@
-export * from '@/selenium/waits/index.js';
-export * from '@/selenium/cdp/index.js';
+export * from './waits/index.js';
+export * from './cdp/index.js';

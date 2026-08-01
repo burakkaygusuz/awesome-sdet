@@ -1,192 +1,63 @@
 import http from 'node:http';
-import {
-  handleCdpNetworkInterception,
-  handleSeleniumWait,
-  type CdpNetworkInterceptionArgs,
-  type SeleniumWaitArgs,
-} from '@/selenium/index.js';
+import { pathToFileURL } from 'node:url';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { createSdetMcpServer } from './server.js';
 
-const PORT = Number(process.env.PORT) || 3000;
+const rawPort = process.env.PORT;
+const PORT = rawPort === undefined ? 3000 : Number(rawPort);
 
-export async function handleStatelessHttpRequest(reqBody: string) {
-  const jsonRpcRequest = JSON.parse(reqBody);
-  const { id, method, params } = jsonRpcRequest;
+export function createHttpServer() {
+  return http.createServer(async (req, res) => {
+    const allowedHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-  if (method === 'tools/list') {
-    return {
-      jsonrpc: '2.0',
-      id,
-      result: {
-        tools: [
-          {
-            name: 'execute_selenium_wait',
-            description:
-              'Statelessly verifies a Selenium ExpectedConditions explicit wait condition',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                targetUrl: { type: 'string' },
-                condition: {
-                  type: 'string',
-                  enum: [
-                    'elementToBeClickable',
-                    'visibilityOfElementLocated',
-                    'presenceOfElementLocated',
-                    'invisibilityOfElementLocated',
-                    'textToBePresentInElement',
-                    'textToBePresentInElementLocated',
-                    'textToBe',
-                    'titleIs',
-                    'titleContains',
-                    'urlToBe',
-                    'urlContains',
-                    'urlMatches',
-                    'alertIsPresent',
-                    'frameToBeAvailableAndSwitchToIt',
-                    'elementToBeSelected',
-                    'stalenessOf',
-                    'numberOfElementsToBe',
-                    'numberOfElementsToBeMoreThan',
-                    'numberOfElementsToBeLessThan',
-                    'numberOfWindowsToBe',
-                    'attributeToBe',
-                    'attributeContains',
-                    'attributeToBeNotEmpty',
-                    'domAttributeToBe',
-                    'domPropertyToBe',
-                  ],
-                },
-                locator: {
-                  type: 'object',
-                  properties: {
-                    by: {
-                      type: 'string',
-                      enum: [
-                        'id',
-                        'name',
-                        'className',
-                        'class',
-                        'cssSelector',
-                        'css',
-                        'xpath',
-                        'tagName',
-                        'tag',
-                        'linkText',
-                        'link',
-                        'partialLinkText',
-                        'partialLink',
-                      ],
-                    },
-                    value: { type: 'string' },
-                  },
-                  required: ['by', 'value'],
-                },
-                timeoutSeconds: { type: 'number' },
-              },
-              required: ['targetUrl', 'condition', 'locator'],
-            },
-          },
-          {
-            name: 'execute_cdp_network_interception',
-            description:
-              'Statelessly configures or verifies Chrome DevTools Protocol (CDP) network request interception',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                targetUrl: { type: 'string' },
-                urlPattern: { type: 'string' },
-                action: {
-                  type: 'string',
-                  enum: [
-                    'mockResponse',
-                    'blockRequest',
-                    'failRequest',
-                    'continueRequest',
-                    'modifyHeaders',
-                    'injectBasicAuth',
-                    'recordTraffic',
-                  ],
-                },
-                mockStatus: { type: 'number' },
-                mockResponseBody: { type: 'string' },
-                headers: { type: 'object' },
-                authCredentials: {
-                  type: 'object',
-                  properties: {
-                    username: { type: 'string' },
-                    password: { type: 'string' },
-                  },
-                  required: ['username', 'password'],
-                },
-                errorReason: {
-                  type: 'string',
-                  enum: ['Failed', 'Aborted', 'AccessDenied', 'ConnectionRefused'],
-                },
-              },
-              required: ['targetUrl', 'urlPattern', 'action'],
-            },
-          },
-        ],
-      },
-    };
-  }
+    if (req.method === 'POST' && req.url === '/mcp') {
+      let hostName: string;
+      const hostHeader = req.headers.host || '';
+      if (hostHeader.startsWith('[::1]')) {
+        hostName = '[::1]';
+      } else {
+        hostName = hostHeader.split(':')[0];
+      }
 
-  if (method === 'tools/call') {
-    const { name, arguments: args } = params;
-    if (name === 'execute_selenium_wait') {
-      const toolResult = handleSeleniumWait(args as SeleniumWaitArgs);
-      return {
-        jsonrpc: '2.0',
-        id,
-        result: toolResult,
-      };
+      const originHeader = req.headers.origin;
+      let originName = '';
+      if (originHeader) {
+        try {
+          originName = new URL(originHeader).hostname;
+        } catch {
+          // ignore parsing errors
+        }
+      }
+
+      if (!allowedHosts.has(hostName) || (originHeader && !allowedHosts.has(originName))) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' });
+        res.end('Forbidden: non-local host/origin');
+        return;
+      }
+
+      const mcpServer = createSdetMcpServer();
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+      });
+      await mcpServer.connect(transport);
+      await transport.handleRequest(req, res);
+      return;
     }
-    if (name === 'execute_cdp_network_interception') {
-      const toolResult = handleCdpNetworkInterception(args as CdpNetworkInterceptionArgs);
-      return {
-        jsonrpc: '2.0',
-        id,
-        result: toolResult,
-      };
-    }
-  }
 
-  return {
-    jsonrpc: '2.0',
-    id,
-    error: { code: -32601, message: `Method not found: ${method}` },
-  };
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  });
 }
 
-const httpServer = http.createServer(async (req, res) => {
-  if (req.method === 'POST' && req.url === '/mcp') {
-    let body = '';
-    req.on('data', (chunk: Buffer) => {
-      body += chunk.toString();
-    });
-
-    req.on('end', async () => {
-      try {
-        const result = await handleStatelessHttpRequest(body);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'Invalid request';
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32600, message: msg } }));
-      }
-    });
-    return;
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+    throw new Error(`Invalid PORT: "${rawPort}" — must be an integer between 1 and 65535`);
   }
-
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not Found');
-});
-
-if (process.env.NODE_ENV !== 'test') {
-  httpServer.listen(PORT, () => {
+  const httpServer = createHttpServer();
+  // Note: Changing to a non-loopback deployment requires authenticated transport (OAuth 2.0/OIDC or equivalent gateway) and a separate threat-model review.
+  httpServer.listen(PORT, '127.0.0.1', () => {
     console.log(
-      `[MCP 2026-07-28 Spec] Stateless SDET Selenium MCP Server running on http://localhost:${PORT}/mcp`
+      `[MCP 2026-07-28 Spec] Stateless SDET Selenium MCP Server running on http://127.0.0.1:${PORT}/mcp`
     );
   });
 }

@@ -4,7 +4,7 @@ import {
   handleSeleniumWait,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
-} from '@/selenium/index.js';
+} from './selenium/index.js';
 
 export function createSdetMcpServer(): McpServer {
   const server = new McpServer({
@@ -15,20 +15,21 @@ export function createSdetMcpServer(): McpServer {
   server.registerTool(
     'execute_selenium_wait',
     {
-      description: 'Statelessly verifies a Selenium ExpectedConditions explicit wait condition',
+      description:
+        'Statelessly validates and reports requests for a Selenium ExpectedConditions explicit wait without executing a browser',
       inputSchema: SeleniumWaitSchema.shape,
     },
-    async (args) => handleSeleniumWait(args)
+    async () => handleSeleniumWait()
   );
 
   server.registerTool(
     'execute_cdp_network_interception',
     {
       description:
-        'Statelessly configures or verifies Chrome DevTools Protocol (CDP) network request interception',
+        'Statelessly validates and reports requests for Chrome DevTools Protocol (CDP) network request interception without executing a browser',
       inputSchema: CdpNetworkInterceptionSchema.shape,
     },
-    async (args) => handleCdpNetworkInterception(args)
+    async () => handleCdpNetworkInterception()
   );
 
   return server;
