@@ -33,7 +33,7 @@ WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By
 | **Logic**         | `and`, `or`, `not`                                             | Combine multiple conditions for complex synchronization.       |
 | **Frames/Alerts** | `frameToBeAvailableAndSwitchToIt`, `alertIsPresent`            | Handle switching to frames or waiting for alerts.              |
 
-> **Full Method List:** For the complete list of all 50+ methods including specific parameters and return types, read the reference file: `references/methods.md` (located alongside this SKILL.md, inside the skill's own directory).
+> **Dynamic Tool Schemas & Enums:** The complete list of 25+ supported `ExpectedConditions` and locator strategies is served dynamically by the `awesome-sdet-selenium-mcp` server (`execute_selenium_wait` tool).
 
 ## Best Practices
 

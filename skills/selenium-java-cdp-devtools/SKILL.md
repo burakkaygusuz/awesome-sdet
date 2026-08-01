@@ -9,7 +9,7 @@ metadata:
 
 ## Scope and source
 
-Java bindings for `org.openqa.selenium.devtools`, condensed from the [official Selenium docs](https://www.selenium.dev/documentation/webdriver/bidi/cdp/) and [Javadoc](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/devtools/package-summary.html). This file covers the everyday recipes; [`references/api-references.md`](references/api-references.md) has the complete class and method listing — read it only when you need an exact signature, an overload, or a class not covered by a recipe below.
+Java bindings for `org.openqa.selenium.devtools`, condensed from the [official Selenium docs](https://www.selenium.dev/documentation/webdriver/bidi/cdp/) and [Javadoc](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/devtools/package-summary.html). This file covers the everyday recipes; complete schemas and parameters are served dynamically via the MCP server.
 
 **CDP is a stopgap, not the long-term API.** CDP has no stable contract across Chrome versions and only works on Chromium-based browsers (Chrome, Edge). Selenium is migrating this functionality to the cross-browser, standards-based **WebDriver BiDi** protocol. If the user's task doesn't specifically require CDP-only features, mention that the BiDi equivalents
 `org.openqa.selenium.bidi.*`, e.g. `Network`, `Log`, `Script` under the BiDi package) are the forward-looking choice — but CDP remains the only option for Performance metrics, script pinning, and a few other domains BiDi hasn't covered yet.
@@ -232,7 +232,7 @@ wait.until(_d -> completed.get());
 Command/event domain classes (`Network`, `Performance`, `Browser`, `Page`, ...) live under a
 Chrome-version-pinned package (e.g. `org.openqa.selenium.devtools.v150.network.Network`) or the stable alias package `org.openqa.selenium.devtools.latest.*` (provided by the `selenium-devtools-latest` artifact, e.g. `import org.openqa.selenium.devtools.latest.network.Network;`).
 
-Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating import paths on every Chrome version bump. If using version-pinned packages directly, Selenium supports the 3 most recent Chrome versions at a time — check the installed Selenium version's Javadoc for the active `vNNN` package. `CdpVersionFinder`/`CdpInfo` (see [`references/api-references.md`](references/api-references.md)) handle this matching automatically inside `getDevTools()`.
+Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating import paths on every Chrome version bump. If using version-pinned packages directly, Selenium supports the 3 most recent Chrome versions at a time — check the installed Selenium version's Javadoc for the active `vNNN` package. `CdpVersionFinder`/`CdpInfo` handle this matching automatically inside `getDevTools()`.
 
 ## Cleanup checklist
 
@@ -249,10 +249,6 @@ Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating imp
 - CDP methods/params can change between Chrome versions with no deprecation warning — pin CI to a
   specific Chrome version if a test depends on exact CDP behavior.
 
-## Full API reference
+## Dynamic Tool Schemas & API Reference
 
-[`references/api-references.md`](references/api-references.md) — every class and interface in `org.openqa.selenium.devtools` with
-full method signatures, constructors, and short descriptions (`DevTools`, `HasDevTools`,
-`Command<X>`, `Event<X>`, `Connection`, `SeleniumCdpConnection`, `NetworkInterceptor`,
-`CdpVersionFinder`, `CdpInfo`, `CdpEndpointFinder`, `Message`, `Reply`, `ConverterFunctions`,
-`DevToolsException`, `RequestFailedException`, `DevToolsProvider`).
+Complete tool schemas, input parameters, and CDP domain specifications are exposed dynamically via the `awesome-sdet-selenium-mcp` server (`tools/list`).
