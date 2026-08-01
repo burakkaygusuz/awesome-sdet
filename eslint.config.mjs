@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import markdown from '@eslint/markdown';
 import markdownlint from 'eslint-plugin-markdownlint';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default defineConfig([
   {
@@ -12,6 +13,15 @@ export default defineConfig([
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     ...js.configs.recommended,
+  },
+  {
+    files: ['**/test/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.nodeBuiltin,
+      },
+    },
   },
   ...tseslint.configs.recommended,
   {
