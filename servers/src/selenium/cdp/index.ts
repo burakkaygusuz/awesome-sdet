@@ -11,16 +11,16 @@ export const CdpNetworkActionSchema = z.enum([
 ]);
 
 export const CdpNetworkInterceptionSchema = z.object({
-  targetUrl: z.string(),
-  urlPattern: z.string(),
+  targetUrl: z.string().max(2048),
+  urlPattern: z.string().max(1024),
   action: CdpNetworkActionSchema,
-  mockStatus: z.number().optional().default(200),
-  mockResponseBody: z.string().optional(),
-  headers: z.record(z.string(), z.string()).optional(),
+  mockStatus: z.number().int().min(100).max(599).optional().default(200),
+  mockResponseBody: z.string().max(4096).optional(),
+  headers: z.record(z.string().max(256), z.string().max(1024)).optional(),
   authCredentials: z
     .object({
-      username: z.string(),
-      password: z.string(),
+      username: z.string().max(256),
+      password: z.string().max(256),
     })
     .optional(),
   errorReason: z.enum(['Failed', 'Aborted', 'AccessDenied', 'ConnectionRefused']).optional(),
@@ -28,31 +28,12 @@ export const CdpNetworkInterceptionSchema = z.object({
 
 export type CdpNetworkInterceptionArgs = z.infer<typeof CdpNetworkInterceptionSchema>;
 
-export function handleCdpNetworkInterception(args: CdpNetworkInterceptionArgs) {
-  const {
-    targetUrl,
-    urlPattern,
-    action,
-    mockStatus = 200,
-    mockResponseBody,
-    authCredentials,
-    errorReason,
-  } = args;
-
-  let extraDetails = '';
-  if (action === 'injectBasicAuth' && authCredentials) {
-    extraDetails = ` with username '${authCredentials.username}'`;
-  } else if (action === 'failRequest' && errorReason) {
-    extraDetails = ` with error reason '${errorReason}'`;
-  } else if (mockResponseBody) {
-    extraDetails = ` with mock status ${mockStatus} and custom body`;
-  }
-
+export function handleCdpNetworkInterception() {
   return {
     content: [
       {
         type: 'text' as const,
-        text: `[MCP 2026-07-28 Stateless Core] CDP Network interception rule '${action}' configured for pattern '${urlPattern}' on URL '${targetUrl}'${extraDetails}.`,
+        text: 'Request schema validated; no CDP session or traffic interception occurred.',
       },
     ],
   };

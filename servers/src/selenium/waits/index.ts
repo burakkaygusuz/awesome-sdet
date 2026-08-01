@@ -45,25 +45,23 @@ export const SeleniumExpectedConditionSchema = z.enum([
 ]);
 
 export const SeleniumWaitSchema = z.object({
-  targetUrl: z.string(),
+  targetUrl: z.string().max(2048),
   condition: SeleniumExpectedConditionSchema,
   locator: z.object({
     by: SeleniumByStrategySchema,
-    value: z.string(),
+    value: z.string().max(512),
   }),
-  timeoutSeconds: z.number().optional().default(10),
+  timeoutSeconds: z.number().int().min(1).max(120).optional().default(10),
 });
 
 export type SeleniumWaitArgs = z.infer<typeof SeleniumWaitSchema>;
 
-export function handleSeleniumWait(args: SeleniumWaitArgs) {
-  const { targetUrl, condition, locator, timeoutSeconds = 10 } = args;
-
+export function handleSeleniumWait() {
   return {
     content: [
       {
         type: 'text' as const,
-        text: `[MCP 2026-07-28 Stateless Core] Condition '${condition}' on locator (${locator.by}="${locator.value}") for URL '${targetUrl}' verified successfully (timeout: ${timeoutSeconds}s).`,
+        text: 'Request schema validated; no browser was driven.',
       },
     ],
   };
