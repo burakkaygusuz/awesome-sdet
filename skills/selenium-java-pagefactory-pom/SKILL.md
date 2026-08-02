@@ -1,6 +1,6 @@
 ---
 name: selenium-java-pagefactory-pom
-description: Use for Java Selenium Page Object Model (POM) and PageFactory work — organizing locators/actions into page classes, `@FindBy`/`@FindBys`/`@FindAll`/`@CacheLookup` annotations, `PageFactory.initElements`, `AjaxElementLocatorFactory` for implicit per-element waits, or a custom `ElementLocatorFactory`/`FieldDecorator`. Trigger on mentions of PageFactory, Page Object Model, POM, @FindBy, @FindBys, @FindAll, @CacheLookup, the How enum, ElementLocator, ElementLocatorFactory, FieldDecorator, ByAll, ByChained, or building/reviewing Selenium page classes. Also use for the full class/method list of `org.openqa.selenium.support` and `org.openqa.selenium.support.pagefactory`.
+description: Use for Java Selenium Page Object Model (POM) and PageFactory work — organizing locators/actions into page classes, `@FindBy`/`@FindBys`/`@FindAll`/`@CacheLookup` annotations, `PageFactory.initElements`, `AjaxElementLocatorFactory` for implicit per-element waits, or a custom `ElementLocatorFactory`/`FieldDecorator`. Trigger on mentions of PageFactory, Page Object Model, POM, @FindBy, @FindBys, @FindAll, @CacheLookup, the How enum, ElementLocator, ElementLocatorFactory, FieldDecorator, ByAll, ByChained, or building/reviewing Selenium page classes.
 metadata:
   keywords: ['selenium', 'java', 'pagefactory', 'pom', 'testing']
 ---

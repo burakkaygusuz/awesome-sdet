@@ -1,6 +1,6 @@
 ---
 name: selenium-java-loadable-component
-description: Use for Java Selenium Page Objects needing a standard load/verify lifecycle — the LoadableComponent pattern (`org.openqa.selenium.support.ui.LoadableComponent`). Trigger on mentions of LoadableComponent, SlowLoadableComponent, `load()`/`isLoaded()`/`get()` page-object methods, chaining page-object preconditions (e.g. login-then-navigate), nested/parent page objects, or waiting for a page to finish loading before assertions run. Also use to explain, implement, or refactor a Page Object into this pattern, or for the full method list of `LoadableComponent`/`SlowLoadableComponent`.
+description: Use for Java Selenium Page Objects needing a standard load/verify lifecycle — the LoadableComponent pattern (`org.openqa.selenium.support.ui.LoadableComponent`). Trigger on mentions of LoadableComponent, SlowLoadableComponent, `load()`/`isLoaded()`/`get()` page-object methods, chaining page-object preconditions (e.g. login-then-navigate), nested/parent page objects, or waiting for a page to finish loading before assertions run. Also use to explain, implement, or refactor a Page Object into this pattern.
 metadata:
   keywords: ['selenium', 'java', 'loadable-component', 'testing']
 ---

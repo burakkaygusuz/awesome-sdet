@@ -1,6 +1,6 @@
 ---
 name: selenium-java-cdp-devtools
-description: Use for Java Selenium tasks involving Chrome DevTools Protocol (CDP) — cookies via CDP, network request/response interception or stubbing, basic-auth injection, console log/JS exception capture, DOM mutation listening, script pinning, performance metrics, or waiting on downloads. Trigger on mentions of DevTools, CDP, HasDevTools, NetworkInterceptor, org.openqa.selenium.devtools, or a bare CDP domain/method (e.g. "Network.setCookie", "Performance.getMetrics") even without "Selenium" mentioned. Also use for the full class/method list of org.openqa.selenium.devtools. Java bindings only (ChromeDriver/EdgeDriver/Chromium drivers); CDP is being phased out for WebDriver BiDi.
+description: Use for Java Selenium tasks involving Chrome DevTools Protocol (CDP) — cookies via CDP, network request/response interception or stubbing, basic-auth injection, console log/JS exception capture, DOM mutation listening, script pinning, performance metrics, or waiting on downloads. Trigger on mentions of DevTools, CDP, HasDevTools, NetworkInterceptor, org.openqa.selenium.devtools, or a bare CDP domain/method (e.g. "Network.setCookie", "Performance.getMetrics") even without "Selenium" mentioned. Java bindings only (ChromeDriver/EdgeDriver/Chromium drivers); CDP is being phased out for WebDriver BiDi.
 metadata:
   keywords: ['selenium', 'cdp', 'devtools', 'chrome-devtools-protocol', 'java', 'testing']
 ---
