@@ -3,9 +3,11 @@ import {
   handleCdpNetworkInterception,
   handleSeleniumWait,
   handlePageFactoryDocs,
+  handleLocatorDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
+  LocatorDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -68,6 +70,16 @@ export function createMcpServer(): McpServer {
       inputSchema: PageFactoryDocsSchema.shape,
     },
     safeToolHandler((args) => handlePageFactoryDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_locator_docs',
+    {
+      description:
+        'Looks up complete Selenium locator strategy guides, performance hierarchies, best practices, and multi-language code examples (Java, Python, TypeScript, JavaScript, C#, Ruby)',
+      inputSchema: LocatorDocsSchema.shape,
+    },
+    safeToolHandler((args) => handleLocatorDocs(args))
   );
 
   return server;

@@ -1,0 +1,45 @@
+# Selenium Locator Strategies — Java API Reference (Java 17+ & Selenium 4.46.0+)
+
+> Official Selenium 4 Java locator strategies (`org.openqa.selenium.By` & `org.openqa.selenium.support.locators.RelativeLocator`).
+
+---
+
+## Java Code Examples (Selenium 4)
+
+```java
+package com.example.locators;
+
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.name;
+import static org.openqa.selenium.By.tagName;
+import static org.openqa.selenium.By.xpath;
+import static org.openqa.selenium.support.locators.RelativeLocator.with;
+
+import java.util.List;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class LocatorExamples {
+
+    public void demonstrateLocators(WebDriver driver) {
+        // 1. By ID (Recommended)
+        WebElement username = driver.findElement(id("username"));
+
+        // 2. By CSS Selector
+        WebElement submitBtn = driver.findElement(cssSelector("button.btn-success[type='submit']"));
+
+        // 3. By Name & ClassName
+        WebElement emailInput = driver.findElement(name("email"));
+        List<WebElement> cardItems = driver.findElements(className("card-item"));
+
+        // 4. By XPath (Relative)
+        WebElement dynamicCell = driver.findElement(xpath("//tr[td[text()='Active']]//button"));
+
+        // 5. Selenium 4 Relative Locators (Spatial)
+        WebElement passwordInput = driver.findElement(with(tagName("input")).below(username));
+        WebElement cancelButton = driver.findElement(with(tagName("button")).toLeftOf(submitBtn));
+    }
+}
+```

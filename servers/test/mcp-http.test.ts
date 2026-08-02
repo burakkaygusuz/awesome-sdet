@@ -71,16 +71,17 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_pagefactory_docs')).toBe(true);
+      expect(toolNames.has('read_se_locator_docs')).toBe(true);
 
       const callResponse = await client.callTool({
-        name: 'read_pagefactory_docs',
-        arguments: { className: 'AjaxElementLocator' },
+        name: 'read_se_locator_docs',
+        arguments: { strategy: 'relativeLocators', language: 'python' },
       });
 
       const content = callResponse.content as Array<{ type: string; text?: string }> | undefined;
       expect(content).toBeDefined();
       const text = content?.[0]?.text || '';
-      expect(text).toContain('AjaxElementLocator');
+      expect(text).toContain('locate_with');
 
       await client.close();
     });
@@ -127,6 +128,34 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_pagefactory_docs')).toBe(true);
+      expect(toolNames.has('read_se_locator_docs')).toBe(true);
+    });
+
+    it('tools/call - read_se_locator_docs by strategy & language', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 40,
+          method: 'tools/call',
+          params: {
+            name: 'read_se_locator_docs',
+            arguments: {
+              strategy: 'xpath',
+              language: 'typescript',
+            },
+          },
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect(data.jsonrpc).toBe('2.0');
+      expect(data.id).toBe(40);
+      expect(data.result).toBeDefined();
+      const text = data.result?.content?.[0]?.text || '';
+      expect(text).toContain('By.xpath');
     });
 
     it('tools/call - read_pagefactory_docs by className', async () => {
