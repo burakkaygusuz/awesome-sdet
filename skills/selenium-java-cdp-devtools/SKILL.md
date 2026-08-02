@@ -135,7 +135,7 @@ try (NetworkInterceptor ignored =
           contentType.add(res.getHeader("Content-Type"));
           return res;
         })) {
-  driver.get("https://www.selenium.dev/selenium/web/blank.html");
+  driver.get("https://example.com");
   wait.until(_d -> contentType.size() > 0);
 }
 ```
@@ -152,7 +152,7 @@ try (NetworkInterceptor ignored =
                 .setStatus(200)
                 .addHeader("Content-Type", MediaType.HTML_UTF_8.toString())
                 .setContent(Contents.utf8String("Creamy, delicious cheese!"))))) {
-  driver.get("https://www.selenium.dev/selenium/web/blank.html");
+  driver.get("https://example.com");
 }
 ```
 
@@ -168,7 +168,7 @@ try (NetworkInterceptor ignored =
           }
           return next.execute(req);
         })) {
-  driver.get("https://www.selenium.dev/selenium/web/devToolsRequestInterceptionTest.html");
+  driver.get("https://the-internet.herokuapp.com");
   driver.findElement(By.tagName("button")).click();
 }
 ```

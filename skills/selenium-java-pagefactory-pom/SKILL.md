@@ -62,18 +62,18 @@ Use when you want the simplest, most explicit code — no proxies, no annotation
 constants are compiler-checked and greppable.
 
 ```java
-package browserStackPages;
+package com.example.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class BrowserStackHomePage {
+public class HomePage {
 
   private final WebDriver driver;
   private final By header = By.xpath("//h1");
   private final By getStarted = By.xpath("//*[@id='signupModalButton']");
 
-  public BrowserStackHomePage(WebDriver driver) {
+  public HomePage(WebDriver driver) {
     this.driver = driver;
   }
 
@@ -96,7 +96,7 @@ Use once a page has enough fields that repeating `driver.findElement` everywhere
 Call `PageFactory.initElements(driver, this)` in the constructor; fields become lazy proxies.
 
 ```java
-package browserStackPages;
+package com.example.pages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
