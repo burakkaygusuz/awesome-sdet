@@ -1,27 +1,29 @@
 import fs from 'node:fs';
 import { z } from 'zod';
 
-export const PageFactoryClassSchema = z.enum([
-  'PageFactory',
-  'FindBy',
-  'FindBys',
-  'FindAll',
-  'CacheLookup',
-  'How',
-  'ByIdOrName',
-  'ElementLocator',
-  'ElementLocatorFactory',
-  'DefaultElementLocator',
-  'DefaultElementLocatorFactory',
-  'AjaxElementLocator',
-  'AjaxElementLocatorFactory',
-  'FieldDecorator',
-  'DefaultFieldDecorator',
-  'ByAll',
-  'ByChained',
-  'Annotations',
-  'AbstractAnnotations',
-]);
+export const PageFactoryClassSchema = z
+  .enum([
+    'PageFactory',
+    'FindBy',
+    'FindBys',
+    'FindAll',
+    'CacheLookup',
+    'How',
+    'ByIdOrName',
+    'ElementLocator',
+    'ElementLocatorFactory',
+    'DefaultElementLocator',
+    'DefaultElementLocatorFactory',
+    'AjaxElementLocator',
+    'AjaxElementLocatorFactory',
+    'FieldDecorator',
+    'DefaultFieldDecorator',
+    'ByAll',
+    'ByChained',
+    'Annotations',
+    'AbstractAnnotations',
+  ])
+  .describe('Selenium PageFactory class or annotation name.');
 
 export const PageFactoryDocsSchema = z.object({
   className: PageFactoryClassSchema.optional().describe(
