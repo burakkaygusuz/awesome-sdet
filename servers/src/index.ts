@@ -1,7 +1,7 @@
 import http from 'node:http';
 import { pathToFileURL } from 'node:url';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createSdetMcpServer } from './server.js';
+import { createMcpServer } from './server.js';
 
 const rawPort = process.env.PORT;
 const PORT = rawPort === undefined ? 3000 : Number(rawPort);
@@ -63,12 +63,27 @@ export async function handleMcpPostRequest(
   res.setHeader('Access-Control-Allow-Origin', originHeader || '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-mcp-session-id');
 
-  const mcpServer = createSdetMcpServer();
-  const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-  });
-  await mcpServer.connect(transport);
-  await transport.handleRequest(req, res);
+  try {
+    const mcpServer = createMcpServer();
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          error: {
+            code: -32603,
+            message: `Internal Server Error: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        })
+      );
+    }
+  }
 }
 
 export function createHttpServer() {
