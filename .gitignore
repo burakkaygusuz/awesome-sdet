@@ -1,5 +1,5 @@
 # Superpowers specs and plans must never be committed
-docs/
+docs/superpowers/
 
 # Dependencies
 node_modules/
