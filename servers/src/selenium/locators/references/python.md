@@ -4,7 +4,7 @@
 
 ---
 
-## Python Code Examples (Selenium 4)
+## Code Examples
 
 ```python
 from selenium.webdriver.common.by import By

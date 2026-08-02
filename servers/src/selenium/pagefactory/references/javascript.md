@@ -4,7 +4,7 @@
 
 ---
 
-## JavaScript Page Object Pattern (Selenium 4)
+## Code Examples
 
 ```javascript
 const { By, until } = require('selenium-webdriver');
@@ -54,7 +54,7 @@ module.exports = { LoginPage };
 
 ---
 
-## Best Practices for JavaScript Selenium POM
+## Best Practices
 
 1. **JSDoc Comments**: Annotate constructor parameter with `@param {WebDriver}` for IDE autocompletion.
 2. **ES6 Classes**: Use ES6 `class` syntax exported via `module.exports` or `export default`.

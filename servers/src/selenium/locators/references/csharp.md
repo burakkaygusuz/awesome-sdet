@@ -4,7 +4,7 @@
 
 ---
 
-## C# Code Examples (Selenium 4 & C# 12)
+## Code Examples
 
 ```csharp
 using System;

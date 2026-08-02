@@ -4,7 +4,7 @@
 
 ---
 
-## Ruby Code Examples (Selenium 4)
+## Code Examples
 
 ```ruby
 require 'selenium-webdriver'

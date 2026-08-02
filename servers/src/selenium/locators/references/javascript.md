@@ -4,7 +4,7 @@
 
 ---
 
-## JavaScript Code Examples (Selenium 4)
+## Code Examples
 
 ```javascript
 const { By, locateWith } = require('selenium-webdriver');

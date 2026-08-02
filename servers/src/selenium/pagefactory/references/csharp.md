@@ -4,7 +4,7 @@
 
 ---
 
-## C# Page Object Pattern (Selenium 4 & C# 12)
+## Code Examples
 
 ```csharp
 using System;
@@ -50,7 +50,7 @@ namespace Com.Example.Pages
 
 ---
 
-## Best Practices for C# Selenium POM
+## Best Practices
 
 1. **`using static OpenQA.Selenium.By`**: Enables calling `Id(...)`, `CssSelector(...)` directly without `By.` prefix.
 2. **C# 12 Primary Constructors**: Use `public class LoginPage(IWebDriver driver)` for concise parameter passing without boilerplate backing fields in .NET 8+.

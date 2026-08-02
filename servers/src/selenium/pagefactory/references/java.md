@@ -4,7 +4,7 @@
 
 ---
 
-## Java Page Object Pattern (Selenium 4)
+## Code Examples
 
 ```java
 package com.example.pages;

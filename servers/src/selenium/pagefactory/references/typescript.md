@@ -4,7 +4,7 @@
 
 ---
 
-## TypeScript Page Object Pattern (Selenium 4)
+## Code Examples
 
 ```typescript
 import { By, until, WebDriver, WebElement } from 'selenium-webdriver';
@@ -56,7 +56,7 @@ export class LoginPage {
 
 ---
 
-## Best Practices for TypeScript Selenium POM
+## Best Practices
 
 1. **Async/Await**: All DOM interactions return `Promise<T>`. Always await locator calls.
 2. **Private Locators**: Declare locator strategies (`By.id`, `By.css`) as `private readonly` class fields.

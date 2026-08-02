@@ -4,7 +4,7 @@
 
 ---
 
-## Python Page Object Pattern (Selenium 4)
+## Code Examples
 
 ```python
 from selenium.webdriver.common.by import By
@@ -47,7 +47,7 @@ class LoginPage:
 
 ---
 
-## Best Practices for Python Selenium POM
+## Best Practices
 
 1. **Tuple Locators**: Store locators as `(By.<STRATEGY>, "selector_value")` class constants.
 2. **Unpacking**: Unpack locators into `driver.find_element(*self.LOCATOR)`.

@@ -4,7 +4,7 @@
 
 ---
 
-## Java Code Examples (Selenium 4)
+## Code Examples
 
 ```java
 package com.example.locators;

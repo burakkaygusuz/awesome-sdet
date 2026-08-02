@@ -4,7 +4,7 @@
 
 ---
 
-## Ruby Page Object Pattern (Selenium 4)
+## Code Examples
 
 ```ruby
 require 'selenium-webdriver'
@@ -48,7 +48,7 @@ end
 
 ---
 
-## Best Practices for Ruby Selenium POM
+## Best Practices
 
 1. **Hash Locators**: Define locator constants as `{ id: 'username' }` or `{ css: 'button' }`.
 2. **Method Chaining**: Return `self` from input wrapper methods.

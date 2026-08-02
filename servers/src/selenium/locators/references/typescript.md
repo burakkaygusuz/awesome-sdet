@@ -4,7 +4,7 @@
 
 ---
 
-## TypeScript Code Examples (Selenium 4)
+## Code Examples
 
 ```typescript
 import { By, locateWith, WebDriver, WebElement } from 'selenium-webdriver';
