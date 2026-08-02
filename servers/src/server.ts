@@ -64,7 +64,7 @@ export function createMcpServer(): McpServer {
     'read_pagefactory_docs',
     {
       description:
-        'Looks up complete API references for Selenium PageFactory, annotations, and locator factories',
+        'Looks up complete API references for Selenium PageFactory, annotations, and multi-language Page Object Model (POM) patterns (Java, Python, TypeScript, JavaScript, C#, Ruby)',
       inputSchema: PageFactoryDocsSchema.shape,
     },
     safeToolHandler((args) => handlePageFactoryDocs(args))

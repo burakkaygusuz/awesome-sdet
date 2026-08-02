@@ -1,6 +1,12 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
 
+export const SupportedLanguageSchema = z
+  .enum(['java', 'python', 'typescript', 'javascript', 'csharp', 'ruby'])
+  .describe('Target programming language for Page Object Model / PageFactory patterns.');
+
+export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
+
 export const PageFactoryClassSchema = z
   .enum([
     'PageFactory',
@@ -29,16 +35,16 @@ export const PageFactoryDocsSchema = z.object({
   className: PageFactoryClassSchema.optional().describe(
     'Optional Selenium PageFactory class or annotation to look up (e.g. "PageFactory", "AjaxElementLocator", "FindBy"). Omit to receive the full reference.'
   ),
+  language: SupportedLanguageSchema.optional().describe(
+    'Target programming language for Page Object Model patterns: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
+  ),
 });
 
 export type PageFactoryDocsArgs = z.infer<typeof PageFactoryDocsSchema>;
-
 export type PageFactoryClass = z.infer<typeof PageFactoryClassSchema>;
 
-const REFERENCE_MARKDOWN_PATH = new URL('./reference.md', import.meta.url);
-
-let cachedMarkdown: string | null = null;
-let cachedEntries: Record<PageFactoryClass, string> | null = null;
+const languageCache: Map<SupportedLanguage, string> = new Map();
+const entryCache: Map<string, string> = new Map();
 
 export function parseMarkdownSections(raw: string): Record<string, string> {
   const sections = raw.split(/\n(?=### )/);
@@ -48,40 +54,45 @@ export function parseMarkdownSections(raw: string): Record<string, string> {
     const match = new RegExp(/^### (@?\w+)/).exec(section);
     if (match?.[1]) {
       const key = match[1].startsWith('@') ? match[1].slice(1) : match[1];
-      map[key] = section.trim();
+      map[key.toLowerCase()] = section.trim();
     }
   }
 
   return map;
 }
 
-export async function loadPageFactoryMarkdown(): Promise<string> {
-  if (!cachedMarkdown) {
-    cachedMarkdown = await fs.readFile(REFERENCE_MARKDOWN_PATH, 'utf8');
+export async function loadLanguageMarkdown(language: SupportedLanguage): Promise<string> {
+  if (!languageCache.has(language)) {
+    const filePath = new URL(`./references/${language}.md`, import.meta.url);
+    const content = await fs.readFile(filePath, 'utf8');
+    languageCache.set(language, content);
   }
-  return cachedMarkdown;
+  return languageCache.get(language)!;
 }
 
-export async function loadPageFactoryEntries(): Promise<Record<PageFactoryClass, string>> {
-  if (!cachedEntries) {
-    const raw = await loadPageFactoryMarkdown();
-    cachedEntries = parseMarkdownSections(raw) as Record<PageFactoryClass, string>;
+export async function loadPageFactoryEntries(): Promise<Record<string, string>> {
+  if (entryCache.size === 0) {
+    const rawJava = await loadLanguageMarkdown('java');
+    const parsed = parseMarkdownSections(rawJava);
+    for (const [k, v] of Object.entries(parsed)) {
+      entryCache.set(k, v);
+    }
   }
-  return cachedEntries;
+  return Object.fromEntries(entryCache.entries());
 }
-
-const FULL_HEADER = `# API Reference — org.openqa.selenium.support & org.openqa.selenium.support.pagefactory`;
 
 export async function handlePageFactoryDocs(args?: PageFactoryDocsArgs) {
+  const targetLanguage: SupportedLanguage = args?.language ?? 'java';
   let text: string;
+
   if (args?.className) {
     const entries = await loadPageFactoryEntries();
-    const entry = entries[args.className];
+    const entry = entries[args.className.toLowerCase()];
     text = entry
-      ? `${FULL_HEADER}\n\n${entry}`
+      ? `# API Reference — Selenium PageFactory (${args.className})\n\n${entry}`
       : `No entry found for "${args.className}". Available classes: ${PageFactoryClassSchema.options.join(', ')}.`;
   } else {
-    text = await loadPageFactoryMarkdown();
+    text = await loadLanguageMarkdown(targetLanguage);
   }
 
   return {

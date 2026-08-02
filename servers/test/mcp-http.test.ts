@@ -129,7 +129,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('read_pagefactory_docs')).toBe(true);
     });
 
-    it('tools/call - read_pagefactory_docs', async () => {
+    it('tools/call - read_pagefactory_docs by className', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -154,6 +154,32 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(Array.isArray(data.result?.content)).toBe(true);
       const text = data.result?.content?.[0]?.text || '';
       expect(text).toContain('AjaxElementLocator');
+    });
+
+    it('tools/call - read_pagefactory_docs by language (python, typescript, csharp)', async () => {
+      for (const lang of ['python', 'typescript', 'csharp', 'ruby', 'javascript']) {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: MCP_HEADERS,
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 31,
+            method: 'tools/call',
+            params: {
+              name: 'read_pagefactory_docs',
+              arguments: {
+                language: lang,
+              },
+            },
+          }),
+        });
+
+        expect(res.status).toBe(200);
+        const data = await parseMcpResponse(res);
+        expect(data.result).toBeDefined();
+        const text = data.result?.content?.[0]?.text || '';
+        expect(text.toLowerCase()).toContain(lang);
+      }
     });
 
     it('tools/call - valid call', async () => {
