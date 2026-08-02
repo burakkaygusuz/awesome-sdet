@@ -4,6 +4,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { createMcpServer } from './server.js';
 
+const mcpServer = createMcpServer();
 const rawPort = process.env.PORT;
 const PORT = rawPort === undefined ? 3000 : Number(rawPort);
 
@@ -63,24 +64,25 @@ export async function handleMcpPostRequest(
 ): Promise<void> {
   res.setHeader('Access-Control-Allow-Origin', originHeader || '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-mcp-session-id');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
 
   try {
-    const mcpServer = createMcpServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
     });
+    res.on('close', () => transport.close());
     await mcpServer.connect(transport);
     await transport.handleRequest(req, res);
   } catch (error) {
+    console.error('[sdet-mcp] Unhandled transport error:', error);
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(
         JSON.stringify({
           jsonrpc: '2.0',
-          error: {
-            code: -32603,
-            message: `Internal Server Error: ${error instanceof Error ? error.message : String(error)}`,
-          },
+          error: { code: -32603, message: 'Internal Server Error' },
         })
       );
     }

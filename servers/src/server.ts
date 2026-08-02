@@ -1,4 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import {
   handleCdpNetworkInterception,
   handleSeleniumWait,
@@ -36,6 +37,13 @@ export function safeToolHandler<T>(
   };
 }
 
+const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+};
+
 export function createMcpServer(): McpServer {
   const server = new McpServer({
     name: 'sdet-mcp',
@@ -45,9 +53,11 @@ export function createMcpServer(): McpServer {
   server.registerTool(
     'execute_se_explicit_wait',
     {
+      title: 'Selenium Explicit Wait',
       description:
-        'Statelessly validates and reports requests for a Selenium ExpectedConditions explicit wait without executing a browser',
+        'Validates a Selenium ExpectedConditions explicit wait configuration and returns the correct usage pattern.',
       inputSchema: SeleniumWaitSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler(() => handleSeleniumWait())
   );
@@ -55,9 +65,11 @@ export function createMcpServer(): McpServer {
   server.registerTool(
     'execute_se_cdp_intercept',
     {
+      title: 'CDP Network Interception',
       description:
-        'Statelessly validates and reports requests for Chrome DevTools Protocol (CDP) network request interception without executing a browser',
+        'Validates a Chrome DevTools Protocol (CDP) network interception configuration and returns the correct usage pattern.',
       inputSchema: CdpNetworkInterceptionSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler(() => handleCdpNetworkInterception())
   );
@@ -65,9 +77,11 @@ export function createMcpServer(): McpServer {
   server.registerTool(
     'read_pagefactory_docs',
     {
+      title: 'Selenium PageFactory Docs',
       description:
-        'Looks up complete API references for Selenium PageFactory, annotations, and multi-language Page Object Model (POM) patterns (Java, Python, TypeScript, JavaScript, C#, Ruby)',
+        'Returns PageFactory API reference and Page Object Model (POM) code examples for a given language.',
       inputSchema: PageFactoryDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handlePageFactoryDocs(args))
   );
@@ -75,9 +89,11 @@ export function createMcpServer(): McpServer {
   server.registerTool(
     'read_se_locator_docs',
     {
+      title: 'Selenium Locator Docs',
       description:
-        'Looks up complete Selenium locator strategy guides, performance hierarchies, best practices, and multi-language code examples (Java, Python, TypeScript, JavaScript, C#, Ruby)',
+        'Returns locator strategy guide, performance hierarchy, best practices, and code examples for a given language.',
       inputSchema: LocatorDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleLocatorDocs(args))
   );
