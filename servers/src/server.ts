@@ -2,10 +2,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   handleCdpNetworkInterception,
   handleSeleniumWait,
+  handlePageFactoryDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
+  PageFactoryDocsSchema,
 } from './selenium/index.js';
-import { handlePageFactoryApiReference, PageFactoryApiQuerySchema } from './pagefactory/index.js';
 
 export function createSdetMcpServer(): McpServer {
   const server = new McpServer({
@@ -38,9 +39,9 @@ export function createSdetMcpServer(): McpServer {
     {
       description:
         'Looks up complete API references for Selenium PageFactory, annotations, and locator factories',
-      inputSchema: PageFactoryApiQuerySchema.shape,
+      inputSchema: PageFactoryDocsSchema.shape,
     },
-    async (args) => handlePageFactoryApiReference(args)
+    async (args) => handlePageFactoryDocs(args)
   );
 
   return server;

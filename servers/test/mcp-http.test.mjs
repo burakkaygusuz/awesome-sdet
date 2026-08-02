@@ -78,6 +78,34 @@ test('MCP HTTP transport protocol tests', async (t) => {
     const toolNames = new Set(data.result.tools.map((t) => t.name));
     assert.ok(toolNames.has('execute_se_explicit_wait'));
     assert.ok(toolNames.has('execute_se_cdp_intercept'));
+    assert.ok(toolNames.has('read_pagefactory_docs'));
+  });
+
+  await t.test('tools/call - read_pagefactory_docs', async () => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: MCP_HEADERS,
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 30,
+        method: 'tools/call',
+        params: {
+          name: 'read_pagefactory_docs',
+          arguments: {
+            className: 'AjaxElementLocator',
+          },
+        },
+      }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await parseMcpResponse(res);
+    assert.equal(data.jsonrpc, '2.0');
+    assert.equal(data.id, 30);
+    assert.ok(data.result);
+    assert.ok(Array.isArray(data.result.content));
+    const text = data.result.content[0]?.text || '';
+    assert.ok(text.includes('AjaxElementLocator'));
   });
 
   await t.test('tools/call - valid call', async () => {
@@ -166,6 +194,35 @@ test('MCP HTTP transport protocol tests', async (t) => {
       req.end(JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }));
     });
     assert.equal(statusCode, 403);
+  });
+
+  await t.test('cors preflight - handles OPTIONS /mcp for local origin', async () => {
+    const res = await fetch(url, {
+      method: 'OPTIONS',
+      headers: {
+        Host: '127.0.0.1',
+        Origin: 'http://localhost:5173',
+        'Access-Control-Request-Method': 'POST',
+      },
+    });
+
+    assert.equal(res.status, 204);
+    assert.equal(res.headers.get('access-control-allow-origin'), 'http://localhost:5173');
+    assert.ok(res.headers.get('access-control-allow-methods')?.includes('POST'));
+  });
+
+  await t.test('cors headers - includes Access-Control-Allow-Origin on POST', async () => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...MCP_HEADERS,
+        Origin: 'http://localhost:3000',
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }),
+    });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('access-control-allow-origin'), 'http://localhost:3000');
   });
 
   await t.test('tools/call - credentials not reflected', async () => {
