@@ -1,15 +1,16 @@
-# Page Object Model (POM) - C# API Reference
+# Page Object Model (POM) — C# API Reference (C# 12 / .NET 8+ & Selenium 4.46.0+)
 
 > Official Selenium C# WebDriver binding (`OpenQA.Selenium`) modern Page Object Model pattern (Selenium 4+ & C# 12 / .NET 8 Primary Constructors).
 
 ---
 
-## C# 12 Modern Page Object Pattern (Primary Constructors & WebDriverWait)
+## C# Page Object Pattern (Selenium 4 & C# 12)
 
 ```csharp
 using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using static OpenQA.Selenium.By;
 
 namespace Com.Example.Pages
 {
@@ -18,9 +19,9 @@ namespace Com.Example.Pages
     {
         private readonly WebDriverWait _wait = new(driver, TimeSpan.FromSeconds(timeoutSeconds));
 
-        private By UsernameInput => By.Id("username");
-        private By PasswordInput => By.Id("password");
-        private By LoginButton => By.CssSelector("button[type='submit']");
+        private By UsernameInput => Id("username");
+        private By PasswordInput => Id("password");
+        private By LoginButton => CssSelector("button[type='submit']");
 
         public void EnterUsername(string username)
         {
@@ -51,6 +52,7 @@ namespace Com.Example.Pages
 
 ## Best Practices for C# Selenium POM
 
-1. **C# 12 Primary Constructors**: Use `public class LoginPage(IWebDriver driver)` for concise parameter passing without boilerplate backing fields in .NET 8+.
-2. **PascalCase Naming**: C# methods and properties MUST use PascalCase (`EnterUsername`, `LoginButton`).
-3. **`TimeSpan.FromSeconds`**: Selenium 4 in .NET requires `TimeSpan` for explicit wait timeouts.
+1. **`using static OpenQA.Selenium.By`**: Enables calling `Id(...)`, `CssSelector(...)` directly without `By.` prefix.
+2. **C# 12 Primary Constructors**: Use `public class LoginPage(IWebDriver driver)` for concise parameter passing without boilerplate backing fields in .NET 8+.
+3. **PascalCase Naming**: C# methods and properties MUST use PascalCase (`EnterUsername`, `LoginButton`).
+4. **`TimeSpan.FromSeconds`**: Selenium 4 in .NET requires `TimeSpan` for explicit wait timeouts.

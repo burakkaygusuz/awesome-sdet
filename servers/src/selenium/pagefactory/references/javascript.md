@@ -1,10 +1,10 @@
-# Page Object Model (POM) - JavaScript API Reference
+# Page Object Model (POM) — JavaScript API Reference (Node.js 20+ & Selenium 4.46.0+)
 
 > Official Selenium WebDriver JavaScript Binding (`selenium-webdriver`) Page Object Patterns.
 
 ---
 
-## JavaScript Page Object Pattern
+## JavaScript Page Object Pattern (Selenium 4)
 
 ```javascript
 const { By, until } = require('selenium-webdriver');

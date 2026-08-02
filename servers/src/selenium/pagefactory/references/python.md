@@ -1,10 +1,10 @@
-# Page Object Model (POM) - Python API Reference
+# Page Object Model (POM) — Python API Reference (Python 3.10+ & Selenium 4.46.0+)
 
 > Official Selenium WebDriver Python Binding (`selenium.webdriver.common.by.By`) Page Object Patterns.
 
 ---
 
-## Python Page Object Pattern
+## Python Page Object Pattern (Selenium 4)
 
 ```python
 from selenium.webdriver.common.by import By

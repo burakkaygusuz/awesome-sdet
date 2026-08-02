@@ -3,7 +3,9 @@ import { z } from 'zod';
 
 export const SupportedLanguageSchema = z
   .enum(['java', 'python', 'typescript', 'javascript', 'csharp', 'ruby'])
-  .describe('Target programming language for Page Object Model / PageFactory patterns.');
+  .describe(
+    'Target programming language and minimum version: "java" (Java 17+), "python" (Python 3.10+), "typescript" (TypeScript 5.0+), "javascript" (Node.js 20+), "csharp" (C# 12 / .NET 8+), or "ruby" (Ruby 3.0+).'
+  );
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
@@ -36,7 +38,7 @@ export const PageFactoryDocsSchema = z.object({
     'Optional Selenium PageFactory class or annotation to look up (e.g. "PageFactory", "AjaxElementLocator", "FindBy"). Omit to receive the full reference.'
   ),
   language: SupportedLanguageSchema.optional().describe(
-    'Target programming language for Page Object Model patterns: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
+    'Target programming language for Page Object Model patterns: "java" (Java 17+), "python" (Python 3.10+), "typescript" (TypeScript 5.0+), "javascript" (Node.js 20+), "csharp" (C# 12 / .NET 8+), or "ruby" (Ruby 3.0+). Defaults to "java".'
   ),
 });
 

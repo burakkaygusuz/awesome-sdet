@@ -1,10 +1,10 @@
-# Page Object Model (POM) - Ruby API Reference
+# Page Object Model (POM) — Ruby API Reference (Ruby 3.0+ & Selenium 4.46.0+)
 
 > Official Selenium WebDriver Ruby Binding (`selenium-webdriver`) Page Object Patterns.
 
 ---
 
-## Ruby Page Object Pattern
+## Ruby Page Object Pattern (Selenium 4)
 
 ```ruby
 require 'selenium-webdriver'
