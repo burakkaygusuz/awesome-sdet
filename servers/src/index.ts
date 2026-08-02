@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { pathToFileURL } from 'node:url';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { createMcpServer } from './server.js';
 
 const rawPort = process.env.PORT;
@@ -119,7 +120,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const httpServer = createHttpServer();
   httpServer.listen(PORT, '127.0.0.1', () => {
     console.log(
-      `[MCP 2026-07-28 Spec] Stateless SDET Selenium MCP Server running on http://127.0.0.1:${PORT}/mcp`
+      `[MCP ${LATEST_PROTOCOL_VERSION} Spec] Stateless SDET Selenium MCP Server running on http://127.0.0.1:${PORT}/mcp`
     );
   });
 }
