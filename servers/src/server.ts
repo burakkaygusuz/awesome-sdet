@@ -6,11 +6,13 @@ import {
   handlePageFactoryDocs,
   handleLocatorDocs,
   handleBidiDocs,
+  handleActionsDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
   LocatorDocsSchema,
   BidiDocsSchema,
+  ActionsDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -110,6 +112,18 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleBidiDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_actions_docs',
+    {
+      title: 'Selenium Actions API Docs',
+      description:
+        'Returns Actions API reference and code examples for low-level user interactions (mouse, keyboard, wheel) for a given language.',
+      inputSchema: ActionsDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
+    },
+    safeToolHandler((args) => handleActionsDocs(args))
   );
 
   return server;

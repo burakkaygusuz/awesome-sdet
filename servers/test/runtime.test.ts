@@ -65,4 +65,10 @@ describe('Runtime Entrypoint Tests', () => {
     const result = await handleBidiDocs();
     expect(result.content[0].text).toContain('WebDriver BiDirectional');
   });
+
+  it('read_se_actions_docs returns Actions API documentation', async () => {
+    const { handleActionsDocs } = await import('../src/selenium/index.js');
+    const result = await handleActionsDocs();
+    expect(result.content[0].text).toContain('Actions API');
+  });
 });
