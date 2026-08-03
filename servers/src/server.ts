@@ -5,10 +5,12 @@ import {
   handleSeleniumWait,
   handlePageFactoryDocs,
   handleLocatorDocs,
+  handleBidiDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
   LocatorDocsSchema,
+  BidiDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -96,6 +98,18 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleLocatorDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_bidi_docs',
+    {
+      title: 'Selenium BiDi Docs',
+      description:
+        'Returns W3C WebDriver BiDirectional (BiDi) protocol API reference and code examples for a given language.',
+      inputSchema: BidiDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
+    },
+    safeToolHandler((args) => handleBidiDocs(args))
   );
 
   return server;

@@ -59,4 +59,10 @@ describe('Runtime Entrypoint Tests', () => {
       server.close((error?: Error) => (error ? reject(error) : resolve()))
     );
   });
+
+  it('read_se_bidi_docs returns BiDi documentation', async () => {
+    const { handleBidiDocs } = await import('../src/selenium/index.js');
+    const result = await handleBidiDocs();
+    expect(result.content[0].text).toContain('WebDriver BiDirectional');
+  });
 });
