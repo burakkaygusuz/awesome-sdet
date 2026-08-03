@@ -7,7 +7,7 @@ metadata:
 
 # Selenium Chrome DevTools Protocol (CDP) — Java
 
-## Scope and source
+## Source & scope
 
 Java bindings for `org.openqa.selenium.devtools`, condensed from the [official Selenium docs](https://www.selenium.dev/documentation/webdriver/bidi/cdp/) and [Javadoc](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/devtools/package-summary.html). This file covers the everyday recipes; complete schemas and parameters are served dynamically via the MCP server.
 

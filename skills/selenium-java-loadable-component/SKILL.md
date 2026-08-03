@@ -9,16 +9,7 @@ metadata:
 
 ## Source & scope
 
-Condensed from the current Selenium documentation
-(`selenium.dev/documentation/test_practices/design_strategies/`, "Loadable Component" section)
-and the Javadoc for `org.openqa.selenium.support.ui.LoadableComponent` /
-`SlowLoadableComponent`. This supersedes the older GitHub wiki page
-(`github.com/SeleniumHQ/selenium/wiki/LoadableComponent`), which documents the Selenium 2 /
-JUnit 3 era API — that page has been folded into the design-strategies doc above. The examples
-below use the current Selenium 4 package (`org.openqa.selenium.support.ui.LoadableComponent`)
-and JUnit 5 (`org.junit.jupiter.api.Assertions`); if a codebase still uses the older
-`junit.framework.Assert`/`org.junit.Assert` imports, only the assertion import changes — the
-pattern itself is identical.
+Condensed from official Selenium documentation (`selenium.dev/documentation/test_practices/design_strategies/`) and Javadoc for `org.openqa.selenium.support.ui.LoadableComponent` and `SlowLoadableComponent`. Code examples use Selenium 4 and JUnit 5 (`org.junit.jupiter.api.Assertions`).
 
 ## What it is / problem it solves
 
@@ -240,3 +231,7 @@ message (e.g. "search failed") instead of a generic timeout when the failure mod
 - `SlowLoadableComponent`'s polling is a plain sleep loop (`sleepFor()`), independent of
   `WebDriverWait`/`FluentWait`/`ExpectedConditions` — Selenium's explicit-wait configuration has
   no effect on it; tune `sleepFor()` and the constructor `timeOut` directly instead.
+
+## Dynamic Tool Schemas & API Reference
+
+Complete class definitions and Javadoc references for `org.openqa.selenium.support.ui.LoadableComponent` and `SlowLoadableComponent` are exposed dynamically via the `sdet-mcp` server (`read_pagefactory_docs` tool).

@@ -1,27 +1,29 @@
 ---
 name: selenium-java-explicit-waits
-description: 'Reference and implementation guide for Selenium Java explicit waits using WebDriverWait and ExpectedConditions (org.openqa.selenium.support.ui.ExpectedConditions). Use when writing or debugging Selenium or Appium Java tests involving test synchronization, replacing Thread.sleep, resolving flaky tests, or handling exceptions like StaleElementReferenceException, ElementNotInteractableException, and ElementClickInterceptedException.'
+description: Reference and implementation guide for Selenium Java explicit waits using WebDriverWait and ExpectedConditions (org.openqa.selenium.support.ui.ExpectedConditions). Trigger on mentions of explicit waits, ExpectedConditions, WebDriverWait, FluentWait, test synchronization, replacing Thread.sleep, resolving flaky tests, or handling exceptions like StaleElementReferenceException, ElementNotInteractableException, and ElementClickInterceptedException.
 metadata:
   keywords:
     ['selenium', 'java', 'explicit-waits', 'expected-conditions', 'webdriverwait', 'testing']
 ---
 
-# Selenium ExpectedConditions (Java)
+# ExpectedConditions & Explicit Waits — Selenium Java
 
-This skill provides a complete reference for the `org.openqa.selenium.support.ui.ExpectedConditions` class in Java. These conditions are essential for creating robust, non-flaky Selenium tests by synchronizing the driver's state with the browser's state.
+## Source & scope
 
-## Core Concepts
+Condensed from official Selenium documentation (`selenium.dev/documentation/webdriver/waits/`) and Javadoc for `org.openqa.selenium.support.ui.ExpectedConditions` and `WebDriverWait`. Code examples use Selenium 4 and Java `java.time.Duration`.
 
-**ExpectedConditions** are predefined conditions used with `WebDriverWait.until()`. They return an object (usually `Boolean`, `WebElement`, or `Alert`) when the condition is met, or `null/false` if not.
+## Core concepts
 
-### Basic Pattern
+**ExpectedConditions** are predefined conditions used with `WebDriverWait.until()`. They return an object (usually `Boolean`, `WebElement`, or `Alert`) when the condition is met, or `null`/`false` if not.
+
+### Basic pattern
 
 ```java
 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("target")));
 ```
 
-## Method Categories
+## Method categories
 
 | Category          | Key Methods                                                    | Description                                                    |
 | :---------------- | :------------------------------------------------------------- | :------------------------------------------------------------- |
@@ -33,18 +35,16 @@ WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By
 | **Logic**         | `and`, `or`, `not`                                             | Combine multiple conditions for complex synchronization.       |
 | **Frames/Alerts** | `frameToBeAvailableAndSwitchToIt`, `alertIsPresent`            | Handle switching to frames or waiting for alerts.              |
 
-> **Dynamic Tool Schemas & Enums:** The complete list of 25+ supported `ExpectedConditions` and locator strategies is served dynamically by the `sdet-mcp` server (`execute_se_explicit_wait` tool).
+## Best practices
 
-## Best Practices
+1. **Prefer Visibility over Presence:** Use `visibilityOfElementLocated` instead of `presenceOfElementLocated` when you intend to click or type into an element.
+2. **Avoid Thread.sleep:** Always use `ExpectedConditions` with `WebDriverWait` for more efficient and reliable tests.
+3. **Handle Staleness:** Wrap conditions in `refreshed()` if the element is likely to be redrawn during the wait.
+4. **Static Imports:** Use `import static org.openqa.selenium.support.ui.ExpectedConditions.*;` to make your code more readable.
 
-1.  **Prefer Visibility over Presence:** Use `visibilityOfElementLocated` instead of `presenceOfElementLocated` when you intend to click or type into an element.
-2.  **Avoid Thread.sleep:** Always use `ExpectedConditions` with `WebDriverWait` for more efficient and reliable tests.
-3.  **Handle Staleness:** Wrap conditions in `refreshed()` if the element is likely to be redrawn during the wait.
-4.  **Static Imports:** Use `import static org.openqa.selenium.support.ui.ExpectedConditions.*;` to make your code more readable.
+## Common recipes & workflows
 
-## Common Workflows
-
-### Waiting for a Page Load
+### Recipe 1 — Waiting for a page load
 
 ```java
 wait.until(and(
@@ -54,13 +54,13 @@ wait.until(and(
 ));
 ```
 
-### Handling Dynamic Lists
+### Recipe 2 — Handling dynamic lists
 
 ```java
 wait.until(numberOfElementsToBeMoreThan(By.className("list-item"), 0));
 ```
 
-### Handling Stale Elements with `refreshed()`
+### Recipe 3 — Handling stale elements with `refreshed()`
 
 ```java
 WebElement element = driver.findElement(By.id("dynamic-element"));
@@ -68,3 +68,7 @@ wait.until(refreshed(ExpectedConditions.elementToBeClickable(element)));
 // Now 'element' refers to the re-attached element, safe to interact
 element.click();
 ```
+
+## Dynamic Tool Schemas & API Reference
+
+Complete list of supported `ExpectedConditions` methods, parameters, and locator strategies are exposed dynamically via the `sdet-mcp` server (`execute_se_explicit_wait` tool).
