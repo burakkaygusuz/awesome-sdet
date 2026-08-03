@@ -70,7 +70,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       const toolNames = new Set(toolsResponse.tools.map((t) => t.name));
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
-      expect(toolNames.has('read_pagefactory_docs')).toBe(true);
+      expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
 
       const callResponse = await client.callTool({
@@ -127,7 +127,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       const toolNames = new Set(data.result?.tools?.map((t) => t.name));
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
-      expect(toolNames.has('read_pagefactory_docs')).toBe(true);
+      expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
     });
 
@@ -167,7 +167,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
           id: 30,
           method: 'tools/call',
           params: {
-            name: 'read_pagefactory_docs',
+            name: 'read_se_pagefactory_docs',
             arguments: {
               className: 'AjaxElementLocator',
             },
@@ -195,7 +195,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
             id: 31,
             method: 'tools/call',
             params: {
-              name: 'read_pagefactory_docs',
+              name: 'read_se_pagefactory_docs',
               arguments: {
                 language: lang,
               },

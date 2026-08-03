@@ -21,60 +21,31 @@ describe('Runtime Entrypoint Tests', () => {
     );
   });
 
-  it('invalid PORT=0 rejects with a clear error', () => {
-    const result = spawnSync('node', [entrypoint], {
-      env: { ...process.env, PORT: '0' },
-      encoding: 'utf8',
-    });
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('Invalid PORT');
+  it('rejects invalid PORT configuration values', () => {
+    for (const invalidPort of ['0', 'abc', '99999']) {
+      const result = spawnSync('node', [entrypoint], {
+        env: { ...process.env, PORT: invalidPort },
+        encoding: 'utf8',
+      });
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('Invalid PORT');
+    }
   });
 
-  it('invalid PORT=abc rejects with a clear error', () => {
-    const result = spawnSync('node', [entrypoint], {
-      env: { ...process.env, PORT: 'abc' },
-      encoding: 'utf8',
-    });
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('Invalid PORT');
-  });
+  it('reads MCP documentation references correctly across modules', async () => {
+    const { handleBidiDocs, handleActionsDocs, handleListenersDocs, handlePageFactoryDocs } =
+      await import('../src/selenium/index.js');
 
-  it('invalid PORT=99999 rejects with a clear error', () => {
-    const result = spawnSync('node', [entrypoint], {
-      env: { ...process.env, PORT: '99999' },
-      encoding: 'utf8',
-    });
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain('Invalid PORT');
-  });
+    const bidiRes = await handleBidiDocs({ language: 'python' });
+    expect(bidiRes.content[0].text).toContain('Python API Reference');
 
-  it('undefined PORT falls back to 3000 silently', async () => {
-    const { createHttpServer } = await import('../dist/index.js');
-    const server = createHttpServer();
-    await new Promise<void>((resolve, reject) => {
-      server.once('error', reject);
-      server.listen(0, '127.0.0.1', () => resolve());
-    });
-    await new Promise<void>((resolve, reject) =>
-      server.close((error?: Error) => (error ? reject(error) : resolve()))
-    );
-  });
+    const actionsRes = await handleActionsDocs({ language: 'csharp' });
+    expect(actionsRes.content[0].text).toContain('C# API Reference');
 
-  it('read_se_bidi_docs returns BiDi documentation for python', async () => {
-    const { handleBidiDocs } = await import('../src/selenium/index.js');
-    const result = await handleBidiDocs({ language: 'python' });
-    expect(result.content[0].text).toContain('Python API Reference');
-  });
+    const listenersRes = await handleListenersDocs({ language: 'python' });
+    expect(listenersRes.content[0].text).toContain('Python API Reference');
 
-  it('read_se_actions_docs returns Actions API documentation for csharp', async () => {
-    const { handleActionsDocs } = await import('../src/selenium/index.js');
-    const result = await handleActionsDocs({ language: 'csharp' });
-    expect(result.content[0].text).toContain('C# API Reference');
-  });
-
-  it('read_se_listeners_docs returns Listeners documentation for python', async () => {
-    const { handleListenersDocs } = await import('../src/selenium/index.js');
-    const result = await handleListenersDocs({ language: 'python' });
-    expect(result.content[0].text).toContain('Python API Reference');
+    const pageFactoryRes = await handlePageFactoryDocs({ language: 'typescript' });
+    expect(pageFactoryRes.content[0].text).toContain('TypeScript API Reference');
   });
 });

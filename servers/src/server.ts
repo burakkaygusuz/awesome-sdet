@@ -81,9 +81,9 @@ export function createMcpServer(): McpServer {
   );
 
   server.registerTool(
-    'read_pagefactory_docs',
+    'read_se_pagefactory_docs',
     {
-      title: 'Selenium PageFactory Docs',
+      title: 'Selenium PageFactory & POM Docs',
       description:
         'Returns PageFactory API reference and Page Object Model (POM) code examples for a given language.',
       inputSchema: PageFactoryDocsSchema.shape,
