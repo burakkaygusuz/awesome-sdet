@@ -72,6 +72,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
+      expect(toolNames.has('read_se_grid_docs')).toBe(true);
 
       const callResponse = await client.callTool({
         name: 'read_se_locator_docs',
@@ -129,6 +130,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
+      expect(toolNames.has('read_se_grid_docs')).toBe(true);
     });
 
     it('tools/call - read_se_locator_docs by strategy & language', async () => {
