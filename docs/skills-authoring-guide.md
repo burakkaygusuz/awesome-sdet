@@ -109,7 +109,7 @@ The `sdet-mcp` server serves dynamic, versioned reference data that would otherw
 
 > **Complete API Reference:** Full class, annotation, and method listings for
 > `org.openqa.selenium.support` are served dynamically by the `sdet-mcp` server
-> (`read_pagefactory_docs` tool). Query it for exact signatures or classes not
+> (`read_se_pagefactory_docs` tool). Query it for exact signatures or classes not
 > covered here.
 
 <!-- ❌ Anti-pattern — inline enumeration ages poorly and bloats Level 2 -->
@@ -214,7 +214,7 @@ SKILL.md files are loaded into the LLM context as **trusted host instructions** 
 
 ### 4.2 Untrusted Content from Tool Outputs
 
-SKILL.md instructions may direct the agent to call MCP tools (e.g. `execute_se_explicit_wait`, `read_pagefactory_docs`). Tool outputs are returned into the context as **untrusted data**. If an MCP tool ever serves content sourced from user input or external systems, that content could carry adversarial instructions.
+SKILL.md instructions may direct the agent to call MCP tools (e.g. `execute_se_explicit_wait`, `read_se_pagefactory_docs`). Tool outputs are returned into the context as **untrusted data**. If an MCP tool ever serves content sourced from user input or external systems, that content could carry adversarial instructions.
 
 The `sdet-mcp` server currently serves only **static local markdown files** with `openWorldHint: false` on all tools — making this risk theoretical rather than active. However, the pattern to defend against it is defined at the **host/client configuration level**, not inside SKILL.md:
 

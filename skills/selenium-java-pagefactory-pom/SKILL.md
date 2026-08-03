@@ -257,12 +257,6 @@ you don't have to reimplement it — use the `read_pagefactory_docs` tool to see
   `tagName`, `linkText`, `partialLinkText`, `xpath` directly — reach for `how = How.ID_OR_NAME,
 using = "..."` only for the one strategy with no dedicated attribute.
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete class, interface, and annotation references for `org.openqa.selenium.support` and
-`org.openqa.selenium.support.pagefactory` (e.g. `PageFactory`, `@FindBy`, `@FindBys`, `@FindAll`,
-`@CacheLookup`, `How`, `ByIdOrName`, `ElementLocator`, `ElementLocatorFactory`,
-`DefaultElementLocator`, `DefaultElementLocatorFactory`, `AjaxElementLocator`,
-`AjaxElementLocatorFactory`, `FieldDecorator`, `DefaultFieldDecorator`, `ByAll`, `ByChained`,
-`Annotations`, `AbstractAnnotations`) with full constructors and method signatures are exposed
-dynamically via the `sdet-mcp` server (`read_pagefactory_docs`).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query multi-language Page Object Model code references and PageFactory class specifications via the `read_se_pagefactory_docs` tool.

@@ -65,6 +65,6 @@ context.navigate("https://example.com");
 Assertions.assertNotNull(context.getId());
 ```
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete class definitions and API references for `org.openqa.selenium.bidi.*` are exposed dynamically via the `sdet-mcp` server (`read_se_bidi_docs` tool).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query multi-language W3C WebDriver BiDi code references and documentation via the `read_se_bidi_docs` tool.

@@ -69,6 +69,6 @@ wait.until(refreshed(ExpectedConditions.elementToBeClickable(element)));
 element.click();
 ```
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete list of supported `ExpectedConditions` methods, parameters, and locator strategies are exposed dynamically via the `sdet-mcp` server (`execute_se_explicit_wait` tool).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query ExpectedConditions schemas and wait strategies via the `execute_se_explicit_wait` tool.

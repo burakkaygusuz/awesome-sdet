@@ -249,6 +249,6 @@ Using `org.openqa.selenium.devtools.latest` is recommended to avoid updating imp
 - CDP methods/params can change between Chrome versions with no deprecation warning — pin CI to a
   specific Chrome version if a test depends on exact CDP behavior.
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete tool schemas, input parameters, and CDP domain specifications are exposed dynamically via the `sdet-mcp` server (`tools/list`).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query additional CDP schemas and DevTools specifications on demand via MCP tool inspection (`tools/list` / `read_se_cdp_docs`).

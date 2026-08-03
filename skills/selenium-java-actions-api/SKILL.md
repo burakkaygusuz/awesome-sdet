@@ -79,6 +79,6 @@ new Actions(driver)
 2. **Prefer high-level methods**: Use `dragAndDrop(source, target)` instead of manual `clickAndHold` + `moveToElement` + `release` unless custom offsets are required.
 3. **Reset state**: Complex action chains automatically release keys, but explicit `actions.release().perform()` can clear active mouse state if needed.
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete method signatures and parameter references for `org.openqa.selenium.interactions.Actions` are exposed dynamically via the `sdet-mcp` server (`read_se_actions_docs` tool).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query multi-language Actions API code references (Java, Python, TypeScript, C#, Ruby) via the `read_se_actions_docs` tool.

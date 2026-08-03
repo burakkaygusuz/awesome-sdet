@@ -252,6 +252,6 @@ void userCanCompleteCheckoutJourney() {
 
 ---
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete class definitions and Javadoc references for `org.openqa.selenium.support.ui.LoadableComponent` and `SlowLoadableComponent` are exposed dynamically via the `sdet-mcp` server (`read_pagefactory_docs` tool).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query multi-language code references and Javadoc specifications for `LoadableComponent` via the `read_se_pagefactory_docs` tool.

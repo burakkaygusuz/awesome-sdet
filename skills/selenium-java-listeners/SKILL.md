@@ -55,6 +55,6 @@ WebDriver decoratedDriver = new EventFiringDecorator<>(listener).decorate(origin
 decoratedDriver.get("https://example.com");
 ```
 
-## Dynamic Tool Schemas & API Reference
+## Dynamic MCP Support & Reference (Optional)
 
-Complete listener interface methods and decorator details for `org.openqa.selenium.support.events.*` are exposed dynamically via the `sdet-mcp` server (`read_se_listeners_docs` tool).
+This skill is fully self-contained. If the `sdet-mcp` server is available in your workspace, you can dynamically query multi-language EventFiringDecorator and listener code references via the `read_se_listeners_docs` tool.
