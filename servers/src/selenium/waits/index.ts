@@ -15,7 +15,7 @@ export const SeleniumByStrategySchema = z
     'link',
     'partialLinkText',
     'partialLink',
-  ])
+  ] as const)
   .describe('Selenium locator strategy type (e.g. "id", "cssSelector", "xpath").');
 
 export const SeleniumExpectedConditionSchema = z
@@ -45,7 +45,7 @@ export const SeleniumExpectedConditionSchema = z
     'attributeToBeNotEmpty',
     'domAttributeToBe',
     'domPropertyToBe',
-  ])
+  ] as const)
   .describe('Selenium ExpectedCondition function name to evaluate.');
 
 export const SeleniumWaitSchema = z.object({

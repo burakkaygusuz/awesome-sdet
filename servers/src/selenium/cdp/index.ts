@@ -9,7 +9,7 @@ export const CdpNetworkActionSchema = z
     'modifyHeaders',
     'injectBasicAuth',
     'recordTraffic',
-  ])
+  ] as const)
   .describe('CDP network interception action type.');
 
 export const CdpNetworkInterceptionSchema = z.object({
@@ -49,7 +49,7 @@ export const CdpNetworkInterceptionSchema = z.object({
     .optional()
     .describe('Credentials payload for injectBasicAuth action.'),
   errorReason: z
-    .enum(['Failed', 'Aborted', 'AccessDenied', 'ConnectionRefused'])
+    .enum(['Failed', 'Aborted', 'AccessDenied', 'ConnectionRefused'] as const)
     .optional()
     .describe('Network failure reason code for failRequest action.'),
 });
