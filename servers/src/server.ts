@@ -7,12 +7,14 @@ import {
   handleLocatorDocs,
   handleBidiDocs,
   handleActionsDocs,
+  handleListenersDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
   LocatorDocsSchema,
   BidiDocsSchema,
   ActionsDocsSchema,
+  ListenersDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -124,6 +126,18 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleActionsDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_listeners_docs',
+    {
+      title: 'Selenium Listeners Docs',
+      description:
+        'Returns EventFiringDecorator and WebDriverListener reference and code examples for event handling for a given language.',
+      inputSchema: ListenersDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
+    },
+    safeToolHandler((args) => handleListenersDocs(args))
   );
 
   return server;

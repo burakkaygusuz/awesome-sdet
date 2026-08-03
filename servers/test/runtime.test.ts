@@ -71,4 +71,10 @@ describe('Runtime Entrypoint Tests', () => {
     const result = await handleActionsDocs();
     expect(result.content[0].text).toContain('Actions API');
   });
+
+  it('read_se_listeners_docs returns Listeners documentation', async () => {
+    const { handleListenersDocs } = await import('../src/selenium/index.js');
+    const result = await handleListenersDocs();
+    expect(result.content[0].text).toContain('EventFiringDecorator');
+  });
 });
