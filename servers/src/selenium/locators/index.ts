@@ -1,6 +1,5 @@
-import fs from 'node:fs/promises';
 import { z } from 'zod';
-import { SupportedLanguageSchema, SupportedLanguage } from '../pagefactory/index.js';
+import { SupportedLanguageSchema, SupportedLanguage, loadReferenceMarkdown } from '../common.js';
 
 export const LocatorStrategySchema = z
   .enum([
@@ -13,7 +12,7 @@ export const LocatorStrategySchema = z
     'linkText',
     'partialLinkText',
     'relativeLocators',
-  ])
+  ] as const)
   .describe('Selenium locator strategy to look up.');
 
 export type LocatorStrategy = z.infer<typeof LocatorStrategySchema>;
@@ -22,9 +21,7 @@ export const LocatorDocsSchema = z.object({
   strategy: LocatorStrategySchema.optional().describe(
     'Specific locator strategy to query (e.g. "id", "cssSelector", "xpath", "relativeLocators"). Omit for complete guide.'
   ),
-  language: SupportedLanguageSchema.optional().describe(
-    'Target programming language: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
-  ),
+  language: SupportedLanguageSchema.optional(),
 });
 
 export type LocatorDocsArgs = z.infer<typeof LocatorDocsSchema>;
@@ -43,23 +40,11 @@ export const STRATEGY_HIERARCHY_MARKDOWN = `## Strategy Hierarchy & Best Practic
 | **\`xpath\`** | 🏅 #4 (Flexible) | Hierarchy & text lookup | Avoid absolute XPaths (\`/html/body/...\`). Use relative XPaths (\`//button[contains(text(), 'Save')]\`). |
 | **\`relativeLocators\`** | 🏅 #4 (Spatial) | Spatial position in Selenium 4 | Use Selenium 4 \`above() / below() / toLeftOf() / toRightOf() / near()\`. |`;
 
-const languageCache: Map<SupportedLanguage, string> = new Map();
-
-export async function loadLocatorMarkdown(language: SupportedLanguage): Promise<string> {
-  const cached = languageCache.get(language);
-  if (cached) return cached;
-
-  const filePath = new URL(`./references/${language}.md`, import.meta.url);
-  const content = await fs.readFile(filePath, 'utf8');
-  languageCache.set(language, content);
-  return content;
-}
-
 const FULL_HEADER = `# API Reference — Selenium Locator Strategies & Best Practices`;
 
 export async function handleLocatorDocs(args?: LocatorDocsArgs) {
   const targetLanguage: SupportedLanguage = args?.language ?? 'java';
-  const langCodeExamples = await loadLocatorMarkdown(targetLanguage);
+  const langCodeExamples = await loadReferenceMarkdown(import.meta.url, targetLanguage);
   const combinedMarkdown = `${FULL_HEADER}\n\n${STRATEGY_HIERARCHY_MARKDOWN}\n\n---\n\n${langCodeExamples}`;
 
   if (args?.strategy) {

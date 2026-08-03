@@ -1,13 +1,7 @@
-import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { SupportedLanguageSchema, SupportedLanguage, loadReferenceMarkdown } from '../common.js';
 
-export const SupportedLanguageSchema = z
-  .enum(['java', 'python', 'typescript', 'javascript', 'csharp', 'ruby'])
-  .describe(
-    'Target programming language and minimum version: "java" (Java 17+), "python" (Python 3.10+), "typescript" (TypeScript 5.0+), "javascript" (Node.js 20+), "csharp" (C# 12 / .NET 8+), or "ruby" (Ruby 3.0+).'
-  );
-
-export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
+export { SupportedLanguageSchema, SupportedLanguage };
 
 export const PageFactoryClassSchema = z
   .enum([
@@ -30,22 +24,19 @@ export const PageFactoryClassSchema = z
     'ByChained',
     'Annotations',
     'AbstractAnnotations',
-  ])
+  ] as const)
   .describe('Selenium PageFactory class or annotation name.');
 
 export const PageFactoryDocsSchema = z.object({
   className: PageFactoryClassSchema.optional().describe(
     'Optional Selenium PageFactory class or annotation to look up (e.g. "PageFactory", "AjaxElementLocator", "FindBy"). Omit to receive the full reference.'
   ),
-  language: SupportedLanguageSchema.optional().describe(
-    'Target programming language for Page Object Model patterns: "java" (Java 17+), "python" (Python 3.10+), "typescript" (TypeScript 5.0+), "javascript" (Node.js 20+), "csharp" (C# 12 / .NET 8+), or "ruby" (Ruby 3.0+). Defaults to "java".'
-  ),
+  language: SupportedLanguageSchema.optional(),
 });
 
 export type PageFactoryDocsArgs = z.infer<typeof PageFactoryDocsSchema>;
 export type PageFactoryClass = z.infer<typeof PageFactoryClassSchema>;
 
-const languageCache: Map<SupportedLanguage, string> = new Map();
 const entryCache: Map<string, string> = new Map();
 
 export function parseMarkdownSections(raw: string): Record<string, string> {
@@ -63,18 +54,9 @@ export function parseMarkdownSections(raw: string): Record<string, string> {
   return map;
 }
 
-export async function loadLanguageMarkdown(language: SupportedLanguage): Promise<string> {
-  if (!languageCache.has(language)) {
-    const filePath = new URL(`./references/${language}.md`, import.meta.url);
-    const content = await fs.readFile(filePath, 'utf8');
-    languageCache.set(language, content);
-  }
-  return languageCache.get(language)!;
-}
-
 export async function loadPageFactoryEntries(): Promise<Record<string, string>> {
   if (entryCache.size === 0) {
-    const rawJava = await loadLanguageMarkdown('java');
+    const rawJava = await loadReferenceMarkdown(import.meta.url, 'java');
     const parsed = parseMarkdownSections(rawJava);
     for (const [k, v] of Object.entries(parsed)) {
       entryCache.set(k, v);
@@ -94,7 +76,7 @@ export async function handlePageFactoryDocs(args?: PageFactoryDocsArgs) {
       ? `# API Reference — Selenium PageFactory (${args.className})\n\n${entry}`
       : `No entry found for "${args.className}". Available classes: ${PageFactoryClassSchema.options.join(', ')}.`;
   } else {
-    text = await loadLanguageMarkdown(targetLanguage);
+    text = await loadReferenceMarkdown(import.meta.url, targetLanguage);
   }
 
   return {
