@@ -60,21 +60,21 @@ describe('Runtime Entrypoint Tests', () => {
     );
   });
 
-  it('read_se_bidi_docs returns BiDi documentation', async () => {
+  it('read_se_bidi_docs returns BiDi documentation for python', async () => {
     const { handleBidiDocs } = await import('../src/selenium/index.js');
-    const result = await handleBidiDocs();
-    expect(result.content[0].text).toContain('WebDriver BiDirectional');
+    const result = await handleBidiDocs({ language: 'python' });
+    expect(result.content[0].text).toContain('Python API Reference');
   });
 
-  it('read_se_actions_docs returns Actions API documentation', async () => {
+  it('read_se_actions_docs returns Actions API documentation for csharp', async () => {
     const { handleActionsDocs } = await import('../src/selenium/index.js');
-    const result = await handleActionsDocs();
-    expect(result.content[0].text).toContain('Actions API');
+    const result = await handleActionsDocs({ language: 'csharp' });
+    expect(result.content[0].text).toContain('C# API Reference');
   });
 
-  it('read_se_listeners_docs returns Listeners documentation', async () => {
+  it('read_se_listeners_docs returns Listeners documentation for python', async () => {
     const { handleListenersDocs } = await import('../src/selenium/index.js');
-    const result = await handleListenersDocs();
-    expect(result.content[0].text).toContain('EventFiringDecorator');
+    const result = await handleListenersDocs({ language: 'python' });
+    expect(result.content[0].text).toContain('Python API Reference');
   });
 });
