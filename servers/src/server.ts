@@ -8,6 +8,7 @@ import {
   handleBidiDocs,
   handleActionsDocs,
   handleListenersDocs,
+  handleGridDocs,
   CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
@@ -15,6 +16,7 @@ import {
   BidiDocsSchema,
   ActionsDocsSchema,
   ListenersDocsSchema,
+  GridDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -138,6 +140,18 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleListenersDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_grid_docs',
+    {
+      title: 'Selenium Grid & RemoteWebDriver Docs',
+      description:
+        'Returns RemoteWebDriver API reference, Grid 4 capabilities, remote file download, custom TOML stereotypes, and cloud grid configuration for a given language.',
+      inputSchema: GridDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
+    },
+    safeToolHandler((args) => handleGridDocs(args))
   );
 
   return server;

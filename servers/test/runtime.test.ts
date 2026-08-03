@@ -48,4 +48,10 @@ describe('Runtime Entrypoint Tests', () => {
     const pageFactoryRes = await handlePageFactoryDocs({ language: 'typescript' });
     expect(pageFactoryRes.content[0].text).toContain('TypeScript API Reference');
   });
+
+  it('read_se_grid_docs returns Grid documentation for java', async () => {
+    const { handleGridDocs } = await import('../src/selenium/index.js');
+    const result = await handleGridDocs({ language: 'java' });
+    expect(result.content[0].text).toContain('RemoteWebDriver');
+  });
 });

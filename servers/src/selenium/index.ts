@@ -6,3 +6,4 @@ export * from './locators/index.js';
 export * from './bidi/index.js';
 export * from './actions/index.js';
 export * from './listeners/index.js';
+export * from './grid/index.js';
