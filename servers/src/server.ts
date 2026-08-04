@@ -8,6 +8,7 @@ import {
   handleActionsDocs,
   handleListenersDocs,
   handleGridDocs,
+  handleObservabilityDocs,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
   LocatorDocsSchema,
@@ -15,6 +16,7 @@ import {
   ActionsDocsSchema,
   ListenersDocsSchema,
   GridDocsSchema,
+  ObservabilityDocsSchema,
 } from './selenium/index.js';
 
 export interface ToolExecutionResult {
@@ -138,6 +140,18 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler((args) => handleGridDocs(args))
+  );
+
+  server.registerTool(
+    'read_se_observability_docs',
+    {
+      title: 'Selenium Observability & OpenTelemetry Docs',
+      description:
+        'Returns OpenTelemetry tracing configuration and Grid 4 GraphQL API metrics querying code examples for a given language.',
+      inputSchema: ObservabilityDocsSchema.shape,
+      annotations: SAFE_READONLY_ANNOTATIONS,
+    },
+    safeToolHandler((args) => handleObservabilityDocs(args))
   );
 
   return server;

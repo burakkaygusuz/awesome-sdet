@@ -54,4 +54,10 @@ describe('Runtime Entrypoint Tests', () => {
     const result = await handleGridDocs({ language: 'java' });
     expect(result.content[0].text).toContain('RemoteWebDriver');
   });
+
+  it('read_se_observability_docs returns Observability documentation for java', async () => {
+    const { handleObservabilityDocs } = await import('../src/selenium/index.js');
+    const result = await handleObservabilityDocs({ language: 'java' });
+    expect(result.content[0].text).toContain('Observability');
+  });
 });
