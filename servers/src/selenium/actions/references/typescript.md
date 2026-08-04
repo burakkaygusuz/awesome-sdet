@@ -13,16 +13,12 @@ export async function demonstrateActions(driver: WebDriver): Promise<void> {
   const source = await driver.findElement(By.id('draggable'));
   const target = await driver.findElement(By.id('droppable'));
 
-  // 1. Mouse Hover & Context Click
   await driver.actions().move({ origin: target }).contextClick().perform();
-
-  // 2. Drag and Drop
   await driver.actions().dragAndDrop(source, target).perform();
 
-  // 3. Keyboard Shortcuts (Control + A)
+  // Shortcut: Select All (Ctrl+A)
   await driver.actions().keyDown(Key.CONTROL).sendKeys('a').keyUp(Key.CONTROL).perform();
 
-  // 4. Scroll Element into View
   await driver.actions().scroll(0, 0, 0, 0, target).perform();
 }
 ```

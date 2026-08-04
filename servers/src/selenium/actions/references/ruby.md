@@ -13,16 +13,12 @@ def demonstrate_actions(driver)
   source = driver.find_element(id: 'draggable')
   target = driver.find_element(id: 'droppable')
 
-  # 1. Mouse Hover & Context Click
   driver.action.move_to(target).context_click.perform
-
-  # 2. Drag and Drop
   driver.action.drag_and_drop(source, target).perform
 
-  # 3. Keyboard Shortcuts (Control + A)
+  # Shortcut: Select All (Ctrl+A)
   driver.action.key_down(:control).send_keys('a').key_up(:control).perform
 
-  # 4. Scroll Element into View
   driver.action.scroll_to(target).perform
 end
 ```

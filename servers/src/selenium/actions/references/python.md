@@ -20,17 +20,13 @@ class ActionsExamples:
         source = driver.find_element(By.ID, "draggable")
         target = driver.find_element(By.ID, "droppable")
 
-        # 1. Hover, Right-click & Double-click
         actions.move_to_element(target).context_click().perform()
         actions.double_click(source).perform()
-
-        # 2. Drag and drop
         actions.drag_and_drop(source, target).perform()
 
-        # 3. Keyboard shortcuts (Control + A)
+        # Shortcut: Select All (Ctrl+A)
         actions.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
 
-        # 4. Scroll into view
         actions.scroll_to_element(target).perform()
 ```
 

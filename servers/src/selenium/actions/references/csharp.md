@@ -18,16 +18,12 @@ public class ActionsExamples
         var source = driver.FindElement(By.Id("draggable"));
         var target = driver.FindElement(By.Id("droppable"));
 
-        // 1. Mouse Hover & Context Click
         actions.MoveToElement(target).ContextClick().Perform();
-
-        // 2. Drag and Drop
         actions.DragAndDrop(source, target).Perform();
 
-        // 3. Keyboard Shortcuts (Control + A)
+        // Shortcut: Select All (Ctrl+A)
         actions.KeyDown(Keys.Control).SendKeys("a").KeyUp(Keys.Control).Perform();
 
-        // 4. Scroll Element into View
         actions.ScrollToElement(target).Perform();
     }
 }
