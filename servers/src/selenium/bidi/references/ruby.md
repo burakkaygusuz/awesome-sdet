@@ -9,11 +9,12 @@
 ```ruby
 require 'selenium-webdriver'
 
-def demonstrate_bidi(driver)
-  # 1. Enable BiDi
+def demonstrate_bidi
+  options = Selenium::WebDriver::Options.chrome(web_socket_url: true)
+  driver = Selenium::WebDriver.for(:chrome, options: options)
+
   bidi = driver.bidi
 
-  # 2. Log inspector
   bidi.log.on_console_entry do |entry|
     puts "Console entry: #{entry.text}"
   end
@@ -22,6 +23,6 @@ end
 
 ## Best Practices
 
-- **Enable BiDi Capability**: Pass `web_socket_url: true` in driver capabilities to enable BiDi.
+- **Enable BiDi Capability**: Pass `web_socket_url: true` in driver options to enable BiDi.
 - **Use BiDi over CDP**: BiDi provides standard cross-browser bidirectional event streams.
 - **Clean up listeners**: Ensure event handlers are properly detached after test completion.

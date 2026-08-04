@@ -7,17 +7,21 @@
 ## Code Examples
 
 ```python
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.bidi.console import Console
-from selenium.webdriver.remote.webdriver import WebDriver
 
 class BidiExamples:
 
-    def demonstrate_bidi(self, driver: WebDriver):
-        # 1. Console Log Inspector
+    def demonstrate_bidi(self):
+        options = ChromeOptions()
+        options.enable_bidi = True
+
+        driver = webdriver.Chrome(options=options)
+
         async def on_log_entry(entry):
             print(f"Log: {entry.text}")
 
-        # BiDi Log Inspector listener
         console = Console(driver)
         console.add_listener(Console.ALL, on_log_entry)
 ```

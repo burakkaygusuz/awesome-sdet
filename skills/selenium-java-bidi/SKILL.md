@@ -9,25 +9,50 @@ metadata:
 
 ## Source & scope
 
-Condensed from official Selenium documentation (`selenium.dev/documentation/webdriver/bidi/`) and Javadoc for `org.openqa.selenium.bidi.*`. BiDi is the official W3C standard for bidirectional browser automation, supported across all major browsers (Chrome, Edge, Firefox). Code examples use Selenium 4 and JUnit 5 (`org.junit.jupiter.api.Assertions`).
+Condensed from official Selenium documentation (`selenium.dev/documentation/webdriver/bidi/`) and Javadoc for `org.openqa.selenium.bidi.*`. BiDi is the official W3C standard for bidirectional browser automation, supported across all major browsers (Chrome, Edge, Firefox). Code examples use Selenium 4 (4.46.0+) and JUnit 5 (`org.junit.jupiter.api.Assertions`).
 
 ## Core building blocks
 
 | Type              | Role                                                                                                              |
 | :---------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `HasBiDi`         | Interface implemented by `RemoteWebDriver` and browser drivers supporting BiDi (`driver.getBiDi()`).              |
+| `HasBiDi`         | Interface implemented by `RemoteWebDriver` and browser drivers supporting BiDi (`((HasBiDi) driver).getBiDi()`).  |
 | `BiDi`            | Session handle managing bidirectional connection, domain creation, and event subscriptions.                       |
 | `LogInspector`    | Inspector for browser console logs, JS exceptions, and system events (`onConsoleEntry`, `onJavaScriptException`). |
 | `Network` (BiDi)  | W3C standard network interception domain (`addIntercept`, `continueWithAuth`, `continueRequest`).                 |
 | `BrowsingContext` | Handle for tabs/windows context inspection, navigation events, and element screenshots.                           |
 | `Script`          | BiDi domain for executing async JavaScript and subscribing to channel messages.                                   |
 
+## BiDi Session Initialization (Prerequisite)
+
+WebDriver BiDi requires enabling the WebSocket connection in browser options before session creation:
+
+```java
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+
+ChromeOptions options = new ChromeOptions();
+// Using official Selenium CapabilityType constant (or "webSocketUrl")
+options.setCapability(CapabilityType.ENABLE_BIDI, true);
+
+WebDriver driver = new ChromeDriver(options);
+```
+
 ## Recipe 1 — Monitoring console logs and JS exceptions with LogInspector
 
 ```java
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.bidi.module.LogInspector;
 import org.openqa.selenium.bidi.log.ConsoleLogEntry;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+ChromeOptions options = new ChromeOptions();
+options.setCapability(CapabilityType.ENABLE_BIDI, true);
+WebDriver driver = new ChromeDriver(options);
 
 LogInspector logInspector = new LogInspector(driver);
 CopyOnWriteArrayList<ConsoleLogEntry> logs = new CopyOnWriteArrayList<>();
@@ -41,9 +66,17 @@ Assertions.assertFalse(logs.isEmpty());
 ## Recipe 2 — Network request interception via BiDi
 
 ```java
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.bidi.module.Network;
 import org.openqa.selenium.bidi.network.AddInterceptParameters;
 import org.openqa.selenium.bidi.network.InterceptPhase;
+
+ChromeOptions options = new ChromeOptions();
+options.setCapability(CapabilityType.ENABLE_BIDI, true);
+WebDriver driver = new ChromeDriver(options);
 
 Network network = new Network(driver);
 network.addIntercept(new AddInterceptParameters(InterceptPhase.BEFORE_REQUEST_SENT));
@@ -56,7 +89,15 @@ network.onRequestSent(request -> {
 ## Recipe 3 — BrowsingContext navigation and context inspection
 
 ```java
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
+
+ChromeOptions options = new ChromeOptions();
+options.setCapability(CapabilityType.ENABLE_BIDI, true);
+WebDriver driver = new ChromeDriver(options);
 
 String currentHandle = driver.getWindowHandle();
 BrowsingContext context = new BrowsingContext(driver, currentHandle);

@@ -7,13 +7,16 @@
 ## Code Examples
 
 ```typescript
-import { Builder, WebDriver } from 'selenium-webdriver';
+import { Builder, chrome } from 'selenium-webdriver';
 
-export async function demonstrateBidi(driver: WebDriver): Promise<void> {
-  // 1. Enable BiDi Session
+export async function demonstrateBidi(): Promise<void> {
+  const options = new chrome.Options();
+  options.setCapability('webSocketUrl', true);
+
+  const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
+
   const bidi = await driver.getBidi();
 
-  // 2. Add Network Intercept Event Listener
   await bidi.network.addEventListener('beforeRequestSent', (event: any) => {
     console.log('Request sent:', event.request.url);
   });
@@ -22,6 +25,6 @@ export async function demonstrateBidi(driver: WebDriver): Promise<void> {
 
 ## Best Practices
 
-- **Enable BiDi Capability**: BiDi options must be enabled when creating the WebDriver session.
+- **Enable BiDi Capability**: BiDi options (`webSocketUrl: true`) must be enabled when creating the WebDriver session.
 - **Use BiDi over CDP**: BiDi is the cross-browser W3C standard replacing browser-specific CDP endpoints.
 - **Clean up listeners**: Detach event listeners (`removeEventListener`) after test execution completes.
