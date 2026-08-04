@@ -17,7 +17,7 @@ end
 
 def demonstrate_listener(original_driver)
   listener = CustomEventListener.new
-  driver = Selenium::WebDriver::Driver.new(listener: listener)
+  driver = Selenium::WebDriver.for(:chrome, listener: listener)
 end
 ```
 
