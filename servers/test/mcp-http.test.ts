@@ -69,7 +69,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       const toolsResponse = await client.listTools();
       const toolNames = new Set(toolsResponse.tools.map((t) => t.name));
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
-      expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
       expect(toolNames.has('read_se_grid_docs')).toBe(true);
@@ -127,7 +126,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.result).toBeDefined();
       const toolNames = new Set(data.result?.tools?.map((t) => t.name));
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
-      expect(toolNames.has('execute_se_cdp_intercept')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
       expect(toolNames.has('read_se_grid_docs')).toBe(true);
@@ -330,35 +328,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:3000');
     });
 
-    it('tools/call - credentials not reflected', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 5,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_cdp_intercept',
-            arguments: {
-              targetUrl: 'https://example.com',
-              urlPattern: '*://api.example.com/*',
-              action: 'injectBasicAuth',
-              authCredentials: {
-                username: 'secret_user_name',
-                password: 'secret_password_123',
-              },
-            },
-          },
-        }),
-      });
-
-      expect(res.status).toBe(200);
-      const text = await res.text();
-      expect(text).not.toContain('secret_user_name');
-      expect(text).not.toContain('secret_password_123');
-    });
-
     it('tools/call - response does not echo input parameters', async () => {
       const SENTINEL_URL = 'https://unique-sentinel-target-url.example.com/path';
       const SENTINEL_VALUE = 'unique-sentinel-locator-value-9f3a';
@@ -423,53 +392,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
               targetUrl: 'https://example.com',
               condition: 'elementToBeClickable',
               locator: { by: 'id', value: 'x'.repeat(513) },
-            },
-          },
-        }),
-      });
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.result?.isError).toBe(true);
-    });
-
-    it('tools/call - rejects urlPattern exceeding 1024 chars', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 13,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_cdp_intercept',
-            arguments: {
-              targetUrl: 'https://example.com',
-              urlPattern: '*/' + 'p'.repeat(1024),
-              action: 'blockRequest',
-            },
-          },
-        }),
-      });
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.result?.isError).toBe(true);
-    });
-
-    it('tools/call - rejects mockResponseBody exceeding 4096 chars', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 14,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_cdp_intercept',
-            arguments: {
-              targetUrl: 'https://example.com',
-              urlPattern: '*/api/*',
-              action: 'mockResponse',
-              mockResponseBody: 'b'.repeat(4097),
             },
           },
         }),

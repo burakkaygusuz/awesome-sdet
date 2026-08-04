@@ -1,7 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import {
-  handleCdpNetworkInterception,
   handleSeleniumWait,
   handlePageFactoryDocs,
   handleLocatorDocs,
@@ -9,7 +8,6 @@ import {
   handleActionsDocs,
   handleListenersDocs,
   handleGridDocs,
-  CdpNetworkInterceptionSchema,
   SeleniumWaitSchema,
   PageFactoryDocsSchema,
   LocatorDocsSchema,
@@ -68,18 +66,6 @@ export function createMcpServer(): McpServer {
       annotations: SAFE_READONLY_ANNOTATIONS,
     },
     safeToolHandler(() => handleSeleniumWait())
-  );
-
-  server.registerTool(
-    'execute_se_cdp_intercept',
-    {
-      title: 'CDP Network Interception',
-      description:
-        'Validates a Chrome DevTools Protocol (CDP) network interception configuration and returns the correct usage pattern.',
-      inputSchema: CdpNetworkInterceptionSchema.shape,
-      annotations: SAFE_READONLY_ANNOTATIONS,
-    },
-    safeToolHandler(() => handleCdpNetworkInterception())
   );
 
   server.registerTool(
