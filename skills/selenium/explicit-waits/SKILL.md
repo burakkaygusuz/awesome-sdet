@@ -1,6 +1,6 @@
 ---
 name: explicit-waits
-description: Synchronization architecture, condition-based waiting strategies (WebDriverWait, FluentWait), and ExpectedConditions. Trigger on explicit wait, WebDriverWait, or ExpectedConditions.
+description: 'Synchronization architecture, condition-based waiting strategies (WebDriverWait, FluentWait), and ExpectedConditions. Trigger on explicit wait, WebDriverWait, or ExpectedConditions.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+

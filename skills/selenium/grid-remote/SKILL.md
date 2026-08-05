@@ -1,6 +1,6 @@
 ---
 name: grid-remote
-description: RemoteWebDriver, enterprise Selenium Grid 4 infrastructure, TOML node stereotypes, and cloud grid scaling. Trigger on RemoteWebDriver, Grid 4, or TOML stereotypes.
+description: 'RemoteWebDriver, enterprise Selenium Grid 4 infrastructure, TOML node stereotypes, and cloud grid scaling. Trigger on RemoteWebDriver, Grid 4, or TOML stereotypes.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+

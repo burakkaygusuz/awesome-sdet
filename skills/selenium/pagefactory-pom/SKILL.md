@@ -1,6 +1,6 @@
 ---
 name: pagefactory-pom
-description: PageFactory lazy element initialization, @FindBy locators, @CacheLookup, and composite locators. Trigger on PageFactory, FindBy, or CacheLookup.
+description: 'PageFactory lazy element initialization, @FindBy locators, @CacheLookup, and composite locators. Trigger on PageFactory, FindBy, or CacheLookup.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+

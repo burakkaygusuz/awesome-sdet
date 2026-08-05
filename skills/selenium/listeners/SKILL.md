@@ -1,6 +1,6 @@
 ---
 name: listeners
-description: Event interception, command decorators (EventFiringDecorator), automated logging, and driver lifecycle hooks. Trigger on EventFiringDecorator or WebDriverListener.
+description: 'Event interception, command decorators (EventFiringDecorator), automated logging, and driver lifecycle hooks. Trigger on EventFiringDecorator or WebDriverListener.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+

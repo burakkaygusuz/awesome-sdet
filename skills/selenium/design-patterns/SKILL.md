@@ -1,6 +1,6 @@
 ---
 name: design-patterns
-description: Enterprise test design patterns: Page Object Model (POM), LoadableComponent, Action Bot, and Fluent Interface. Trigger on POM, LoadableComponent, or Action Bot.
+description: 'Enterprise test design patterns: Page Object Model (POM), LoadableComponent, Action Bot, and Fluent Interface. Trigger on POM, LoadableComponent, or Action Bot.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+

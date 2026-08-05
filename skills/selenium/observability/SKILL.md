@@ -1,6 +1,6 @@
 ---
 name: observability
-description: OpenTelemetry client-side tracing, Jaeger/OTLP exporters, and Grid 4 GraphQL metrics. Trigger on OpenTelemetry, tracing, Jaeger, or Grid GraphQL.
+description: 'OpenTelemetry client-side tracing, Jaeger/OTLP exporters, and Grid 4 GraphQL metrics. Trigger on OpenTelemetry, tracing, Jaeger, or Grid GraphQL.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.0+
