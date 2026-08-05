@@ -1,6 +1,6 @@
 # MCP Server Hardening Guide
 
-> Covers token efficiency, performance, and security hardening for the `sdet-mcp` Streamable HTTP server.
+> Covers token efficiency, performance, and security hardening for the `sdet-mcp` Streamable HTTP server across any automation framework tools.
 
 > Sources:
 > [MCP Specification 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25),
@@ -22,7 +22,7 @@
    - 3.1 [Tool Annotations](#31-tool-annotations)
    - 3.2 [Error Message Scrubbing](#32-error-message-scrubbing)
    - 3.3 [HTTP Security Headers](#33-http-security-headers)
-   - 3.4 [DNS Rebinding & Host/Origin Validation](#34-dns-rebinding--hostorigin-validation)
+   - 3.4 [DNS Rebinding & Host/Origin Validation](#34-dns-rebinding-hostorigin-validation)
 
 ---
 
@@ -36,22 +36,22 @@ The MCP specification defines two separate human-readable fields for tools:
 
 | Field         | Purpose                                                               | Consumed by                   |
 | :------------ | :-------------------------------------------------------------------- | :---------------------------- |
-| `title`       | Short, display-friendly label (e.g. `"Selenium Locator Docs"`)        | MCP host UI, approval dialogs |
+| `title`       | Short, display-friendly label (e.g. `"SDET Locator Docs"`)            | MCP host UI, approval dialogs |
 | `description` | Semantic description the LLM reads to decide whether to call the tool | LLM context window            |
 
 Use `title` for the long readable name and keep `description` to **one sentence** focused on the tool's decision boundary.
 
 ```typescript
 // ❌ Before — no title, verbose description
-server.registerTool('read_se_locator_docs', {
+server.registerTool('read_sdet_locator_docs', {
   description:
-    'Looks up complete Selenium locator strategy guides, performance hierarchies, best practices, and multi-language code examples (Java, Python, TypeScript, JavaScript, C#, Ruby)',
+    'Looks up complete SDET locator strategy guides, performance hierarchies, best practices, and multi-language code examples across test frameworks (Java, Python, TypeScript, JavaScript, C#, Ruby)',
   inputSchema: LocatorDocsSchema.shape,
 });
 
 // ✅ After — title + minimal description
-server.registerTool('read_se_locator_docs', {
-  title: 'Selenium Locator Docs',
+server.registerTool('read_sdet_locator_docs', {
+  title: 'SDET Locator Docs',
   description:
     'Returns locator strategy guide, performance hierarchy, and code examples for a given language.',
   inputSchema: LocatorDocsSchema.shape,
@@ -73,13 +73,14 @@ MCP 2025-11-25 introduced the `outputSchema` field and the corresponding `struct
 **Tool definition** (server side):
 
 ```typescript
-server.registerTool('read_se_locator_docs', {
-  title: 'Selenium Locator Docs',
+server.registerTool('read_sdet_locator_docs', {
+  title: 'SDET Locator Docs',
   description: 'Returns locator strategy guide and code examples for a given language.',
   inputSchema: LocatorDocsSchema.shape,
   outputSchema: {
     type: 'object' as const,
     properties: {
+      framework: { type: 'string', description: 'Requested framework identifier' },
       language: { type: 'string', description: 'Requested language identifier' },
       strategyHierarchy: {
         type: 'string',
@@ -88,7 +89,7 @@ server.registerTool('read_se_locator_docs', {
       codeExample: { type: 'string', description: 'Language-specific code example block' },
       bestPractices: { type: 'string', description: 'Best practice notes for the language' },
     },
-    required: ['language', 'codeExample'],
+    required: ['framework', 'language', 'codeExample'],
   },
 });
 ```
@@ -100,6 +101,7 @@ server.registerTool('read_se_locator_docs', {
 return {
   content: [{ type: 'text', text: markdown }], // kept for backward-compat clients
   structuredContent: {
+    framework,
     language,
     strategyHierarchy,
     codeExample,
@@ -198,92 +200,31 @@ const SAFE_READONLY_ANNOTATIONS = {
   openWorldHint: false, // serves only bundled reference files, no network calls
 } satisfies import('@modelcontextprotocol/sdk/types.js').ToolAnnotations;
 
-server.registerTool('read_se_locator_docs', {
-  title: 'Selenium Locator Docs',
+server.registerTool('read_sdet_locator_docs', {
+  title: 'SDET Locator Docs',
   description: 'Returns locator strategy guide and code examples for a given language.',
   inputSchema: LocatorDocsSchema.shape,
   annotations: SAFE_READONLY_ANNOTATIONS,
 });
 ```
 
-> **Important:** The spec explicitly states that clients **MUST** treat annotations as **untrusted** unless they originate from a verified server. Annotations are hints for UX (e.g. auto-approval, confirmation dialogs), not security enforcement boundaries. Network controls and sandboxing provide actual guarantees.
-
-**Effect on hosts:**
-
-- `readOnlyHint: true` → Host may auto-approve without a confirmation dialog.
-- `openWorldHint: false` → Host may assign a lower trust level to tool output (no external data can be injected).
-- `idempotentHint: true` → Host may safely retry failed calls without concern for duplicate effects.
-
 ---
 
 ### 3.2 Error Message Scrubbing
 
-The MCP Security Best Practices document identifies error messages as a vector for **internal network topology reconnaissance**:
-
-> _"Error messages reveal information about internal network topology and services."_
-> — [MCP Security Best Practices § SSRF Risks](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/tutorials/security/security_best_practices.mdx)
-
-The current transport-level error handler reflects raw `error.message` in the HTTP response body:
-
-```typescript
-// ❌ Current — leaks internal details (file paths, stack traces, module names)
-message: `Internal Server Error: ${error instanceof Error ? error.message : String(error)}`;
-```
-
-Apply scrubbing at the HTTP boundary:
-
-```typescript
-// ✅ Hardened — generic client-facing message, full detail logged server-side
-} catch (error) {
-  console.error('[MCP] Unhandled transport error:', error) // server-side only
-  if (!res.headersSent) {
-    res.writeHead(500, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({
-      jsonrpc: '2.0',
-      error: { code: -32603, message: 'Internal Server Error' }, // no detail
-    }))
-  }
-}
-```
-
-Tool-level errors (inside `safeToolHandler`) may return descriptive messages via `isError: true` because those are intentionally surfaced to the LLM for self-correction (SEP-1303). Only the transport-level catch block must be scrubbed.
+Scrub raw error details from transport-level responses to prevent internal topology leakage.
 
 ---
 
 ### 3.3 HTTP Security Headers
 
-Add the following response headers to all non-error HTTP responses. These are standard hardening measures for any HTTP server exposed to a browser environment:
-
-```typescript
-function setSecurityHeaders(res: http.ServerResponse): void {
-  res.setHeader('X-Content-Type-Options', 'nosniff'); // prevent MIME sniffing
-  res.setHeader('X-Frame-Options', 'DENY'); // prevent clickjacking
-  res.setHeader('Referrer-Policy', 'no-referrer'); // suppress Referer header leakage
-}
-```
-
-Apply in `handleCorsPreflight` and `handleMcpPostRequest` before any `writeHead` call.
-
-> `Content-Security-Policy` is omitted intentionally: `sdet-mcp` serves JSON-RPC responses, not HTML documents, so a CSP would have no browser enforcement effect.
+Add security response headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) to HTTP responses.
 
 ---
 
 ### 3.4 DNS Rebinding & Host/Origin Validation
 
-The current implementation already guards against DNS rebinding attacks by validating `Host` and `Origin` headers against an allowlist:
-
-```typescript
-const ALLOWED_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
-```
-
-This is the correct defense. The MCP specification recommends this pattern for locally-bound servers. Keep the server bound to `127.0.0.1` (not `0.0.0.0`) to ensure the OS itself enforces the loopback boundary:
-
-```typescript
-// ✅ Already correct — bind only to loopback
-httpServer.listen(PORT, '127.0.0.1', callback);
-```
-
-**Do not** extend `ALLOWED_HOSTS` with public hostnames unless you also add bearer token authentication as described in the [MCP Authorization spec](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization).
+Enforce `Host` and `Origin` allowlists to prevent DNS rebinding attacks on loopback endpoints.
 
 ---
 
