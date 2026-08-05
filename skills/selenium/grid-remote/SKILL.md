@@ -1,8 +1,17 @@
 ---
-name: selenium-grid-remote
-description: Architecture guide for RemoteWebDriver, enterprise Selenium Grid 4 infrastructure, cloud grid execution, TOML node stereotypes, and containerized browser scaling. Trigger on RemoteWebDriver, Selenium Grid, Grid 4, TOML stereotypes, cloud grid, or remote browser execution.
+name: grid-remote
+description: RemoteWebDriver, enterprise Selenium Grid 4 infrastructure, TOML node stereotypes, and cloud grid scaling. Trigger on RemoteWebDriver, Grid 4, or TOML stereotypes.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'remotewebdriver', 'selenium-grid', 'cloud-grid', 'testing']
+  framework: selenium
+  keywords:
+    - remotewebdriver
+    - selenium-grid-4
+    - toml-stereotypes
+    - cloud-grid
+    - distributed-execution
 ---
 
 # RemoteWebDriver & Enterprise Selenium Grid 4 Architecture

@@ -1,8 +1,17 @@
 ---
-name: selenium-bidi
-description: Architecture and workflow guide for W3C WebDriver BiDirectional (BiDi) protocol automation including console log inspection, network request interception, and browsing context management. Trigger on BiDi, WebDriver BiDi, LogInspector, Network interception, BrowsingContext, or WebSocket browser events.
+name: bidi
+description: W3C WebDriver BiDirectional (BiDi) protocol features: console log inspection, network interception, and browsing context. Trigger on BiDi, LogInspector, network mocking, or WebSocket events.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'bidi', 'webdriver-bidi', 'testing']
+  framework: selenium
+  keywords:
+    - webdriver-bidi
+    - log-inspector
+    - network-interception
+    - browsing-context
+    - websocket-events
 ---
 
 # WebDriver BiDi Protocol Architecture

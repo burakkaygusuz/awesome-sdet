@@ -1,8 +1,18 @@
 ---
-name: selenium-design-patterns
-description: Enterprise design patterns for Selenium test automation including Page Object Model (POM), LoadableComponent, Action Bot, Page Component Objects, and Fluent User Journey interfaces. Trigger on LoadableComponent, Action Bot, Page Component, Page Object Model, POM, design patterns, or fluent page object.
+name: design-patterns
+description: Enterprise test design patterns: Page Object Model (POM), LoadableComponent, Action Bot, and Fluent Interface. Trigger on POM, LoadableComponent, or Action Bot.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'design-patterns', 'pom', 'loadable-component', 'testing']
+  framework: selenium
+  keywords:
+    - page-object-model
+    - pom
+    - loadable-component
+    - action-bot
+    - page-component-object
+    - fluent-interface
 ---
 
 # Enterprise Selenium Design Patterns

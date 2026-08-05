@@ -1,8 +1,17 @@
 ---
-name: selenium-cookies-storage
-description: Architectural patterns for HTTP cookie management, login UI auth bypass via session injection, and HTML5 LocalStorage/SessionStorage state management. Trigger on Cookie, addCookie, getCookieNamed, deleteAllCookies, auth bypass, session injection, LocalStorage, or SessionStorage.
+name: cookies-storage
+description: HTTP cookie management, UI auth bypass via session injection, and HTML5 Web Storage state. Trigger on cookies, auth bypass, LocalStorage, or SessionStorage.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'cookie', 'auth-bypass', 'storage', 'session', 'testing']
+  framework: selenium
+  keywords:
+    - cookie-management
+    - auth-bypass
+    - session-injection
+    - local-storage
+    - session-storage
 ---
 
 # Cookie & Session Storage Architecture

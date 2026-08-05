@@ -1,8 +1,16 @@
 ---
-name: selenium-pagefactory-pom
-description: PageFactory and Page Object Model patterns, element initialization, `@FindBy` locators, and lazy initialization. Trigger on PageFactory, `@FindBy`, `@FindBys`, `@FindAll`, `@CacheLookup`, or Page Object initialization.
+name: pagefactory-pom
+description: PageFactory lazy element initialization, @FindBy locators, @CacheLookup, and composite locators. Trigger on PageFactory, FindBy, or CacheLookup.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'pagefactory', 'pom', 'findby', 'testing']
+  framework: selenium
+  keywords:
+    - pagefactory
+    - findby-annotation
+    - cache-lookup
+    - lazy-element-initialization
 ---
 
 # PageFactory & Page Object Model Architecture

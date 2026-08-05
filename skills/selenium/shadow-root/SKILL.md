@@ -1,8 +1,17 @@
 ---
-name: selenium-shadow-root
-description: Architectural patterns for Shadow DOM automation, SearchContext.getShadowRoot(), nested shadow root navigation, and Web Components element interaction. Trigger on Shadow DOM, shadow root, getShadowRoot, SearchContext, or Web Components.
+name: shadow-root
+description: Shadow DOM element traversal via SearchContext.getShadowRoot(), nested shadow roots, and W3C CSS rules. Trigger on Shadow DOM, getShadowRoot, or Web Components.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'shadow-dom', 'shadow-root', 'web-components', 'testing']
+  framework: selenium
+  keywords:
+    - shadow-dom
+    - shadow-root
+    - search-context
+    - web-components
+    - css-selectors
 ---
 
 # Shadow DOM & Web Components Architecture

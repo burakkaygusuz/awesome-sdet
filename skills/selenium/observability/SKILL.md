@@ -1,9 +1,16 @@
 ---
-name: selenium-observability
-description: Architectural guide for Selenium 4 OpenTelemetry observability, client-side tracing, Jaeger/OTLP exporters, and Grid 4 GraphQL API querying. Trigger on OpenTelemetry, telemetry, tracing, Jaeger, Zipkin, OTLP, Grid GraphQL API, or monitoring Selenium test execution.
+name: observability
+description: OpenTelemetry client-side tracing, Jaeger/OTLP exporters, and Grid 4 GraphQL metrics. Trigger on OpenTelemetry, tracing, Jaeger, or Grid GraphQL.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
+  framework: selenium
   keywords:
-    ['selenium', 'opentelemetry', 'tracing', 'jaeger', 'graphql', 'observability', 'testing']
+    - opentelemetry
+    - client-tracing
+    - jaeger-otlp
+    - grid-graphql-metrics
 ---
 
 # Observability & OpenTelemetry Tracing Architecture

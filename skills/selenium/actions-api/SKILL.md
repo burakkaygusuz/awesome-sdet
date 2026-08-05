@@ -1,8 +1,19 @@
 ---
-name: selenium-actions-api
-description: Architectural patterns and best practices for Selenium Actions API low-level virtualized user interactions (mouse hover, context click, drag and drop, keyboard shortcuts, scroll wheel). Trigger on Actions API, ActionChains, dragAndDrop, contextClick, scrollToElement, or virtual device input.
+name: actions-api
+description: Low-level virtualized user interactions (mouse hover, context click, drag & drop, keyboard shortcuts, scroll wheel). Trigger on Actions API, ActionChains, or pointer input.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'actions-api', 'interactions', 'testing']
+  framework: selenium
+  keywords:
+    - actions-api
+    - action-chains
+    - virtual-user-input
+    - drag-and-drop
+    - context-click
+    - mouse-hover
+    - scroll-wheel
 ---
 
 # Actions API — Low-Level User Interactions

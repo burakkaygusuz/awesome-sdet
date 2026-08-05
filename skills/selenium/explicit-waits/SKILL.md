@@ -1,8 +1,17 @@
 ---
-name: selenium-explicit-waits
-description: Synchronization rules, condition-based waiting strategies, and custom ExpectedConditions for Selenium test automation. Trigger on explicit wait, WebDriverWait, ExpectedConditions, implicit wait, FluentWait, or synchronization issues.
+name: explicit-waits
+description: Synchronization architecture, condition-based waiting strategies (WebDriverWait, FluentWait), and ExpectedConditions. Trigger on explicit wait, WebDriverWait, or ExpectedConditions.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'explicit-waits', 'synchronization', 'expected-conditions', 'testing']
+  framework: selenium
+  keywords:
+    - explicit-waits
+    - webdriver-wait
+    - expected-conditions
+    - fluent-wait
+    - synchronization
 ---
 
 # Synchronization & Explicit Waits Architecture

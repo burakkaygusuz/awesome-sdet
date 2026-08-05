@@ -1,8 +1,17 @@
 ---
-name: selenium-listeners
-description: Architectural patterns for Selenium event listeners, command interception, logging decorators, and driver lifecycle event hooks. Trigger on EventFiringDecorator, EventFiringWebDriver, WebDriverListener, event listener, command interception, or driver logging wrapper.
+name: listeners
+description: Event interception, command decorators (EventFiringDecorator), automated logging, and driver lifecycle hooks. Trigger on EventFiringDecorator or WebDriverListener.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'listeners', 'event-firing', 'webdriver-listener', 'testing']
+  framework: selenium
+  keywords:
+    - event-firing-decorator
+    - webdriver-listener
+    - event-interception
+    - command-interception
+    - driver-logging
 ---
 
 # Selenium Event Listeners & Decorators Architecture

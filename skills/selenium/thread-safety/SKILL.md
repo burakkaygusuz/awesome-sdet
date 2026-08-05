@@ -1,8 +1,16 @@
 ---
-name: selenium-thread-safety
-description: Concurrency patterns, thread safety rules, isolated driver lifecycle management, and parallel test execution strategies for Selenium test suites. Trigger on thread safety, parallel execution, driver factory, ThreadLocal, or concurrent test execution.
+name: thread-safety
+description: Thread safety architecture, isolated driver lifecycle (DriverFactory), and parallel test execution. Trigger on thread safety, ThreadLocal, or parallel execution.
+user-invocable: true
+license: MIT
+compatibility: Selenium 4.0+
 metadata:
-  keywords: ['selenium', 'thread-safety', 'parallel-execution', 'concurrency', 'testing']
+  framework: selenium
+  keywords:
+    - thread-local
+    - parallel-execution
+    - driver-factory
+    - concurrency-safety
 ---
 
 # Parallel Execution & Thread Safety Architecture
