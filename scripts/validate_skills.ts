@@ -1,51 +1,96 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+interface Skill {
+  name: string;
+  canonicalName: string;
+  framework: string;
+  topic: string;
+  description: string;
+  path: string;
+}
+
 async function validateSkills(): Promise<void> {
-  const dirIndex = process.argv.indexOf('--dir');
+  const dirIdx = process.argv.indexOf('--dir');
   const targetDir =
-    dirIndex !== -1 && dirIndex + 1 < process.argv.length ? process.argv[dirIndex + 1] : 'skills';
+    dirIdx !== -1 && dirIdx + 1 < process.argv.length ? process.argv[dirIdx + 1] : 'skills';
   const skillsPath = path.resolve(targetDir);
 
-  try {
-    await fs.access(skillsPath);
-  } catch {
-    console.error(`Error: Directory not found: ${skillsPath}`);
-    process.exit(1);
-  }
-
+  const frameworks: Record<string, Skill[]> = {};
+  let totalSkills = 0;
   let hasErrors = false;
-  const entries = await fs.readdir(skillsPath, { withFileTypes: true });
-  const dirs = entries.filter((e) => e.isDirectory() && !e.name.startsWith('.'));
+
+  const entries = await fs.readdir(skillsPath, { recursive: true, withFileTypes: true });
+  const skillFiles = entries.filter((e) => e.isFile() && e.name === 'SKILL.md');
 
   await Promise.all(
-    dirs.map(async (dir) => {
-      const file = path.join(skillsPath, dir.name, 'SKILL.md');
-      try {
-        const rawContent = await fs.readFile(file, 'utf8');
-        const content = rawContent.replace(/^\uFEFF/, '');
-        const frontmatter = /^---\r?\n([\s\S]+?)\r?\n---/.exec(content)?.[1] ?? '';
+    skillFiles.map(async (file) => {
+      const parentDir = file.parentPath ?? (file as unknown as { path: string }).path;
+      const filePath = path.join(parentDir, file.name);
+      const relPath = path.relative(process.cwd(), filePath);
+      const parts = relPath.split(path.sep);
 
-        for (const key of ['name', 'description', 'keywords']) {
-          if (!new RegExp(String.raw`(?:^|\n)(?:  )?${key}:\s*\S+`).test(frontmatter)) {
-            console.error(
-              `Error: Frontmatter '${key}' key missing or empty in ${path.join(targetDir, dir.name, 'SKILL.md')}`
-            );
-            hasErrors = true;
-          }
+      const topic = parts[parts.length - 2];
+      const frameworkDir = parts[parts.length - 3];
+
+      try {
+        const content = await fs.readFile(filePath, 'utf8');
+        const frontmatter = /^---\r?\n([\s\S]+?)\r?\n---/.exec(content)?.[1] || '';
+
+        const getVal = (key: string) =>
+          new RegExp(String.raw`(?:^|\n)(?:  )?${key}:\s*(.+)`).exec(frontmatter)?.[1]?.trim() ||
+          '';
+
+        const name = getVal('name');
+        const description = getVal('description');
+        const framework = getVal('framework') || frameworkDir;
+        const hasKeywords = new RegExp(String.raw`(?:^|\n)(?:  )?keywords:\s*\S+`).test(
+          frontmatter
+        );
+
+        if (!name || !description || !framework || !hasKeywords) {
+          console.error(`Error: Frontmatter validation failed in ${relPath}`);
+          hasErrors = true;
+        } else if (name !== topic) {
+          console.error(
+            `Error: Skill name '${name}' must match directory '${topic}' in ${relPath}`
+          );
+          hasErrors = true;
+        } else {
+          frameworks[framework] = frameworks[framework] || [];
+          frameworks[framework].push({
+            name,
+            canonicalName: `${framework}-${name}`,
+            framework,
+            topic,
+            description,
+            path: relPath,
+          });
+          totalSkills++;
         }
-      } catch {
-        console.error(`Error: Missing SKILL.md in ${path.join(targetDir, dir.name)}`);
+      } catch (err) {
+        console.error(`Error reading ${relPath}:`, err);
         hasErrors = true;
       }
     })
   );
 
   if (hasErrors) process.exit(1);
-  console.log('Validation passed successfully.');
+
+  await fs.mkdir('dist', { recursive: true });
+  await fs.writeFile(
+    'dist/skills-manifest.json',
+    JSON.stringify({ generatedAt: new Date().toISOString(), totalSkills, frameworks }, null, 2)
+  );
+
+  console.log(
+    `Validation passed. Manifest generated with ${totalSkills} skills across ${
+      Object.keys(frameworks).length
+    } framework(s).`
+  );
 }
 
-validateSkills().catch((error: unknown) => {
-  console.error('Unhandled error during validation:', error);
+validateSkills().catch((err) => {
+  console.error('Unhandled error:', err);
   process.exit(1);
 });
