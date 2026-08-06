@@ -1,10 +1,7 @@
 ---
 name: selenium-automation-engineer
 description: Principal SDET & Selenium 4 Architect Agent for orchestrating polyglot test automation suites across Java, Python, TypeScript, JavaScript, C#, and Ruby. Leverages sdet-mcp server tools and repository skills.
-metadata:
-  version: '1.0.0'
-  framework: 'selenium'
-  role: 'Principal Automation Engineer'
+user-invocable: true
 ---
 
 # Selenium 4 Automation Engineer Agent
