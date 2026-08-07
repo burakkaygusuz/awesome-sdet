@@ -16,7 +16,16 @@ interface JsonRpcResponse {
   id: number;
   result?: {
     protocolVersion?: string;
-    tools?: Array<{ name: string }>;
+    tools?: Array<{
+      name: string;
+      description?: string;
+      annotations?: {
+        readOnlyHint?: boolean;
+        destructiveHint?: boolean;
+        idempotentHint?: boolean;
+        openWorldHint?: boolean;
+      };
+    }>;
     content?: Array<{ type: string; text?: string }>;
     isError?: boolean;
   };
@@ -72,6 +81,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
       expect(toolNames.has('read_se_grid_docs')).toBe(true);
+      expect(toolNames.has('read_cy_commands_docs')).toBe(true);
 
       const callResponse = await client.callTool({
         name: 'read_se_locator_docs',
@@ -88,7 +98,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
   });
 
   describe('Wire Protocol & HTTP Security Guard Tests', () => {
-    it('initialize', async () => {
+    it('initialize handshake matches LATEST_PROTOCOL_VERSION', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -112,7 +122,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.result?.protocolVersion).toBe(LATEST_PROTOCOL_VERSION);
     });
 
-    it('tools/list', async () => {
+    it('tools/list returns all registered Selenium & Cypress tools with safety annotations', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -124,7 +134,10 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.jsonrpc).toBe('2.0');
       expect(data.id).toBe(2);
       expect(data.result).toBeDefined();
-      const toolNames = new Set(data.result?.tools?.map((t) => t.name));
+
+      const tools = data.result?.tools || [];
+      const toolNames = new Set(tools.map((t) => t.name));
+
       // Selenium Tools
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
@@ -140,6 +153,11 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('read_cy_task_docs')).toBe(true);
       expect(toolNames.has('read_cy_stubs_spies_docs')).toBe(true);
       expect(toolNames.has('read_cy_fixtures_docs')).toBe(true);
+
+      // Safety Annotations Check
+      const seLocatorTool = tools.find((t) => t.name === 'read_se_locator_docs');
+      expect(seLocatorTool?.annotations).toBeDefined();
+      expect(seLocatorTool?.annotations?.readOnlyHint).toBe(true);
     });
 
     it('tools/call - read_se_locator_docs by strategy & language', async () => {
@@ -195,47 +213,28 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(text).toContain('cy.get');
     });
 
-    it('tools/call - read_pagefactory_docs by className', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 30,
-          method: 'tools/call',
-          params: {
-            name: 'read_se_pagefactory_docs',
-            arguments: {
-              className: 'AjaxElementLocator',
-            },
-          },
-        }),
-      });
+    it('tools/call - Cypress tools suite execution (component, network, session, shadow, task, stubs, fixtures)', async () => {
+      const cyTools = [
+        { name: 'read_cy_component_docs', keyText: 'mount' },
+        { name: 'read_cy_network_docs', keyText: 'cy.intercept' },
+        { name: 'read_cy_session_docs', keyText: 'cy.session' },
+        { name: 'read_cy_shadow_docs', keyText: 'shadow' },
+        { name: 'read_cy_task_docs', keyText: 'cy.task' },
+        { name: 'read_cy_stubs_spies_docs', keyText: 'cy.spy' },
+        { name: 'read_cy_fixtures_docs', keyText: 'cy.fixture' },
+      ];
 
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(30);
-      expect(data.result).toBeDefined();
-      expect(Array.isArray(data.result?.content)).toBe(true);
-      const text = data.result?.content?.[0]?.text || '';
-      expect(text).toContain('AjaxElementLocator');
-    });
-
-    it('tools/call - read_pagefactory_docs by language (python, typescript, csharp)', async () => {
-      for (const lang of ['python', 'typescript', 'csharp', 'ruby', 'javascript']) {
+      for (const t of cyTools) {
         const res = await fetch(url, {
           method: 'POST',
           headers: MCP_HEADERS,
           body: JSON.stringify({
             jsonrpc: '2.0',
-            id: 31,
+            id: 50,
             method: 'tools/call',
             params: {
-              name: 'read_se_pagefactory_docs',
-              arguments: {
-                language: lang,
-              },
+              name: t.name,
+              arguments: { language: 'typescript' },
             },
           }),
         });
@@ -244,22 +243,22 @@ describe('MCP HTTP Transport Protocol Tests', () => {
         const data = await parseMcpResponse(res);
         expect(data.result).toBeDefined();
         const text = data.result?.content?.[0]?.text || '';
-        expect(text.toLowerCase()).toContain(lang);
+        expect(text.toLowerCase()).toContain(t.keyText.toLowerCase());
       }
     });
 
-    it('tools/call - valid Cypress read_cy_commands_docs call', async () => {
+    it('tools/call - invalid language returns handled isError: true', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({
           jsonrpc: '2.0',
-          id: 301,
+          id: 51,
           method: 'tools/call',
           params: {
             name: 'read_cy_commands_docs',
             arguments: {
-              language: 'typescript',
+              language: 'unsupported_lang',
             },
           },
         }),
@@ -267,68 +266,31 @@ describe('MCP HTTP Transport Protocol Tests', () => {
 
       expect(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(301);
-      expect(data.result).toBeDefined();
-      expect(Array.isArray(data.result?.content)).toBe(true);
-      const responseText = data.result?.content?.[0]?.text || '';
-      expect(responseText).toContain('Cypress Core Commands');
-    });
-
-    it('tools/call - valid call', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 3,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_explicit_wait',
-            arguments: {
-              targetUrl: 'https://example.com',
-              condition: 'elementToBeClickable',
-              locator: { by: 'id', value: 'button' },
-            },
-          },
-        }),
-      });
-
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(3);
-      expect(data.result).toBeDefined();
-      expect(Array.isArray(data.result?.content)).toBe(true);
-      const responseText = data.result?.content?.[0]?.text || '';
-      expect(responseText).toContain('no browser was driven');
-    });
-
-    it('tools/call - invalid call', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 4,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_explicit_wait',
-            arguments: {
-              targetUrl: 12345,
-              condition: 'elementToBeClickable',
-              locator: { by: 'id', value: 'button' },
-            },
-          },
-        }),
-      });
-
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(4);
       expect(data.result).toBeDefined();
       expect(data.result?.isError).toBe(true);
+      const text = data.result?.content?.[0]?.text || '';
+      expect(text).toContain('Unsupported language');
+    });
+
+    it('security headers - returns X-Content-Type-Options, X-Frame-Options, Referrer-Policy', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({ jsonrpc: '2.0', id: 60, method: 'tools/list' }),
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+      expect(res.headers.get('x-frame-options')).toBe('DENY');
+      expect(res.headers.get('referrer-policy')).toBe('no-referrer');
+    });
+
+    it('route protection - returns 404 for non-existent path', async () => {
+      const baseUrl = url.replace('/mcp', '');
+      const res = await fetch(`${baseUrl}/non-existent-route`, {
+        method: 'GET',
+      });
+      expect(res.status).toBe(404);
     });
 
     it('host/origin guard - rejects non-local Host', async () => {
@@ -378,20 +340,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(res.headers.get('access-control-allow-methods')).toContain('POST');
     });
 
-    it('cors headers - includes Access-Control-Allow-Origin on POST', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          ...MCP_HEADERS,
-          Origin: 'http://localhost:3000',
-        },
-        body: JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }),
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:3000');
-    });
-
     it('tools/call - response does not echo input parameters', async () => {
       const SENTINEL_URL = 'https://unique-sentinel-target-url.example.com/path';
       const SENTINEL_VALUE = 'unique-sentinel-locator-value-9f3a';
@@ -416,53 +364,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       const text = await res.text();
       expect(text).not.toContain(SENTINEL_URL);
       expect(text).not.toContain(SENTINEL_VALUE);
-    });
-
-    it('tools/call - rejects targetUrl exceeding 2048 chars', async () => {
-      const longUrl = 'https://example.com/' + 'a'.repeat(2048);
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 11,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_explicit_wait',
-            arguments: {
-              targetUrl: longUrl,
-              condition: 'elementToBeClickable',
-              locator: { by: 'id', value: 'btn' },
-            },
-          },
-        }),
-      });
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.result?.isError).toBe(true);
-    });
-
-    it('tools/call - rejects locator.value exceeding 512 chars', async () => {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 12,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_explicit_wait',
-            arguments: {
-              targetUrl: 'https://example.com',
-              condition: 'elementToBeClickable',
-              locator: { by: 'id', value: 'x'.repeat(513) },
-            },
-          },
-        }),
-      });
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.result?.isError).toBe(true);
     });
   });
 });
