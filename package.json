@@ -11,6 +11,9 @@
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
+    "audit": "pnpm audit --audit-level high",
+    "audit:skills": "skills-check audit",
+    "audit:all": "pnpm audit --audit-level high && skills-check audit",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -20,18 +23,19 @@
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-markdownlint": "^0.10.1",
-    "globals": "^17.8.0",
+    "globals": "^17.9.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "skills-check": "^1.2.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.66.0"
   },
   "type": "module",
   "pnpm": {
     "overrides": {
-      "undici": ">=8.9.0"
+      "hono@<4.12.34": ">=4.12.34",
+      "undici@<6.28.0": ">=6.28.0"
     }
   }
 }
