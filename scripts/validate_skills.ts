@@ -44,12 +44,15 @@ async function validateSkills(): Promise<void> {
         const name = getVal('name');
         const description = getVal('description');
         const framework = getVal('framework') || frameworkDir;
-        const hasKeywords = new RegExp(String.raw`(?:^|\n)(?:  )?keywords:\s*\S+`).test(
-          frontmatter
-        );
+        const hasUnsupportedKeywords = new RegExp(String.raw`(?:^|\n)keywords:`).test(frontmatter);
 
-        if (!name || !description || !framework || !hasKeywords) {
-          console.error(`Error: Frontmatter validation failed in ${relPath}`);
+        if (!name || !description || !framework) {
+          console.error(`Error: Missing required frontmatter fields in ${relPath}`);
+          hasErrors = true;
+        } else if (hasUnsupportedKeywords) {
+          console.error(
+            `Error: Attribute 'keywords' is unsupported in VS Code agents. Remove top-level 'keywords' in ${relPath}`
+          );
           hasErrors = true;
         } else if (name !== topic) {
           console.error(
