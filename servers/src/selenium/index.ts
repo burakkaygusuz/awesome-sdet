@@ -7,3 +7,4 @@ export * from './actions/index.js';
 export * from './listeners/index.js';
 export * from './grid/index.js';
 export * from './observability/index.js';
+export * from './register.js';

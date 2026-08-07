@@ -125,10 +125,21 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.id).toBe(2);
       expect(data.result).toBeDefined();
       const toolNames = new Set(data.result?.tools?.map((t) => t.name));
+      // Selenium Tools
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
       expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
       expect(toolNames.has('read_se_grid_docs')).toBe(true);
+
+      // Cypress Tools
+      expect(toolNames.has('read_cy_commands_docs')).toBe(true);
+      expect(toolNames.has('read_cy_network_docs')).toBe(true);
+      expect(toolNames.has('read_cy_session_docs')).toBe(true);
+      expect(toolNames.has('read_cy_shadow_docs')).toBe(true);
+      expect(toolNames.has('read_cy_component_docs')).toBe(true);
+      expect(toolNames.has('read_cy_task_docs')).toBe(true);
+      expect(toolNames.has('read_cy_stubs_spies_docs')).toBe(true);
+      expect(toolNames.has('read_cy_fixtures_docs')).toBe(true);
     });
 
     it('tools/call - read_se_locator_docs by strategy & language', async () => {
@@ -156,6 +167,32 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.result).toBeDefined();
       const text = data.result?.content?.[0]?.text || '';
       expect(text).toContain('By.xpath');
+    });
+
+    it('tools/call - read_cy_commands_docs by language', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 41,
+          method: 'tools/call',
+          params: {
+            name: 'read_cy_commands_docs',
+            arguments: {
+              language: 'typescript',
+            },
+          },
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect(data.jsonrpc).toBe('2.0');
+      expect(data.id).toBe(41);
+      expect(data.result).toBeDefined();
+      const text = data.result?.content?.[0]?.text || '';
+      expect(text).toContain('cy.get');
     });
 
     it('tools/call - read_pagefactory_docs by className', async () => {
@@ -209,6 +246,33 @@ describe('MCP HTTP Transport Protocol Tests', () => {
         const text = data.result?.content?.[0]?.text || '';
         expect(text.toLowerCase()).toContain(lang);
       }
+    });
+
+    it('tools/call - valid Cypress read_cy_commands_docs call', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 301,
+          method: 'tools/call',
+          params: {
+            name: 'read_cy_commands_docs',
+            arguments: {
+              language: 'typescript',
+            },
+          },
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect(data.jsonrpc).toBe('2.0');
+      expect(data.id).toBe(301);
+      expect(data.result).toBeDefined();
+      expect(Array.isArray(data.result?.content)).toBe(true);
+      const responseText = data.result?.content?.[0]?.text || '';
+      expect(responseText).toContain('Cypress Core Commands');
     });
 
     it('tools/call - valid call', async () => {
