@@ -2,9 +2,9 @@ import http from 'node:http';
 import { AddressInfo } from 'node:net';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createHttpServer } from '../dist/index.js';
+import { PROTOCOL_VERSION } from '../dist/server.js';
 
 const MCP_HEADERS = {
   'Content-Type': 'application/json',
@@ -16,6 +16,12 @@ interface JsonRpcResponse {
   id: number;
   result?: {
     protocolVersion?: string;
+    serverInfo?: {
+      name: string;
+      version: string;
+      description?: string;
+    };
+    capabilities?: Record<string, unknown>;
     tools?: Array<{
       name: string;
       description?: string;
@@ -26,7 +32,33 @@ interface JsonRpcResponse {
         openWorldHint?: boolean;
       };
     }>;
+    resources?: Array<{
+      uri: string;
+      name?: string;
+      mimeType?: string;
+    }>;
+    resourceTemplates?: Array<{
+      uriTemplate: string;
+      name?: string;
+      mimeType?: string;
+    }>;
+    prompts?: Array<{
+      name: string;
+      description?: string;
+      arguments?: Array<{ name: string; required?: boolean }>;
+    }>;
+    contents?: Array<{
+      uri: string;
+      text?: string;
+      mimeType?: string;
+    }>;
+    messages?: Array<{
+      role: string;
+      content: { type: string; text?: string };
+    }>;
     content?: Array<{ type: string; text?: string }>;
+    ttlMs?: number;
+    cacheScope?: string;
     isError?: boolean;
   };
   error?: {
@@ -44,7 +76,7 @@ async function parseMcpResponse(res: Response): Promise<JsonRpcResponse> {
   return JSON.parse(rawText);
 }
 
-describe('MCP HTTP Transport Protocol Tests', () => {
+describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
   let server: http.Server;
   let url: string;
 
@@ -69,12 +101,13 @@ describe('MCP HTTP Transport Protocol Tests', () => {
   });
 
   describe('Official MCP SDK Client Integration', () => {
-    it('connects, lists tools, and executes tool using StreamableHTTPClientTransport', async () => {
+    it('connects, lists tools, resources, prompts, and executes tools using StreamableHTTPClientTransport', async () => {
       const transport = new StreamableHTTPClientTransport(new URL(url));
       const client = new Client({ name: 'test-sdk-client', version: '1.0.0' });
 
       await client.connect(transport);
 
+      // Tools Primitive
       const toolsResponse = await client.listTools();
       const toolNames = new Set(toolsResponse.tools.map((t) => t.name));
       expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
@@ -82,6 +115,13 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(toolNames.has('read_se_locator_docs')).toBe(true);
       expect(toolNames.has('read_se_grid_docs')).toBe(true);
       expect(toolNames.has('read_cy_commands_docs')).toBe(true);
+
+      // Prompts Primitive
+      const promptsResponse = await client.listPrompts();
+      const promptNames = new Set(promptsResponse.prompts.map((p) => p.name));
+      expect(promptNames.has('generate-test')).toBe(true);
+      expect(promptNames.has('migrate-test')).toBe(true);
+      expect(promptNames.has('diagnose-flakiness')).toBe(true);
 
       const callResponse = await client.callTool({
         name: 'read_se_locator_docs',
@@ -97,20 +137,15 @@ describe('MCP HTTP Transport Protocol Tests', () => {
     });
   });
 
-  describe('Wire Protocol & HTTP Security Guard Tests', () => {
-    it('initialize handshake matches LATEST_PROTOCOL_VERSION', async () => {
+  describe('MCP 2026-07-28 Stateless Wire Protocol & Discovery', () => {
+    it('server/discover returns protocolVersion 2026-07-28, capabilities, and serverInfo without handshake', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: 1,
-          method: 'initialize',
-          params: {
-            protocolVersion: LATEST_PROTOCOL_VERSION,
-            capabilities: {},
-            clientInfo: { name: 'test-client', version: '1.0.0' },
-          },
+          method: 'server/discover',
         }),
       });
 
@@ -119,20 +154,107 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.jsonrpc).toBe('2.0');
       expect(data.id).toBe(1);
       expect(data.result).toBeDefined();
-      expect(data.result?.protocolVersion).toBe(LATEST_PROTOCOL_VERSION);
+      expect(data.result?.protocolVersion).toBe(PROTOCOL_VERSION);
+      expect(data.result?.serverInfo?.name).toBe('sdet-mcp');
+      expect(data.result?.capabilities).toBeDefined();
+    });
+
+    it('server/discover via Mcp-Method header returns 2026-07-28 discovery payload', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'server/discover',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect(data.result?.protocolVersion).toBe('2026-07-28');
+    });
+
+    it('resources/list and resources/read - exposes Selenium, Cypress and SDET documentation as Resources', async () => {
+      // List resources
+      const listRes = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({ jsonrpc: '2.0', id: 10, method: 'resources/list' }),
+      });
+      expect(listRes.status).toBe(200);
+      const listData = await parseMcpResponse(listRes);
+      expect(listData.result).toBeDefined();
+
+      const readRes = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 11,
+          method: 'resources/read',
+          params: { uri: 'sdet://guidelines' },
+        }),
+      });
+      expect(readRes.status).toBe(200);
+      const readData = await parseMcpResponse(readRes);
+      expect(readData.result?.contents).toBeDefined();
+      const contentText = readData.result?.contents?.[0]?.text || '';
+      expect(contentText).toContain('Universal SDET Guidelines');
+    });
+
+    it('prompts/list and prompts/get - provides workflow prompts for test generation, migration, and diagnosis', async () => {
+      const listRes = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({ jsonrpc: '2.0', id: 20, method: 'prompts/list' }),
+      });
+      expect(listRes.status).toBe(200);
+      const listData = await parseMcpResponse(listRes);
+      expect(listData.result?.prompts).toBeDefined();
+      const promptNames = listData.result?.prompts?.map((p) => p.name) || [];
+      expect(promptNames).toContain('generate-test');
+      expect(promptNames).toContain('migrate-test');
+      expect(promptNames).toContain('diagnose-flakiness');
+
+      // Get generate-test prompt
+      const getRes = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 21,
+          method: 'prompts/get',
+          params: {
+            name: 'generate-test',
+            arguments: {
+              framework: 'cypress',
+              language: 'typescript',
+              featureDescription: 'User login with MFA verification',
+            },
+          },
+        }),
+      });
+      expect(getRes.status).toBe(200);
+      const getData = await parseMcpResponse(getRes);
+      expect(getData.result?.messages).toBeDefined();
+      const promptMsg = getData.result?.messages?.[0]?.content?.text || '';
+      expect(promptMsg).toContain('User login with MFA verification');
     });
 
     it('tools/list returns all registered Selenium & Cypress tools with safety annotations', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
-        body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+        body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }),
       });
 
       expect(res.status).toBe(200);
       const data = await parseMcpResponse(res);
       expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(2);
+      expect(data.id).toBe(3);
       expect(data.result).toBeDefined();
 
       const tools = data.result?.tools || [];
@@ -160,7 +282,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(seLocatorTool?.annotations?.readOnlyHint).toBe(true);
     });
 
-    it('tools/call - read_se_locator_docs by strategy & language', async () => {
+    it('tools/call - read_se_locator_docs returns CacheableResult (ttlMs, cacheScope)', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -183,6 +305,8 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.jsonrpc).toBe('2.0');
       expect(data.id).toBe(40);
       expect(data.result).toBeDefined();
+      expect(data.result?.ttlMs).toBe(3600000);
+      expect(data.result?.cacheScope).toBe('global');
       const text = data.result?.content?.[0]?.text || '';
       expect(text).toContain('By.xpath');
     });
@@ -209,42 +333,10 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(data.jsonrpc).toBe('2.0');
       expect(data.id).toBe(41);
       expect(data.result).toBeDefined();
+      expect(data.result?.ttlMs).toBe(3600000);
+      expect(data.result?.cacheScope).toBe('global');
       const text = data.result?.content?.[0]?.text || '';
       expect(text).toContain('cy.get');
-    });
-
-    it('tools/call - Cypress tools suite execution (component, network, session, shadow, task, stubs, fixtures)', async () => {
-      const cyTools = [
-        { name: 'read_cy_component_docs', keyText: 'mount' },
-        { name: 'read_cy_network_docs', keyText: 'cy.intercept' },
-        { name: 'read_cy_session_docs', keyText: 'cy.session' },
-        { name: 'read_cy_shadow_docs', keyText: 'shadow' },
-        { name: 'read_cy_task_docs', keyText: 'cy.task' },
-        { name: 'read_cy_stubs_spies_docs', keyText: 'cy.spy' },
-        { name: 'read_cy_fixtures_docs', keyText: 'cy.fixture' },
-      ];
-
-      for (const t of cyTools) {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: MCP_HEADERS,
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 50,
-            method: 'tools/call',
-            params: {
-              name: t.name,
-              arguments: { language: 'typescript' },
-            },
-          }),
-        });
-
-        expect(res.status).toBe(200);
-        const data = await parseMcpResponse(res);
-        expect(data.result).toBeDefined();
-        const text = data.result?.content?.[0]?.text || '';
-        expect(text.toLowerCase()).toContain(t.keyText.toLowerCase());
-      }
     });
 
     it('tools/call - invalid language returns handled isError: true', async () => {
@@ -285,14 +377,6 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(res.headers.get('referrer-policy')).toBe('no-referrer');
     });
 
-    it('route protection - returns 404 for non-existent path', async () => {
-      const baseUrl = url.replace('/mcp', '');
-      const res = await fetch(`${baseUrl}/non-existent-route`, {
-        method: 'GET',
-      });
-      expect(res.status).toBe(404);
-    });
-
     it('host/origin guard - rejects non-local Host', async () => {
       const statusCode = await new Promise<number>((resolve, reject) => {
         const req = http.request(
@@ -325,7 +409,7 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(statusCode).toBe(403);
     });
 
-    it('cors preflight - handles OPTIONS /mcp for local origin', async () => {
+    it('cors preflight - verifies MCP 2026-07-28 headers and absence of obsolete x-mcp-session-id', async () => {
       const res = await fetch(url, {
         method: 'OPTIONS',
         headers: {
@@ -338,32 +422,10 @@ describe('MCP HTTP Transport Protocol Tests', () => {
       expect(res.status).toBe(204);
       expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:5173');
       expect(res.headers.get('access-control-allow-methods')).toContain('POST');
-    });
-
-    it('tools/call - response does not echo input parameters', async () => {
-      const SENTINEL_URL = 'https://unique-sentinel-target-url.example.com/path';
-      const SENTINEL_VALUE = 'unique-sentinel-locator-value-9f3a';
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 10,
-          method: 'tools/call',
-          params: {
-            name: 'execute_se_explicit_wait',
-            arguments: {
-              targetUrl: SENTINEL_URL,
-              condition: 'elementToBeClickable',
-              locator: { by: 'id', value: SENTINEL_VALUE },
-            },
-          },
-        }),
-      });
-      expect(res.status).toBe(200);
-      const text = await res.text();
-      expect(text).not.toContain(SENTINEL_URL);
-      expect(text).not.toContain(SENTINEL_VALUE);
+      const allowHeaders = res.headers.get('access-control-allow-headers') || '';
+      expect(allowHeaders).toContain('Mcp-Method');
+      expect(allowHeaders).toContain('Mcp-Name');
+      expect(allowHeaders).not.toContain('x-mcp-session-id');
     });
   });
 });

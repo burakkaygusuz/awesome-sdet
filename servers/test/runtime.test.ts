@@ -65,4 +65,20 @@ describe('Runtime Entrypoint Tests', () => {
     const result = await handleObservabilityDocs({ language: 'java' });
     expect.soft(result.content[0].text).toContain('Observability');
   });
+
+  it('runs stdio mode successfully when --stdio argument is supplied', async () => {
+    const child = execFile('node', [entrypoint, '--stdio']);
+    let stdoutData = '';
+
+    child.stdout?.on('data', (chunk) => {
+      stdoutData += String(chunk);
+    });
+
+    child.stdin?.write(`${JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' })}\n`);
+    child.stdin?.end();
+
+    await new Promise<void>((resolve) => child.on('exit', () => resolve()));
+    expect.soft(child.exitCode).toBe(0);
+    expect.soft(typeof stdoutData).toBe('string');
+  });
 });

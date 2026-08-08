@@ -35,3 +35,12 @@ export async function loadReferenceMarkdown(
     return content;
   }
 }
+
+export async function readSeleniumReferenceDoc(
+  domain: string,
+  language: string = 'java'
+): Promise<string> {
+  const normLang = (language.toLowerCase().trim() || 'java') as SupportedLanguage;
+  const baseUrl = new URL(`../selenium/${domain}/index.js`, import.meta.url).href;
+  return loadReferenceMarkdown(baseUrl, normLang);
+}

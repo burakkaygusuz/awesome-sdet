@@ -2,19 +2,36 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import { registerSeleniumTools } from './selenium/index.js';
 import { registerCypressTools } from './cypress/index.js';
+import { registerResources } from './resources/index.js';
+import { registerPrompts } from './prompts/index.js';
 
-export interface ToolExecutionResult {
+export const PROTOCOL_VERSION_2026_07_28 = '2026-07-28';
+
+export interface CacheableResult {
+  ttlMs?: number;
+  cacheScope?: 'global' | 'session' | 'user';
+}
+
+export interface ToolExecutionResult extends CacheableResult {
   [key: string]: unknown;
   content: Array<{ type: 'text'; text: string }>;
   isError?: boolean;
 }
+
+export const DEFAULT_DOCS_CACHE_TTL_MS = 3_600_000; // 1 hour TTL for immutable reference docs
+export const GLOBAL_CACHE_SCOPE = 'global' as const;
 
 export function safeToolHandler<T>(
   handler: (args: T) => ToolExecutionResult | Promise<ToolExecutionResult>
 ) {
   return async (args: T): Promise<ToolExecutionResult> => {
     try {
-      return await handler(args);
+      const result = await handler(args);
+      return {
+        ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
+        cacheScope: GLOBAL_CACHE_SCOPE,
+        ...result,
+      };
     } catch (error) {
       return {
         content: [
@@ -42,9 +59,15 @@ export function createMcpServer(): McpServer {
     version: '1.0.0',
   });
 
-  // Framework Tool Registrations
+  // Tools Primitive Registration
   registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
+
+  // Resources Primitive Registration
+  registerResources(server);
+
+  // Prompts Primitive Registration
+  registerPrompts(server);
 
   return server;
 }
