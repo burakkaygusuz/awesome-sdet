@@ -1,8 +1,10 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import { describe, expect, it } from 'vitest';
 
+const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const entrypoint = join(__dirname, '../dist/index.js');
 
@@ -11,7 +13,7 @@ describe('Runtime Entrypoint Tests', () => {
     const { createHttpServer } = await import('../dist/index.js');
     const server = createHttpServer();
 
-    expect(typeof server.listen).toBe('function');
+    expect.soft(typeof server.listen).toBe('function');
     await new Promise<void>((resolve, reject) => {
       server.once('error', reject);
       server.listen(0, '127.0.0.1', () => resolve());
@@ -21,14 +23,17 @@ describe('Runtime Entrypoint Tests', () => {
     );
   });
 
-  it('rejects invalid PORT configuration values', () => {
+  it('rejects invalid PORT configuration values asynchronously', async () => {
     for (const invalidPort of ['0', 'abc', '99999']) {
-      const result = spawnSync('node', [entrypoint], {
-        env: { ...process.env, PORT: invalidPort },
-        encoding: 'utf8',
-      });
-      expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain('Invalid PORT');
+      try {
+        await execFileAsync('node', [entrypoint], {
+          env: { ...process.env, PORT: invalidPort },
+        });
+        expect.unreachable('Should have failed with invalid PORT');
+      } catch (err: unknown) {
+        const error = err as { stderr?: string };
+        expect.soft(error.stderr).toContain('Invalid PORT');
+      }
     }
   });
 
@@ -37,27 +42,27 @@ describe('Runtime Entrypoint Tests', () => {
       await import('../src/selenium/index.js');
 
     const bidiRes = await handleBidiDocs({ language: 'python' });
-    expect(bidiRes.content[0].text).toContain('Python API Reference');
+    expect.soft(bidiRes.content[0].text).toContain('Python API Reference');
 
     const actionsRes = await handleActionsDocs({ language: 'csharp' });
-    expect(actionsRes.content[0].text).toContain('C# API Reference');
+    expect.soft(actionsRes.content[0].text).toContain('C# API Reference');
 
     const listenersRes = await handleListenersDocs({ language: 'python' });
-    expect(listenersRes.content[0].text).toContain('Python API Reference');
+    expect.soft(listenersRes.content[0].text).toContain('Python API Reference');
 
     const pageFactoryRes = await handlePageFactoryDocs({ language: 'typescript' });
-    expect(pageFactoryRes.content[0].text).toContain('TypeScript API Reference');
+    expect.soft(pageFactoryRes.content[0].text).toContain('TypeScript API Reference');
   });
 
   it('read_se_grid_docs returns Grid documentation for java', async () => {
     const { handleGridDocs } = await import('../src/selenium/index.js');
     const result = await handleGridDocs({ language: 'java' });
-    expect(result.content[0].text).toContain('RemoteWebDriver');
+    expect.soft(result.content[0].text).toContain('RemoteWebDriver');
   });
 
   it('read_se_observability_docs returns Observability documentation for java', async () => {
     const { handleObservabilityDocs } = await import('../src/selenium/index.js');
     const result = await handleObservabilityDocs({ language: 'java' });
-    expect(result.content[0].text).toContain('Observability');
+    expect.soft(result.content[0].text).toContain('Observability');
   });
 });
