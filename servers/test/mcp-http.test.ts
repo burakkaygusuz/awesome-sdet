@@ -4,7 +4,6 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createHttpServer } from '../dist/index.js';
-import { PROTOCOL_VERSION } from '../dist/server.js';
 
 const MCP_HEADERS = {
   'Content-Type': 'application/json',
@@ -154,7 +153,7 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
       expect(data.jsonrpc).toBe('2.0');
       expect(data.id).toBe(1);
       expect(data.result).toBeDefined();
-      expect(data.result?.protocolVersion).toBe(PROTOCOL_VERSION);
+      expect(data.result?.protocolVersion).toBe('2026-07-28');
       expect(data.result?.serverInfo?.name).toBe('sdet-mcp');
       expect(data.result?.capabilities).toBeDefined();
     });
