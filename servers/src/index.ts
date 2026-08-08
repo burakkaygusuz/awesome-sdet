@@ -50,11 +50,42 @@ export function handleCorsPreflight(
   res.writeHead(204, {
     'Access-Control-Allow-Origin': originHeader || '*',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Mcp-Method, Mcp-Name',
+    'Access-Control-Allow-Headers':
+      'Content-Type, Authorization, Mcp-Method, Mcp-Name, Mcp-Protocol-Version',
     'Access-Control-Max-Age': '86400',
   });
   res.end();
   return true;
+}
+
+export function handleSseGetRequest(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  originHeader?: string
+): void {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'Access-Control-Allow-Origin': originHeader || '*',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer',
+  });
+
+  const serverUrl = `http://127.0.0.1:${PORT}/mcp`;
+  res.write(`event: endpoint\ndata: ${serverUrl}\n\n`);
+
+  const keepAliveInterval = setInterval(() => {
+    if (!res.writableEnded) {
+      res.write(': keepalive\n\n');
+    }
+  }, 15000);
+
+  req.on('close', () => {
+    clearInterval(keepAliveInterval);
+    res.end();
+  });
 }
 
 export async function handleMcpPostRequest(
@@ -65,13 +96,13 @@ export async function handleMcpPostRequest(
   res.setHeader('Access-Control-Allow-Origin', originHeader || '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, Mcp-Method, Mcp-Name'
+    'Content-Type, Authorization, Mcp-Method, Mcp-Name, Mcp-Protocol-Version'
   );
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
 
-  // Read request body to inspect direct 2026-07-28 discovery / RPC calls
+  // Read request body to validate wire protocol and headers
   let body = '';
   req.on('data', (chunk) => {
     body += chunk;
@@ -79,37 +110,76 @@ export async function handleMcpPostRequest(
 
   req.on('end', async () => {
     try {
+      let jsonPayload: {
+        jsonrpc?: string;
+        id?: unknown;
+        method?: string;
+        params?: Record<string, unknown>;
+      } = {};
+
       if (body) {
-        let jsonPayload: { jsonrpc?: string; id?: unknown; method?: string };
         try {
           jsonPayload = JSON.parse(body);
         } catch {
           jsonPayload = {};
         }
+      }
 
-        // Direct 2026-07-28 server/discover support
-        if (
-          jsonPayload.method === 'server/discover' ||
-          req.headers['mcp-method'] === 'server/discover'
-        ) {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
+      // 1. Protocol Version Validation
+      const protocolVersionHeader = (
+        req.headers['mcp-protocol-version'] as string | undefined
+      )?.trim();
+      const SUPPORTED_PROTOCOL_VERSIONS = new Set([
+        PROTOCOL_VERSION_2026_07_28,
+        '2025-11-25',
+        '2024-11-05',
+      ]);
+      if (protocolVersionHeader && !SUPPORTED_PROTOCOL_VERSIONS.has(protocolVersionHeader)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: {
+              code: -32000,
+              message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported versions: '${PROTOCOL_VERSION_2026_07_28}', '2025-11-25'`,
+            },
+          })
+        );
+        return;
+      }
+
+      // 2. Mcp-Method Header Mismatch Validation
+      const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
+      if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: {
+              code: -32600,
+              message: `Header/Body mismatch: Mcp-Method header '${mcpMethodHeader}' does not match JSON-RPC method '${jsonPayload.method}'`,
+            },
+          })
+        );
+        return;
+      }
+
+      // 3. Mcp-Name Header Mismatch Validation
+      const mcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
+      if (mcpNameHeader && jsonPayload.params && typeof jsonPayload.params === 'object') {
+        const paramTarget = (jsonPayload.params.name ?? jsonPayload.params.uri) as
+          string | undefined;
+        if (paramTarget && paramTarget !== mcpNameHeader) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
             JSON.stringify({
               jsonrpc: '2.0',
-              id: jsonPayload.id ?? 1,
-              result: {
-                protocolVersion: PROTOCOL_VERSION_2026_07_28,
-                serverInfo: {
-                  name: 'sdet-mcp',
-                  version: '1.0.0',
-                  description:
-                    'Model Context Protocol Server providing test automation tools, resources, and runtime execution.',
-                },
-                capabilities: {
-                  tools: { listChanged: false },
-                  resources: { subscribe: false, listChanged: false },
-                  prompts: { listChanged: false },
-                },
+              id: jsonPayload.id ?? null,
+              error: {
+                code: -32602,
+                message: `Header/Body mismatch: Mcp-Name header '${mcpNameHeader}' does not match target parameter '${paramTarget}'`,
               },
             })
           );
@@ -117,18 +187,41 @@ export async function handleMcpPostRequest(
         }
       }
 
-      // Route JSON-RPC payload to Streamable HTTP Transport
+      // Direct 2026-07-28 server/discover support
+      const effectiveMethod = jsonPayload.method || mcpMethodHeader;
+      if (effectiveMethod === 'server/discover') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? 1,
+            result: {
+              protocolVersion: PROTOCOL_VERSION_2026_07_28,
+              serverInfo: {
+                name: 'sdet-mcp',
+                version: '1.0.0',
+                description:
+                  'Model Context Protocol Server providing test automation tools, resources, and runtime execution.',
+              },
+              capabilities: {
+                tools: { listChanged: false },
+                resources: { subscribe: false, listChanged: false },
+                prompts: { listChanged: false },
+              },
+            },
+          })
+        );
+        return;
+      }
+
+      // Route JSON-RPC payload to Streamable HTTP Transport via standard SDK contract
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
       res.on('close', () => transport.close());
       await mcpServer.connect(transport);
 
-      // Rewrap request with buffered body stream for transport
-      const simulatedReq = Object.assign(req, {
-        rawBody: body,
-      });
-      await transport.handleRequest(simulatedReq, res, body ? JSON.parse(body) : undefined);
+      await transport.handleRequest(req, res, body ? jsonPayload : undefined);
     } catch (error) {
       console.error('[sdet-mcp] Unhandled transport error:', error);
       if (!res.headersSent) {
@@ -156,6 +249,11 @@ export function createHttpServer() {
       const { originHeader } = extractHostAndOrigin(req);
 
       if (handleCorsPreflight(req, res, originHeader)) {
+        return;
+      }
+
+      if (req.method === 'GET') {
+        handleSseGetRequest(req, res, originHeader);
         return;
       }
 

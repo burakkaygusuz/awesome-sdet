@@ -288,7 +288,7 @@ export function safeToolHandler(fn: () => ToolExecutionResult): ToolExecutionRes
 
 ### 4.5 Singleton `McpServer` & Transport Lifecycle Management
 
-In Streamable HTTP servers, allocate the `McpServer` instance once at module scope. Only the `StreamableHTTPServerTransport` is instantiated per request:
+In Streamable HTTP servers, allocate the `McpServer` instance once at module scope. The `StreamableHTTPServerTransport` is instantiated per request:
 
 ```typescript
 const mcpServer = createMcpServer(); // Singleton instance
@@ -297,37 +297,29 @@ export async function handleMcpPostRequest(req: IncomingMessage, res: ServerResp
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   res.on('close', () => transport.close()); // Guaranteed cleanup
   await mcpServer.connect(transport);
-  await transport.handleRequest(req, res);
+  await transport.handleRequest(req, res, parsedBody);
 }
 ```
 
 ---
 
-### 4.6 Tool Annotations & Security Guards
+### 4.6 Header-Based Routing & Desync Prevention (`Mcp-Method` & `Mcp-Name`)
 
-Declare security annotations on all read-only documentation tools:
+Under the MCP 2026-07-28 stateless wire protocol, reverse proxies and API gateways rely on request headers for cache indexing, access control, and routing. To prevent gateway desynchronization and request smuggling:
 
-```typescript
-export const SAFE_READONLY_ANNOTATIONS = {
-  readOnlyHint: true, // Tool produces zero environmental mutations
-  destructiveHint: false, // Non-destructive
-  idempotentHint: true, // Same parameters yield identical results
-  openWorldHint: false, // Operates strictly on bundled local documentation
-} as const;
-```
+1. **`Mcp-Method` Header Matching:** When the `Mcp-Method` header is present, the server verifies it matches `body.method`. Mismatches are rejected with HTTP 400 and JSON-RPC error code `-32600`.
+2. **`Mcp-Name` Target Identifier Matching:** When `Mcp-Name` is present, it must match `params.name` (tools/prompts) or `params.uri` (resources). Mismatches are rejected with HTTP 400 and `-32602`.
+3. **Protocol Version Validation (`Mcp-Protocol-Version`):** The server explicitly validates incoming protocol version headers against supported versions (`2026-07-28`, `2025-11-25`), rejecting unsupported versions with HTTP 400 and `-32000`.
 
 ---
 
-### 4.7 Transport Security, DNS Rebinding & HTTP Headers
+### 4.7 Server-Sent Events (SSE) Streaming & Dual Transports
 
-For loopback and network-accessible MCP HTTP servers:
+The server provides unified endpoint handling across both HTTP streaming and local CLI execution:
 
-1. **HTTP Security Headers:**
-   - `X-Content-Type-Options: nosniff`
-   - `X-Frame-Options: DENY`
-   - `Referrer-Policy: no-referrer`
-2. **DNS Rebinding Protection:** Validate incoming `Host` and `Origin` headers against allowed domains (`localhost`, `127.0.0.1`).
-3. **Error Scrubbing:** Never leak internal stack traces or database connection strings in HTTP 500 responses.
+1. **SSE Streaming (`GET /mcp`):** Serves `Content-Type: text/event-stream` with an initial `event: endpoint` payload and periodic keep-alive pings, allowing real-time notification streams.
+2. **Zero-Config CLI Transport (`--stdio`):** Enables direct IDE spawning without background daemon processes.
+3. **HTTP Security Headers & DNS Rebinding:** Enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, and strict `Host`/`Origin` loopback whitelisting (`localhost`, `127.0.0.1`, `[::1]`).
 
 ---
 

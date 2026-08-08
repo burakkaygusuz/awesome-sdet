@@ -172,6 +172,112 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
       expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
     });
 
+    it('rejects Mcp-Method header / JSON-RPC body method mismatch with HTTP 400 and -32600', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/call',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 90,
+          method: 'tools/list',
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error).toBeDefined();
+      expect.soft(data.error?.code).toBe(-32600);
+      expect.soft(data.error?.message).toContain('Mcp-Method header');
+    });
+
+    it('rejects Mcp-Name header / params target mismatch with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/call',
+          'Mcp-Name': 'unexpected_tool_name',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 91,
+          method: 'tools/call',
+          params: {
+            name: 'actual_tool_name',
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error).toBeDefined();
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('Mcp-Name header');
+    });
+
+    it('rejects unsupported protocol version with HTTP 400 and -32000', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Protocol-Version': '2023-01-01',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 92,
+          method: 'server/discover',
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error).toBeDefined();
+      expect.soft(data.error?.code).toBe(-32000);
+      expect.soft(data.error?.message).toContain('Unsupported protocol version');
+    });
+
+    it('SSE response path - GET /mcp returns text/event-stream with endpoint event', async () => {
+      const sseData = await new Promise<string>((resolve, reject) => {
+        const req = http.request(
+          url,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'text/event-stream',
+            },
+          },
+          (res) => {
+            expect.soft(res.statusCode).toBe(200);
+            expect.soft(res.headers['content-type']).toContain('text/event-stream');
+            let body = '';
+            res.on('data', (chunk) => {
+              body += String(chunk);
+              if (body.includes('event: endpoint')) {
+                req.destroy();
+                resolve(body);
+              }
+            });
+          }
+        );
+        req.on('error', (err) => {
+          if (
+            err.message.includes('socket hang up') ||
+            (err as { code?: string }).code === 'ECONNRESET'
+          ) {
+            return; // Expected upon req.destroy()
+          }
+          reject(err);
+        });
+        req.end();
+      });
+
+      expect.soft(sseData).toContain('event: endpoint');
+      expect.soft(sseData).toContain('/mcp');
+    });
+
     it('resources/list and resources/read - dynamically accesses registered Resources', async () => {
       const listRes = await fetch(url, {
         method: 'POST',
@@ -393,6 +499,7 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
       const allowHeaders = res.headers.get('access-control-allow-headers') || '';
       expect.soft(allowHeaders).toContain('Mcp-Method');
       expect.soft(allowHeaders).toContain('Mcp-Name');
+      expect.soft(allowHeaders).toContain('Mcp-Protocol-Version');
       expect.soft(allowHeaders).not.toContain('x-mcp-session-id');
     });
   });
