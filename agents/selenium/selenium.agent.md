@@ -50,7 +50,7 @@ graph TD
 
 ### Stage 2: Skill & MCP Tool Query
 
-1. Read `skills/selenium/<topic>/SKILL.md` for architectural rules and best practices.
+1. Read `skills/selenium-<topic>/SKILL.md` for architectural rules and best practices.
 2. Query `sdet-mcp` tool (`read_se_<domain>_docs`) specifying target language for exact API code examples.
 
 ### Stage 3: Pattern & Architecture Design

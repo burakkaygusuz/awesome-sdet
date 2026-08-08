@@ -51,7 +51,7 @@ graph TD
 
 ### Stage 2: Skill & MCP Tool Query
 
-1. Read `skills/cypress/<topic>/SKILL.md` for architectural guidelines.
+1. Read `skills/cypress-<topic>/SKILL.md` for architectural guidelines.
 2. Query specific `sdet-mcp` tool (`read_cy_network_docs`, `read_cy_session_docs`, `read_cy_commands_docs`, etc.) for exact API command signatures and examples.
 
 ### Stage 3: Pattern & Assertion Design

@@ -71,4 +71,4 @@ When migrating test suites between different automation frameworks, map concepts
 1. **Zero Arbitrary Sleeps:** Never generate hardcoded sleep/pause timeouts (`Thread.sleep`, `cy.wait(ms)`, `sleep()`). Always enforce condition-based polling or event listening.
 2. **Deterministic Test State:** Always isolate test data via API seeding, database fixtures, or network stubs rather than relying on ephemeral UI side-effects.
 3. **Idiomatic Paradigm Enforcement:** Strictly adhere to the target framework's concurrency model (e.g. non-blocking chained subjects for queue-based engines, awaited promises for async runtimes, ThreadLocal for multi-threaded suites).
-4. **Three-Level Progressive Disclosure:** Direct users to Level 1/2 skill files (`skills/<framework>/`) and Level 3 `sdet-mcp` tools for detailed API contracts.
+4. **Three-Level Progressive Disclosure:** Direct users to Level 1/2 skill files (`skills/<domain>-<topic>/`) and Level 3 `sdet-mcp` tools for detailed API contracts.
