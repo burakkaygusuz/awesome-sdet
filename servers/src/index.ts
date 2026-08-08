@@ -49,43 +49,13 @@ export function handleCorsPreflight(
 
   res.writeHead(204, {
     'Access-Control-Allow-Origin': originHeader || '*',
-    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers':
       'Content-Type, Authorization, Mcp-Method, Mcp-Name, Mcp-Protocol-Version',
     'Access-Control-Max-Age': '86400',
   });
   res.end();
   return true;
-}
-
-export function handleSseGetRequest(
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
-  originHeader?: string
-): void {
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream; charset=utf-8',
-    'Cache-Control': 'no-cache, no-transform',
-    Connection: 'keep-alive',
-    'Access-Control-Allow-Origin': originHeader || '*',
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'Referrer-Policy': 'no-referrer',
-  });
-
-  const serverUrl = `http://127.0.0.1:${PORT}/mcp`;
-  res.write(`event: endpoint\ndata: ${serverUrl}\n\n`);
-
-  const keepAliveInterval = setInterval(() => {
-    if (!res.writableEnded) {
-      res.write(': keepalive\n\n');
-    }
-  }, 15000);
-
-  req.on('close', () => {
-    clearInterval(keepAliveInterval);
-    res.end();
-  });
 }
 
 export async function handleMcpPostRequest(
@@ -252,15 +222,18 @@ export function createHttpServer() {
         return;
       }
 
-      if (req.method === 'GET') {
-        handleSseGetRequest(req, res, originHeader);
-        return;
-      }
-
       if (req.method === 'POST') {
         await handleMcpPostRequest(req, res, originHeader);
         return;
       }
+
+      // MCP 2026-07-28 Spec: Streamable HTTP exclusively supports POST (GET stream endpoint removed)
+      res.writeHead(405, {
+        'Content-Type': 'text/plain',
+        Allow: 'POST, OPTIONS',
+      });
+      res.end('Method Not Allowed: MCP 2026-07-28 Streamable HTTP requires POST');
+      return;
     }
 
     res.writeHead(404, { 'Content-Type': 'text/plain' });

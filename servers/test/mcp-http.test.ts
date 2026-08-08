@@ -239,43 +239,13 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
       expect.soft(data.error?.message).toContain('Unsupported protocol version');
     });
 
-    it('SSE response path - GET /mcp returns text/event-stream with endpoint event', async () => {
-      const sseData = await new Promise<string>((resolve, reject) => {
-        const req = http.request(
-          url,
-          {
-            method: 'GET',
-            headers: {
-              Accept: 'text/event-stream',
-            },
-          },
-          (res) => {
-            expect.soft(res.statusCode).toBe(200);
-            expect.soft(res.headers['content-type']).toContain('text/event-stream');
-            let body = '';
-            res.on('data', (chunk) => {
-              body += String(chunk);
-              if (body.includes('event: endpoint')) {
-                req.destroy();
-                resolve(body);
-              }
-            });
-          }
-        );
-        req.on('error', (err) => {
-          if (
-            err.message.includes('socket hang up') ||
-            (err as { code?: string }).code === 'ECONNRESET'
-          ) {
-            return; // Expected upon req.destroy()
-          }
-          reject(err);
-        });
-        req.end();
+    it('MCP 2026-07-28 Streamable HTTP rejects GET /mcp with HTTP 405 Method Not Allowed', async () => {
+      const res = await fetch(url, {
+        method: 'GET',
       });
 
-      expect.soft(sseData).toContain('event: endpoint');
-      expect.soft(sseData).toContain('/mcp');
+      expect.soft(res.status).toBe(405);
+      expect.soft(res.headers.get('allow')).toContain('POST');
     });
 
     it('resources/list and resources/read - dynamically accesses registered Resources', async () => {

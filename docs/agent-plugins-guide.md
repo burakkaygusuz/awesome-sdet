@@ -313,12 +313,12 @@ Under the MCP 2026-07-28 stateless wire protocol, reverse proxies and API gatewa
 
 ---
 
-### 4.7 Server-Sent Events (SSE) Streaming & Dual Transports
+### 4.7 Stateless Streamable HTTP Transport & Security Hardening
 
-The server provides unified endpoint handling across both HTTP streaming and local CLI execution:
+The server provides unified endpoint handling across both network streaming and local CLI execution:
 
-1. **SSE Streaming (`GET /mcp`):** Serves `Content-Type: text/event-stream` with an initial `event: endpoint` payload and periodic keep-alive pings, allowing real-time notification streams.
-2. **Zero-Config CLI Transport (`--stdio`):** Enables direct IDE spawning without background daemon processes.
+1. **Stateless Streamable HTTP (`POST /mcp`):** Conforming strictly to the MCP 2026-07-28 specification (_"Removal of the GET stream endpoint"_), Streamable HTTP operates exclusively via `POST` requests (and `OPTIONS` for CORS preflight). Unsupported methods like `GET` return `405 Method Not Allowed` with `Allow: POST, OPTIONS`.
+2. **Zero-Config CLI Transport (`--stdio`):** Enables direct AI assistant spawning as a child process without background server management.
 3. **HTTP Security Headers & DNS Rebinding:** Enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, and strict `Host`/`Origin` loopback whitelisting (`localhost`, `127.0.0.1`, `[::1]`).
 
 ---
