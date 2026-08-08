@@ -1,6 +1,6 @@
 # Agent Plugins, Skills & MCP Server Engineering Guide
 
-> A comprehensive technical guide for authoring, validating, and hardening **Agent Plugins 1.0.0**, **Skills**, and **Model Context Protocol (MCP)** servers for AI Coding Assistants across multi-framework SDET automation platforms.
+> A comprehensive technical guide for authoring, validating, and scaling **Agent Plugins 1.0.0**, **Agent Skills**, and **Model Context Protocol (MCP 2026-07-28)** servers across universal SDET automation ecosystems (Web, Mobile, API, Performance, and Contract testing).
 >
 > Normative References:
 >
@@ -15,42 +15,78 @@
 
 ## Table of Contents
 
-1. [Agent Plugins 1.0.0 Manifest Specification](#1-agent-plugins-100-manifest-specification)
-   - 1.1 [Root Plugin Manifest (`plugin.json`)](#11-root-plugin-manifest-pluginjson)
-   - 1.2 [MCP Server Manifest (`mcp.json`)](#12-mcp-server-manifest-mcpjson)
-   - 1.3 [Canonical Schemas & Validation Philosophy (Spec §5.4)](#13-canonical-schemas--validation-philosophy-spec-54)
-2. [Skills Authoring & Three-Level Progressive Loading](#2-skills-authoring--three-level-progressive-loading)
-   - 2.1 [The Three-Level Token Architecture](#21-the-three-level-token-architecture)
-   - 2.2 [Writing High-Precision `description` Fields](#22-writing-high-precision-description-fields)
-   - 2.3 [Keeping the `SKILL.md` Body Lean](#23-keeping-the-skillmd-body-lean)
-   - 2.4 [Delegating Exhaustive Data to MCP & `references/`](#24-delegating-exhaustive-data-to-mcp--references)
-3. [MCP Server Architecture & Hardening](#3-mcp-server-architecture--hardening)
-   - 3.1 [Tool `title` vs. `description` Token Optimization](#31-tool-title-vs-description-token-optimization)
-   - 3.2 [Structured Output & `outputSchema`](#32-structured-output--outputschema)
-   - 3.3 [Input Validation & Asynchronous Zod Parsing (`parseAsync`)](#33-input-validation--asynchronous-zod-parsing-parseasync)
-   - 3.4 [Tool Execution Errors (SEP-1303)](#34-tool-execution-errors-sep-1303)
-   - 3.5 [Singleton `McpServer` & Transport Lifecycle Management](#35-singleton-mcpserver--transport-lifecycle-management)
-   - 3.6 [Tool Annotations & Security Guards](#36-tool-annotations--security-guards)
-   - 3.7 [Transport Security, DNS Rebinding & HTTP Headers](#37-transport-security-dns-rebinding--http-headers)
-4. [Hybrid SDET Agent Architecture & Framework Specialization](#4-hybrid-sdet-agent-architecture--framework-specialization)
-   - 4.1 [Master Orchestrator & Specialist Agent Topology](#41-master-orchestrator--specialist-agent-topology)
-   - 4.2 [Subagent Delegation & Invocation Workflow](#42-subagent-delegation--invocation-workflow)
-   - 4.3 [Universal Cross-Framework Migration Architecture](#43-universal-cross-framework-migration-architecture)
-   - 4.4 [Universal Quality & Anti-Pattern Invariants](#44-universal-quality--anti-pattern-invariants)
-5. [SOLID Codebase & Validation Pipeline](#5-solid-codebase--validation-pipeline)
-   - 5.1 [Modular Validator Architecture](#51-modular-validator-architecture)
-   - 5.2 [End-to-End Verification Pipeline](#52-end-to-end-verification-pipeline)
-6. [Authoring Checklist](#6-authoring-checklist)
+1. [Canonical Extensibility Architecture & Structural Taxonomy](#1-canonical-extensibility-architecture--structural-taxonomy)
+2. [Agent Plugins 1.0.0 Manifest Specification](#2-agent-plugins-100-manifest-specification)
+   - 2.1 [Root Plugin Manifest (`plugin.json`)](#21-root-plugin-manifest-pluginjson)
+   - 2.2 [MCP Server Manifest (`mcp.json`)](#22-mcp-server-manifest-mcpjson)
+   - 2.3 [Canonical Schemas & Validation Philosophy (Spec §5.4)](#23-canonical-schemas--validation-philosophy-spec-54)
+3. [Skills Authoring & Three-Level Progressive Loading](#3-skills-authoring--three-level-progressive-loading)
+   - 3.1 [The Three-Level Token Architecture](#31-the-three-level-token-architecture)
+   - 3.2 [Writing High-Precision `description` Fields](#32-writing-high-precision-description-fields)
+   - 3.3 [Keeping the `SKILL.md` Body Lean](#33-keeping-the-skillmd-body-lean)
+   - 3.4 [Delegating Exhaustive Data to MCP & `references/`](#34-delegating-exhaustive-data-to-mcp--references)
+4. [MCP Server Architecture & Hardening](#4-mcp-server-architecture--hardening)
+   - 4.1 [Tool `title` vs. `description` Token Optimization](#41-tool-title-vs-description-token-optimization)
+   - 4.2 [Structured Output & `outputSchema`](#42-structured-output--outputschema)
+   - 4.3 [Input Validation & Asynchronous Zod Parsing (`parseAsync`)](#43-input-validation--asynchronous-zod-parsing-parseasync)
+   - 4.4 [Tool Execution Errors (SEP-1303)](#44-tool-execution-errors-sep-1303)
+   - 4.5 [Singleton `McpServer` & Transport Lifecycle Management](#45-singleton-mcpserver--transport-lifecycle-management)
+   - 4.6 [Tool Annotations & Security Guards](#46-tool-annotations--security-guards)
+   - 4.7 [Transport Security, DNS Rebinding & HTTP Headers](#47-transport-security-dns-rebinding--http-headers)
+5. [Hybrid SDET Agent Architecture & Universal Extensibility](#5-hybrid-sdet-agent-architecture--universal-extensibility)
+   - 5.1 [Master Orchestrator & Specialist Agent Topology](#51-master-orchestrator--specialist-agent-topology)
+   - 5.2 [Subagent Delegation & Invocation Workflow](#52-subagent-delegation--invocation-workflow)
+   - 5.3 [Universal Cross-Framework Migration Architecture](#53-universal-cross-framework-migration-architecture)
+   - 5.4 [Universal Quality & Anti-Pattern Invariants](#54-universal-quality--anti-pattern-invariants)
+6. [SOLID Codebase & Validation Pipeline](#6-solid-codebase--validation-pipeline)
+   - 6.1 [Modular Validator Architecture](#61-modular-validator-architecture)
+   - 6.2 [End-to-End Verification Pipeline](#62-end-to-end-verification-pipeline)
+7. [Authoring Checklist](#7-authoring-checklist)
 
 ---
 
-## 1. Agent Plugins 1.0.0 Manifest Specification
+## 1. Canonical Extensibility Architecture & Structural Taxonomy
+
+The repository is architected as an **evergreen, multi-framework SDET platform**. It is designed to continuously incorporate new test automation paradigms (e.g. Web, Mobile, API, Performance, Contract, Visual, and Chaos testing) without requiring breaking changes to core manifests, routers, or validation rules.
+
+### Structural Taxonomy Archetype
+
+```
+.
+├── plugin.json                     # Root Agent Plugin manifest declaring universal SDET identity
+├── mcp.json                        # MCP server manifest with dual stdio & streamable-http transports
+├── skills/                         # Flat 1-level Agent Skills discovery root (MUST NOT nest subdirectories)
+│   ├── <ecosystem-or-domain>-<topic>/
+│   │   └── SKILL.md                # Level 2: Decision matrices, anti-patterns, gotchas
+│   └── ...                         # Any new automation framework or domain plugs in directly here
+├── agents/                         # Hybrid SDET agent declarations
+│   ├── sdet.agent.md               # Master orchestrator, strategy coordinator & cross-framework router
+│   └── <specialty>/
+│       └── <specialty>.agent.md    # Autonomous domain specialist agents
+├── servers/                        # Model Context Protocol server implementation (MCP 2026-07-28)
+│   ├── src/
+│   │   ├── index.ts                # Dual transport runtime (zero-config stdio & streamable-http)
+│   │   ├── server.ts               # McpServer singleton registering Tools, Resources, and Prompts
+│   │   ├── resources/              # URI documentation resources (<protocol>://{domain}/{language})
+│   │   ├── prompts/                # Standard SDET workflow prompts (generate-test, migrate-test)
+│   │   └── <domain>/               # Domain-isolated tools, schemas, and reference doc loaders
+│   └── test/                       # Protocol, discovery, transport, and runtime test suites
+├── scripts/                        # Automated CI verification & manifest builder pipeline
+│   ├── schemas.ts                  # Strict data contracts with Spec §5.4 robustness
+│   ├── validate.ts                 # Main orchestrator & dist/skills-manifest.json generator
+│   └── validators/                 # Single-Responsibility modular validators
+└── docs/                           # Architectural guides & technical specifications
+```
+
+---
+
+## 2. Agent Plugins 1.0.0 Manifest Specification
 
 The **Agent Plugins 1.0.0** standard defines interoperable plugins for AI coding assistants and autonomous agents. An agent plugin bundles skills, prompts, and MCP servers into an auditable repository package.
 
-### 1.1 Root Plugin Manifest (`plugin.json`)
+### 2.1 Root Plugin Manifest (`plugin.json`)
 
-The `plugin.json` file resides at the root of the repository and declares the plugin identity, author, version, and capabilities.
+The `plugin.json` file resides at the root of the repository and declares the generic SDET plugin identity, author, version, and capabilities.
 
 ```json
 {
@@ -85,11 +121,11 @@ The `plugin.json` file resides at the root of the repository and declares the pl
 - **`version`**: Semantic versioning format `^\d+\.\d+\.\d+$`.
 - **`author`**: MUST be a JSON Object containing `name`, optional `email` (`z.email()`), and optional `url` (`z.url()`). Bare string author names are invalid under Agent Plugins 1.0.0.
 - **`license`**: Valid SPDX license identifier (e.g. `MIT`, `Apache-2.0`).
-- **`keywords`**: Extensible array of topic strings representing the supported automation ecosystem.
+- **`keywords`**: Extensible array of topic strings representing the universal automation ecosystem.
 
 ---
 
-### 1.2 MCP Server Manifest (`mcp.json`)
+### 2.2 MCP Server Manifest (`mcp.json`)
 
 The `mcp.json` manifest configures Model Context Protocol endpoints provided by the plugin.
 
@@ -118,7 +154,7 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
 
 ---
 
-### 1.3 Canonical Schemas & Validation Philosophy (Spec §5.4)
+### 2.3 Canonical Schemas & Validation Philosophy (Spec §5.4)
 
 1. **Canonical Schema URLs:** Always reference official canonical schema URLs (`https://agent-plugins.org/schemas/1.0.0/*.json`) rather than local schema mirrors.
 2. **Strict Property Rejection (`.strict()`):** All manifest schemas prohibit unrecognized top-level fields (`additionalProperties: false`). Manifests containing unknown keys (such as `description` inside an MCP server entry) MUST be rejected or skipped by spec-compliant clients.
@@ -126,9 +162,9 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
 
 ---
 
-## 2. Skills Authoring & Three-Level Progressive Loading
+## 3. Skills Authoring & Three-Level Progressive Loading
 
-### 2.1 The Three-Level Token Architecture
+### 3.1 The Three-Level Token Architecture
 
 Skills are organized hierarchically to protect the LLM context window while maintaining deep technical accuracy:
 
@@ -140,28 +176,22 @@ Skills are organized hierarchically to protect the LLM context window while main
 
 ```markdown
 skills/
-├── selenium/
-│ ├── actions-api/
-│ │ ├── SKILL.md ← Level 2: Decision trees, gotchas, core patterns
-│ │ └── references/ ← Level 3: Language implementations
-│ │ ├── java.md
-│ │ ├── python.md
-│ │ └── typescript.md
-└── cypress/
-└── querying-selectors/
-└── SKILL.md
+├── <domain-or-framework>-<feature>/
+│ └── SKILL.md ← Level 2: Core architectural patterns & decision trees
+└── <domain-or-framework>-<topic>/
+└── SKILL.md ← Level 2: Direct 1-level discovery (MUST NOT be nested)
 ```
 
 ---
 
-### 2.2 Writing High-Precision `description` Fields
+### 3.2 Writing High-Precision `description` Fields
 
 The `description` field is a **trigger signal**, not a tutorial. It instructs the LLM host **when** to activate the skill.
 
 **Rules for Authoring Descriptions:**
 
 1. **Answer the Activation Question:** Under what precise intent should this skill load?
-2. **Be Trigger-Focused:** Use clear semantic keywords covering the domain (e.g. POM, explicit waits, Shadow DOM, iframe traversal).
+2. **Be Trigger-Focused:** Use clear semantic keywords covering the domain (e.g. POM, explicit waits, Shadow DOM, network stubs, load testing, contract verification).
 3. **No Inline API Dumps:** Never list method signatures or class tables in the description.
 4. **Length Budget:** Keep descriptions concise (≤ 100 words).
 5. **Always Quote YAML Strings:** Use double quotes (`"..."`) or single quotes (`'...'`) in frontmatter to prevent YAML parse errors when colons appear in sentences.
@@ -178,7 +208,7 @@ description: 'Master Page Object Model (POM) design patterns, component objects,
 
 ---
 
-### 2.3 Keeping the `SKILL.md` Body Lean
+### 3.3 Keeping the `SKILL.md` Body Lean
 
 The `SKILL.md` body (Level 2) loads in full whenever the skill is triggered:
 
@@ -188,19 +218,19 @@ The `SKILL.md` body (Level 2) loads in full whenever the skill is triggered:
 
 ---
 
-### 2.4 Delegating Exhaustive Data to MCP & `references/`
+### 3.4 Delegating Exhaustive Data to MCP & `references/`
 
-Exhaustive lookup tables, full method dictionaries, and version matrix tables belong at Level 3. Delegate to `references/` or `sdet-mcp`:
+Exhaustive lookup tables, full method dictionaries, and multi-language syntax belong at Level 3. Delegate to `sdet-mcp` tools or read-only Resources:
 
 ```markdown
-> **Complete Reference:** For language-specific syntax across Java, Python, TypeScript, C#, and Ruby, query the `sdet-mcp` tool `read_selenium_actions_docs` or view `references/<language>.md`.
+> **Complete Reference:** For language-specific syntax across multiple languages, query the `sdet-mcp` tool `read_<domain>_*` or read the corresponding `sdet://` or `<domain>://` Resource.
 ```
 
 ---
 
-## 3. MCP Server Architecture & Hardening
+## 4. MCP Server Architecture & Hardening
 
-### 3.1 Tool `title` vs. `description` Token Optimization
+### 4.1 Tool `title` vs. `description` Token Optimization
 
 The MCP specification defines distinct roles for tool labels and descriptions:
 
@@ -208,17 +238,18 @@ The MCP specification defines distinct roles for tool labels and descriptions:
 - **`description`**: Semantic guidance read by the LLM context window to determine tool dispatch (target ≤ 120 characters).
 
 ```typescript
-server.registerTool('read_selenium_actions_docs', {
-  title: 'Selenium Actions API Docs',
-  description: 'Returns Actions API user interaction guides and multi-language code examples.',
-  inputSchema: ActionsDocsSchema.shape,
+server.registerTool('read_se_locator_docs', {
+  title: 'Selenium Locator Strategy Docs',
+  description:
+    'Returns element location strategies, relative locators, and multi-language code examples.',
+  inputSchema: LocatorDocsSchema.shape,
   annotations: SAFE_READONLY_ANNOTATIONS,
 });
 ```
 
 ---
 
-### 3.2 Structured Output & `outputSchema`
+### 4.2 Structured Output & `outputSchema`
 
 MCP 2026-07-28 tools can declare an `outputSchema` alongside returning `structuredContent`. Clients supporting structured outputs parse JSON fields directly without markdown regex extraction, falling back to `content[].text` for legacy clients:
 
@@ -236,7 +267,7 @@ return {
 
 ---
 
-### 3.3 Input Validation & Asynchronous Zod Parsing (`parseAsync`)
+### 4.3 Input Validation & Asynchronous Zod Parsing (`parseAsync`)
 
 All tool arguments and manifest payloads must be validated using Zod. In asynchronous pipelines, use `await schema.parseAsync(input)`:
 
@@ -256,7 +287,7 @@ export async function validateToolArgs(raw: unknown) {
 
 ---
 
-### 3.4 Tool Execution Errors (SEP-1303)
+### 4.4 Tool Execution Errors (SEP-1303)
 
 Under [SEP-1303](https://github.com/modelcontextprotocol/modelcontextprotocol), input validation failures SHOULD be returned as **tool execution errors** (`isError: true`) instead of protocol JSON-RPC errors (`-32602`). This places actionable feedback in the LLM context for automatic self-correction.
 
@@ -277,7 +308,7 @@ export function safeToolHandler(fn: () => ToolExecutionResult): ToolExecutionRes
 
 ---
 
-### 3.5 Singleton `McpServer` & Transport Lifecycle Management
+### 4.5 Singleton `McpServer` & Transport Lifecycle Management
 
 In Streamable HTTP servers, allocate the `McpServer` instance once at module scope. Only the `StreamableHTTPServerTransport` is instantiated per request:
 
@@ -294,7 +325,7 @@ export async function handleMcpPostRequest(req: IncomingMessage, res: ServerResp
 
 ---
 
-### 3.6 Tool Annotations & Security Guards
+### 4.6 Tool Annotations & Security Guards
 
 Declare security annotations on all read-only documentation tools:
 
@@ -309,7 +340,7 @@ export const SAFE_READONLY_ANNOTATIONS = {
 
 ---
 
-### 3.7 Transport Security, DNS Rebinding & HTTP Headers
+### 4.7 Transport Security, DNS Rebinding & HTTP Headers
 
 For loopback and network-accessible MCP HTTP servers:
 
@@ -322,11 +353,11 @@ For loopback and network-accessible MCP HTTP servers:
 
 ---
 
-## 4. Hybrid SDET Agent Architecture & Framework Specialization
+## 5. Hybrid SDET Agent Architecture & Universal Extensibility
 
-### 4.1 Master Orchestrator & Specialist Agent Topology
+### 5.1 Master Orchestrator & Specialist Agent Topology
 
-To achieve clean separation of concerns without sacrificing cross-framework migration capabilities, `awesome-sdet` employs an extensible **Universal Hybrid Architecture**:
+To achieve clean separation of concerns without sacrificing cross-framework migration capabilities, the plugin employs an extensible **Universal Hybrid Topology**:
 
 ```
                                       [ User / AI Host ]
@@ -334,7 +365,7 @@ To achieve clean separation of concerns without sacrificing cross-framework migr
                          ┌───────────────────┴───────────────────┐
                          ▼                                       ▼
                  [ sdet Orchestrator ]                [ Direct Specialist Call ]
-            (Strategy, Router & Migration)               (@<framework-specialist>)
+            (Strategy, Router & Migration)               (@<domain-specialist>)
                          │
      ┌───────────────────┼───────────────────┬───────────────────┐
      ▼                   ▼                   ▼                   ▼
@@ -345,7 +376,7 @@ To achieve clean separation of concerns without sacrificing cross-framework migr
      └───────────────────┴─────────┬─────────┴───────────────────┘
                                    ▼
                  [ Dynamic Skill & MCP Tool Registry ]
-                 • skills/<skill_name>/ (Level 1/2 Knowledge)
+                 • skills/<domain>-<topic>/ (Level 1/2 Knowledge)
                  • sdet-mcp runtime tools (Level 3 API Execution)
 ```
 
@@ -354,19 +385,19 @@ To achieve clean separation of concerns without sacrificing cross-framework migr
    - Manages cross-framework test migrations across all supported paradigms.
    - Delegates domain-specific test authoring to specialized subagents via `invoke_subagent`.
 
-2. **Specialized Framework Agents:**
-   - Autonomous, domain-isolated agents residing in `agents/<domain>/<framework>.agent.md`.
+2. **Specialized Framework & Domain Agents:**
+   - Autonomous, domain-isolated agents residing in `agents/<specialty>/<specialty>.agent.md`.
    - Adhere strictly to their framework's execution mechanics and query dedicated `sdet-mcp` tools.
-   - Self-contained and independently extensible (e.g. web, mobile, performance, API).
+   - Self-contained and independently extensible (e.g. web, mobile, performance, API, contract).
 
 ---
 
-### 4.2 Subagent Delegation & Invocation Workflow
+### 5.2 Subagent Delegation & Invocation Workflow
 
 When complex tasks require deep domain focus, the master orchestrator dynamically discovers and delegates to specialized subagents:
 
 ```markdown
-1. User: "Refactor this legacy test suite to a modern TypeScript implementation with network stubs."
+1. User: "Refactor this legacy test suite to a modern test implementation with network stubs."
 2. sdet orchestrator:
    - Analyzes test structure, locators, assertions, and execution model.
    - Invokes target specialist subagent with exact migration targets.
@@ -378,7 +409,7 @@ When complex tasks require deep domain focus, the master orchestrator dynamicall
 
 ---
 
-### 4.3 Universal Cross-Framework Migration Architecture
+### 5.3 Universal Cross-Framework Migration Architecture
 
 When migrating test suites between different automation frameworks, map concepts using universal testing primitives:
 
@@ -393,7 +424,7 @@ When migrating test suites between different automation frameworks, map concepts
 
 ---
 
-### 4.4 Universal Quality & Anti-Pattern Invariants
+### 5.4 Universal Quality & Anti-Pattern Invariants
 
 To prevent code degradation, every framework agent enforces strict negative rules:
 
@@ -405,9 +436,9 @@ To prevent code degradation, every framework agent enforces strict negative rule
 
 ---
 
-## 5. SOLID Codebase & Validation Pipeline
+## 6. SOLID Codebase & Validation Pipeline
 
-### 5.1 Modular Validator Architecture
+### 6.1 Modular Validator Architecture
 
 Validators adhere strictly to the **Single Responsibility Principle (SRP)**:
 
@@ -418,12 +449,12 @@ scripts/
 └── validators/
     ├── plugin-validator.ts        # Validates plugin.json
     ├── mcp-validator.ts           # Validates mcp.json
-    └── skills-validator.ts        # Validates skills/**/SKILL.md frontmatter & content
+    └── skills-validator.ts        # Validates flat skills/*/SKILL.md non-recursively
 ```
 
 ---
 
-### 5.2 End-to-End Verification Pipeline
+### 6.2 End-to-End Verification Pipeline
 
 Every contribution is validated through an automated CI suite:
 
@@ -446,9 +477,9 @@ pnpm --dir servers test
 
 ---
 
-## 6. Authoring Checklist
+## 7. Authoring Checklist
 
-When adding or updating skills, manifests, or tools, ensure all criteria pass:
+When adding or extending skills, manifests, or tools in the repository, ensure all criteria pass:
 
 ```markdown
 Plugin & MCP Manifests
@@ -462,12 +493,12 @@ Skills Authoring
 ☐ description ≤ 100 words, quoted ("..."), trigger-accurate
 ☐ SKILL.md body < 500 lines (TOC included if > 300 lines)
 ☐ No forbidden freemium terminology
-☐ Exhaustive code tables delegated to references/ or sdet-mcp
+☐ Exhaustive code tables delegated to sdet-mcp or read-only Resources
 
 Hybrid Agent Architecture
 ☐ sdet acts as master coordinator for migration and strategy
-☐ selenium enforces W3C WebDriver, BiDi, and explicit waits (no Thread.sleep)
-☐ cypress enforces command queues and cy.intercept (no async/await)
+☐ Specialist agents encapsulate domain execution rules and constraints
+☐ Direct 1-level skill discovery preserved (skills/<domain>-<topic>/SKILL.md)
 
 MCP Server Hardening
 ☐ Singleton McpServer reused across HTTP requests
