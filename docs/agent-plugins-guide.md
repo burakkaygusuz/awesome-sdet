@@ -5,47 +5,25 @@
 > Normative References:
 >
 > - [Agent Plugins 1.0.0 Specification](https://agent-plugins.org/specification)
-> - [Agent Plugins Plugin Authors Guide](https://agent-plugins.org/plugin-authors)
 > - [Agent Plugins Manifest Schema](https://agent-plugins.org/schemas/1.0.0/plugin.schema.json)
 > - [Agent Plugins MCP Schema](https://agent-plugins.org/schemas/1.0.0/mcp.schema.json)
 > - [Model Context Protocol Specification](https://modelcontextprotocol.io/specification/2026-07-28)
-> - [Anthropic Skills: Three-Level Progressive Loading](https://github.com/anthropics/skills)
 
 ---
 
 ## Table of Contents
 
-1. [Canonical Extensibility Architecture & Structural Taxonomy](#1-canonical-extensibility-architecture--structural-taxonomy)
+1. [Canonical Architecture & Structural Taxonomy](#1-canonical-architecture--structural-taxonomy)
 2. [Agent Plugins 1.0.0 Manifest Specification](#2-agent-plugins-100-manifest-specification)
-   - 2.1 [Root Plugin Manifest (`plugin.json`)](#21-root-plugin-manifest-pluginjson)
-   - 2.2 [MCP Server Manifest (`mcp.json`)](#22-mcp-server-manifest-mcpjson)
-   - 2.3 [Canonical Schemas & Validation Philosophy (Spec §5.4)](#23-canonical-schemas--validation-philosophy-spec-54)
-3. [Skills Authoring & Three-Level Progressive Loading](#3-skills-authoring--three-level-progressive-loading)
-   - 3.1 [The Three-Level Token Architecture](#31-the-three-level-token-architecture)
-   - 3.2 [Writing High-Precision `description` Fields](#32-writing-high-precision-description-fields)
-   - 3.3 [Keeping the `SKILL.md` Body Lean](#33-keeping-the-skillmd-body-lean)
-   - 3.4 [Delegating Exhaustive Data to MCP & `references/`](#34-delegating-exhaustive-data-to-mcp--references)
-4. [MCP Server Architecture & Hardening](#4-mcp-server-architecture--hardening)
-   - 4.1 [Tool `title` vs. `description` Token Optimization](#41-tool-title-vs-description-token-optimization)
-   - 4.2 [Structured Output & `outputSchema`](#42-structured-output--outputschema)
-   - 4.3 [Input Validation & Asynchronous Zod Parsing (`parseAsync`)](#43-input-validation--asynchronous-zod-parsing-parseasync)
-   - 4.4 [Tool Execution Errors (SEP-1303)](#44-tool-execution-errors-sep-1303)
-   - 4.5 [Singleton `McpServer` & Transport Lifecycle Management](#45-singleton-mcpserver--transport-lifecycle-management)
-   - 4.6 [Tool Annotations & Security Guards](#46-tool-annotations--security-guards)
-   - 4.7 [Transport Security, DNS Rebinding & HTTP Headers](#47-transport-security-dns-rebinding--http-headers)
-5. [Hybrid SDET Agent Architecture & Universal Extensibility](#5-hybrid-sdet-agent-architecture--universal-extensibility)
-   - 5.1 [Master Orchestrator & Specialist Agent Topology](#51-master-orchestrator--specialist-agent-topology)
-   - 5.2 [Subagent Delegation & Invocation Workflow](#52-subagent-delegation--invocation-workflow)
-   - 5.3 [Universal Cross-Framework Migration Architecture](#53-universal-cross-framework-migration-architecture)
-   - 5.4 [Universal Quality & Anti-Pattern Invariants](#54-universal-quality--anti-pattern-invariants)
-6. [SOLID Codebase & Validation Pipeline](#6-solid-codebase--validation-pipeline)
-   - 6.1 [Modular Validator Architecture](#61-modular-validator-architecture)
-   - 6.2 [End-to-End Verification Pipeline](#62-end-to-end-verification-pipeline)
+3. [Agent Skills & Progressive Token Architecture](#3-agent-skills--progressive-token-architecture)
+4. [MCP Server 2026-07-28 Runtime & Hardening](#4-mcp-server-2026-07-28-runtime--hardening)
+5. [Hybrid SDET Orchestrator & Migration Engine](#5-hybrid-sdet-orchestrator--migration-engine)
+6. [SOLID Verification Pipeline](#6-solid-verification-pipeline)
 7. [Authoring Checklist](#7-authoring-checklist)
 
 ---
 
-## 1. Canonical Extensibility Architecture & Structural Taxonomy
+## 1. Canonical Architecture & Structural Taxonomy
 
 The repository is architected as an **evergreen, multi-framework SDET platform**. It is designed to continuously incorporate new test automation paradigms (e.g. Web, Mobile, API, Performance, Contract, Visual, and Chaos testing) without requiring breaking changes to core manifests, routers, or validation rules.
 
@@ -162,7 +140,7 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
 
 ---
 
-## 3. Skills Authoring & Three-Level Progressive Loading
+## 3. Agent Skills & Progressive Token Architecture
 
 ### 3.1 The Three-Level Token Architecture
 
@@ -228,7 +206,7 @@ Exhaustive lookup tables, full method dictionaries, and multi-language syntax be
 
 ---
 
-## 4. MCP Server Architecture & Hardening
+## 4. MCP Server 2026-07-28 Runtime & Hardening
 
 ### 4.1 Tool `title` vs. `description` Token Optimization
 
@@ -353,7 +331,7 @@ For loopback and network-accessible MCP HTTP servers:
 
 ---
 
-## 5. Hybrid SDET Agent Architecture & Universal Extensibility
+## 5. Hybrid SDET Orchestrator & Migration Engine
 
 ### 5.1 Master Orchestrator & Specialist Agent Topology
 
@@ -436,7 +414,7 @@ To prevent code degradation, every framework agent enforces strict negative rule
 
 ---
 
-## 6. SOLID Codebase & Validation Pipeline
+## 6. SOLID Verification Pipeline
 
 ### 6.1 Modular Validator Architecture
 
