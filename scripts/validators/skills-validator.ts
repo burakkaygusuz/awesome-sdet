@@ -37,7 +37,6 @@ export function parseFrontmatter(
 
 export async function validateSkillFile(
   filePath: string,
-  framework: string,
   rootDir: string,
   skillsDir: string
 ): Promise<{ skill: Skill | null; hasError: boolean }> {
@@ -51,11 +50,11 @@ export async function validateSkillFile(
 
   let hasError = false;
   const name = fields['name'];
-  const topicDir = path.basename(path.dirname(filePath));
+  const skillDirName = path.basename(path.dirname(filePath));
 
-  if (name !== topicDir) {
+  if (name !== skillDirName) {
     console.error(
-      `Error: ${relPath}: Frontmatter name '${name}' does not match directory name '${topicDir}'`
+      `Error: ${relPath}: Frontmatter name '${name}' does not match directory name '${skillDirName}'`
     );
     hasError = true;
   }
@@ -65,11 +64,16 @@ export async function validateSkillFile(
     hasError = true;
   }
 
+  const framework = skillDirName.includes('-') ? skillDirName.split('-')[0] : 'common';
+  const topic = skillDirName.includes('-')
+    ? skillDirName.substring(framework.length + 1)
+    : skillDirName;
+
   const skill: Skill = {
-    name: name || topicDir,
-    canonicalName: `${framework}/${name || topicDir}`,
+    name: name || skillDirName,
+    canonicalName: `${framework}/${topic}`,
     framework,
-    topic: topicDir,
+    topic,
     description: fields['description'] || '',
     filePath: path.relative(rootDir, filePath),
   };
@@ -77,29 +81,33 @@ export async function validateSkillFile(
   return { skill, hasError };
 }
 
-export async function collectFrameworkSkills(
-  framework: string,
+/**
+ * Standard Agent Skills Discovery:
+ * Scans direct child directories of `skills/` (MUST NOT recursively search subdirectories).
+ */
+export async function collectAllSkills(
   rootDir: string,
   skillsDir: string
-): Promise<{ skills: Skill[]; hasErrors: boolean }> {
-  const frameworkPath = path.join(skillsDir, framework);
-  const entries = await fs.readdir(frameworkPath, { recursive: true, withFileTypes: true });
-
-  const skillEntries = entries.filter((entry) => entry.isFile() && entry.name === 'SKILL.md');
+): Promise<{ skills: Skill[]; frameworks: string[]; hasErrors: boolean }> {
+  const entries = await fs.readdir(skillsDir, { withFileTypes: true });
+  const skillDirs = entries.filter((entry) => entry.isDirectory());
 
   const results = await Promise.all(
-    skillEntries.map(async (entry) => {
-      const parentDir =
-        (entry as unknown as { path?: string; parentPath?: string }).path ||
-        (entry as unknown as { parentPath?: string }).parentPath ||
-        frameworkPath;
-      const filePath = path.join(parentDir, entry.name);
-      return validateSkillFile(filePath, framework, rootDir, skillsDir);
+    skillDirs.map(async (dir) => {
+      const skillFilePath = path.join(skillsDir, dir.name, 'SKILL.md');
+      try {
+        await fs.access(skillFilePath);
+        return validateSkillFile(skillFilePath, rootDir, skillsDir);
+      } catch {
+        console.error(`Error: skills/${dir.name}/SKILL.md does not exist`);
+        return { skill: null, hasError: true };
+      }
     })
   );
 
   const skills: Skill[] = [];
   let hasErrors = false;
+  const frameworkSet = new Set<string>();
 
   for (const result of results) {
     if (result.hasError) {
@@ -107,8 +115,13 @@ export async function collectFrameworkSkills(
     }
     if (result.skill) {
       skills.push(result.skill);
+      frameworkSet.add(result.skill.framework);
     }
   }
 
-  return { skills, hasErrors };
+  return {
+    skills,
+    frameworks: Array.from(frameworkSet).sort((a, b) => a.localeCompare(b)),
+    hasErrors,
+  };
 }
