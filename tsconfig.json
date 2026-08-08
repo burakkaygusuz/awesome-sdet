@@ -8,11 +8,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./",
-    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "ignoreDeprecations": "6.0",
     "types": ["node"]
   },

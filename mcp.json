@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "sdet-mcp": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:3000/mcp",
+      "description": "Model Context Protocol Server providing test automation tools, documentation references, and runtime execution."
+    }
+  }
+}

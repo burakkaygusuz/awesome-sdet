@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "awesome-sdet",
+  "version": "1.0.0",
+  "description": "Enterprise SDET Agent Plugin for AI coding assistants featuring test automation skills and a secure Model Context Protocol (MCP) server.",
+  "author": {
+    "name": "Burak Kaygusuz",
+    "url": "https://github.com/burakkaygusuz"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/burakkaygusuz/awesome-sdet",
+  "keywords": [
+    "sdet",
+    "test-automation",
+    "e2e-testing",
+    "api-testing",
+    "performance-testing",
+    "mobile-testing",
+    "mcp",
+    "agent-plugin",
+    "ai-agent"
+  ]
+}
