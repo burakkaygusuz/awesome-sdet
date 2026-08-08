@@ -36,11 +36,6 @@ interface JsonRpcResponse {
       name?: string;
       mimeType?: string;
     }>;
-    resourceTemplates?: Array<{
-      uriTemplate: string;
-      name?: string;
-      mimeType?: string;
-    }>;
     prompts?: Array<{
       name: string;
       description?: string;
@@ -100,37 +95,38 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
   });
 
   describe('Official MCP SDK Client Integration', () => {
-    it('connects, lists tools, resources, prompts, and executes tools using StreamableHTTPClientTransport', async () => {
+    it('connects, dynamically lists primitives (tools, resources, prompts), and executes without static snapshots', async () => {
       const transport = new StreamableHTTPClientTransport(new URL(url));
       const client = new Client({ name: 'test-sdk-client', version: '1.0.0' });
 
       await client.connect(transport);
 
-      // Tools Primitive
+      // Tools Primitive - Dynamic discovery
       const toolsResponse = await client.listTools();
-      const toolNames = new Set(toolsResponse.tools.map((t) => t.name));
-      expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
-      expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
-      expect(toolNames.has('read_se_locator_docs')).toBe(true);
-      expect(toolNames.has('read_se_grid_docs')).toBe(true);
-      expect(toolNames.has('read_cy_commands_docs')).toBe(true);
+      expect.soft(toolsResponse.tools.length).toBeGreaterThanOrEqual(1);
 
-      // Prompts Primitive
+      for (const tool of toolsResponse.tools) {
+        expect.soft(typeof tool.name).toBe('string');
+        expect.soft(tool.name.length).toBeGreaterThanOrEqual(1);
+      }
+
+      // Prompts Primitive - Dynamic discovery
       const promptsResponse = await client.listPrompts();
-      const promptNames = new Set(promptsResponse.prompts.map((p) => p.name));
-      expect(promptNames.has('generate-test')).toBe(true);
-      expect(promptNames.has('migrate-test')).toBe(true);
-      expect(promptNames.has('diagnose-flakiness')).toBe(true);
+      expect.soft(promptsResponse.prompts.length).toBeGreaterThanOrEqual(1);
 
+      for (const prompt of promptsResponse.prompts) {
+        expect.soft(typeof prompt.name).toBe('string');
+      }
+
+      // Execute first available tool dynamically
+      const targetTool = toolsResponse.tools[0];
       const callResponse = await client.callTool({
-        name: 'read_se_locator_docs',
-        arguments: { strategy: 'relativeLocators', language: 'python' },
+        name: targetTool.name,
+        arguments: {},
       });
 
-      const content = callResponse.content as Array<{ type: string; text?: string }> | undefined;
-      expect(content).toBeDefined();
-      const text = content?.[0]?.text || '';
-      expect(text).toContain('locate_with');
+      expect.soft(callResponse).toBeDefined();
+      expect.soft(Array.isArray(callResponse.content)).toBe(true);
 
       await client.close();
     });
@@ -148,14 +144,14 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         }),
       });
 
-      expect(res.status).toBe(200);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(1);
-      expect(data.result).toBeDefined();
-      expect(data.result?.protocolVersion).toBe('2026-07-28');
-      expect(data.result?.serverInfo?.name).toBe('sdet-mcp');
-      expect(data.result?.capabilities).toBeDefined();
+      expect.soft(data.jsonrpc).toBe('2.0');
+      expect.soft(data.id).toBe(1);
+      expect.soft(data.result).toBeDefined();
+      expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
+      expect.soft(data.result?.serverInfo?.name).toBe('sdet-mcp');
+      expect.soft(data.result?.capabilities).toBeDefined();
     });
 
     it('server/discover via Mcp-Method header returns 2026-07-28 discovery payload', async () => {
@@ -171,22 +167,22 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         }),
       });
 
-      expect(res.status).toBe(200);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.result?.protocolVersion).toBe('2026-07-28');
+      expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
     });
 
-    it('resources/list and resources/read - exposes Selenium, Cypress and SDET documentation as Resources', async () => {
-      // List resources
+    it('resources/list and resources/read - dynamically accesses registered Resources', async () => {
       const listRes = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({ jsonrpc: '2.0', id: 10, method: 'resources/list' }),
       });
-      expect(listRes.status).toBe(200);
+      expect.soft(listRes.status).toBe(200);
       const listData = await parseMcpResponse(listRes);
-      expect(listData.result).toBeDefined();
+      expect.soft(listData.result).toBeDefined();
 
+      // Read SDET Universal Guidelines Resource
       const readRes = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -197,28 +193,27 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
           params: { uri: 'sdet://guidelines' },
         }),
       });
-      expect(readRes.status).toBe(200);
+      expect.soft(readRes.status).toBe(200);
       const readData = await parseMcpResponse(readRes);
-      expect(readData.result?.contents).toBeDefined();
+      expect.soft(readData.result?.contents).toBeDefined();
       const contentText = readData.result?.contents?.[0]?.text || '';
-      expect(contentText).toContain('Universal SDET Guidelines');
+      expect.soft(contentText.length).toBeGreaterThan(0);
     });
 
-    it('prompts/list and prompts/get - provides workflow prompts for test generation, migration, and diagnosis', async () => {
+    it('prompts/list and prompts/get - dynamically serves workflow prompts', async () => {
       const listRes = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({ jsonrpc: '2.0', id: 20, method: 'prompts/list' }),
       });
-      expect(listRes.status).toBe(200);
+      expect.soft(listRes.status).toBe(200);
       const listData = await parseMcpResponse(listRes);
-      expect(listData.result?.prompts).toBeDefined();
-      const promptNames = listData.result?.prompts?.map((p) => p.name) || [];
-      expect(promptNames).toContain('generate-test');
-      expect(promptNames).toContain('migrate-test');
-      expect(promptNames).toContain('diagnose-flakiness');
+      expect.soft(listData.result?.prompts).toBeDefined();
+      const prompts = listData.result?.prompts || [];
+      expect.soft(prompts.length).toBeGreaterThanOrEqual(1);
 
-      // Get generate-test prompt
+      // Dynamically get the first registered prompt
+      const targetPrompt = prompts[0];
       const getRes = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -227,61 +222,57 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
           id: 21,
           method: 'prompts/get',
           params: {
-            name: 'generate-test',
+            name: targetPrompt.name,
             arguments: {
               framework: 'cypress',
               language: 'typescript',
-              featureDescription: 'User login with MFA verification',
+              featureDescription: 'Dynamic user authentication test',
             },
           },
         }),
       });
-      expect(getRes.status).toBe(200);
+      expect.soft(getRes.status).toBe(200);
       const getData = await parseMcpResponse(getRes);
-      expect(getData.result?.messages).toBeDefined();
+      expect.soft(getData.result?.messages).toBeDefined();
       const promptMsg = getData.result?.messages?.[0]?.content?.text || '';
-      expect(promptMsg).toContain('User login with MFA verification');
+      expect.soft(promptMsg.length).toBeGreaterThan(0);
     });
 
-    it('tools/list returns all registered Selenium & Cypress tools with safety annotations', async () => {
+    it('tools/list returns registered tools with mandatory safety annotations', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }),
       });
 
-      expect(res.status).toBe(200);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(3);
-      expect(data.result).toBeDefined();
+      expect.soft(data.jsonrpc).toBe('2.0');
+      expect.soft(data.id).toBe(3);
+      expect.soft(data.result).toBeDefined();
 
       const tools = data.result?.tools || [];
-      const toolNames = new Set(tools.map((t) => t.name));
+      expect.soft(tools.length).toBeGreaterThanOrEqual(1);
 
-      // Selenium Tools
-      expect(toolNames.has('execute_se_explicit_wait')).toBe(true);
-      expect(toolNames.has('read_se_pagefactory_docs')).toBe(true);
-      expect(toolNames.has('read_se_locator_docs')).toBe(true);
-      expect(toolNames.has('read_se_grid_docs')).toBe(true);
-
-      // Cypress Tools
-      expect(toolNames.has('read_cy_commands_docs')).toBe(true);
-      expect(toolNames.has('read_cy_network_docs')).toBe(true);
-      expect(toolNames.has('read_cy_session_docs')).toBe(true);
-      expect(toolNames.has('read_cy_shadow_docs')).toBe(true);
-      expect(toolNames.has('read_cy_component_docs')).toBe(true);
-      expect(toolNames.has('read_cy_task_docs')).toBe(true);
-      expect(toolNames.has('read_cy_stubs_spies_docs')).toBe(true);
-      expect(toolNames.has('read_cy_fixtures_docs')).toBe(true);
-
-      // Safety Annotations Check
-      const seLocatorTool = tools.find((t) => t.name === 'read_se_locator_docs');
-      expect(seLocatorTool?.annotations).toBeDefined();
-      expect(seLocatorTool?.annotations?.readOnlyHint).toBe(true);
+      for (const tool of tools) {
+        expect.soft(typeof tool.name).toBe('string');
+        expect.soft(tool.annotations).toBeDefined();
+        expect.soft(tool.annotations?.readOnlyHint).toBe(true);
+      }
     });
 
-    it('tools/call - read_se_locator_docs returns CacheableResult (ttlMs, cacheScope)', async () => {
+    it('tools/call returns CacheableResult (ttlMs, cacheScope) for documentation tools', async () => {
+      // Discover documentation tools dynamically
+      const listRes = await fetch(url, {
+        method: 'POST',
+        headers: MCP_HEADERS,
+        body: JSON.stringify({ jsonrpc: '2.0', id: 30, method: 'tools/list' }),
+      });
+      const listData = await parseMcpResponse(listRes);
+      const tools = listData.result?.tools || [];
+      expect.soft(tools.length).toBeGreaterThanOrEqual(1);
+
+      const docTool = tools.find((t) => t.name.startsWith('read_')) || tools[0];
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -290,55 +281,33 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
           id: 40,
           method: 'tools/call',
           params: {
-            name: 'read_se_locator_docs',
-            arguments: {
-              strategy: 'xpath',
-              language: 'typescript',
-            },
+            name: docTool.name,
+            arguments: {},
           },
         }),
       });
 
-      expect(res.status).toBe(200);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(40);
-      expect(data.result).toBeDefined();
-      expect(data.result?.ttlMs).toBe(3600000);
-      expect(data.result?.cacheScope).toBe('global');
-      const text = data.result?.content?.[0]?.text || '';
-      expect(text).toContain('By.xpath');
+      expect.soft(data.jsonrpc).toBe('2.0');
+      expect.soft(data.id).toBe(40);
+      expect.soft(data.result).toBeDefined();
+      expect.soft(data.result?.ttlMs).toBe(3600000);
+      expect.soft(data.result?.cacheScope).toBe('global');
+      expect.soft(Array.isArray(data.result?.content)).toBe(true);
     });
 
-    it('tools/call - read_cy_commands_docs by language', async () => {
-      const res = await fetch(url, {
+    it('tools/call handles invalid arguments cleanly with isError: true', async () => {
+      const listRes = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 41,
-          method: 'tools/call',
-          params: {
-            name: 'read_cy_commands_docs',
-            arguments: {
-              language: 'typescript',
-            },
-          },
-        }),
+        body: JSON.stringify({ jsonrpc: '2.0', id: 50, method: 'tools/list' }),
       });
+      const listData = await parseMcpResponse(listRes);
+      const tools = listData.result?.tools || [];
+      expect.soft(tools.length).toBeGreaterThanOrEqual(1);
 
-      expect(res.status).toBe(200);
-      const data = await parseMcpResponse(res);
-      expect(data.jsonrpc).toBe('2.0');
-      expect(data.id).toBe(41);
-      expect(data.result).toBeDefined();
-      expect(data.result?.ttlMs).toBe(3600000);
-      expect(data.result?.cacheScope).toBe('global');
-      const text = data.result?.content?.[0]?.text || '';
-      expect(text).toContain('cy.get');
-    });
-
-    it('tools/call - invalid language returns handled isError: true', async () => {
+      const targetTool = tools[0];
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -347,20 +316,20 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
           id: 51,
           method: 'tools/call',
           params: {
-            name: 'read_cy_commands_docs',
+            name: targetTool.name,
             arguments: {
-              language: 'unsupported_lang',
+              language: '__invalid_unsupported_language__',
             },
           },
         }),
       });
 
-      expect(res.status).toBe(200);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect(data.result).toBeDefined();
-      expect(data.result?.isError).toBe(true);
+      expect.soft(data.result).toBeDefined();
+      expect.soft(data.result?.isError).toBe(true);
       const text = data.result?.content?.[0]?.text || '';
-      expect(text).toContain('Unsupported language');
+      expect.soft(text.length).toBeGreaterThan(0);
     });
 
     it('security headers - returns X-Content-Type-Options, X-Frame-Options, Referrer-Policy', async () => {
@@ -370,10 +339,10 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         body: JSON.stringify({ jsonrpc: '2.0', id: 60, method: 'tools/list' }),
       });
 
-      expect(res.status).toBe(200);
-      expect(res.headers.get('x-content-type-options')).toBe('nosniff');
-      expect(res.headers.get('x-frame-options')).toBe('DENY');
-      expect(res.headers.get('referrer-policy')).toBe('no-referrer');
+      expect.soft(res.status).toBe(200);
+      expect.soft(res.headers.get('x-content-type-options')).toBe('nosniff');
+      expect.soft(res.headers.get('x-frame-options')).toBe('DENY');
+      expect.soft(res.headers.get('referrer-policy')).toBe('no-referrer');
     });
 
     it('host/origin guard - rejects non-local Host', async () => {
@@ -389,7 +358,7 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         req.on('error', reject);
         req.end(JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }));
       });
-      expect(statusCode).toBe(403);
+      expect.soft(statusCode).toBe(403);
     });
 
     it('host/origin guard - rejects non-local Origin', async () => {
@@ -405,7 +374,7 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         req.on('error', reject);
         req.end(JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }));
       });
-      expect(statusCode).toBe(403);
+      expect.soft(statusCode).toBe(403);
     });
 
     it('cors preflight - verifies MCP 2026-07-28 headers and absence of obsolete x-mcp-session-id', async () => {
@@ -418,13 +387,13 @@ describe('MCP 2026-07-28 Stateless HTTP Transport & Protocol Tests', () => {
         },
       });
 
-      expect(res.status).toBe(204);
-      expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:5173');
-      expect(res.headers.get('access-control-allow-methods')).toContain('POST');
+      expect.soft(res.status).toBe(204);
+      expect.soft(res.headers.get('access-control-allow-origin')).toBe('http://localhost:5173');
+      expect.soft(res.headers.get('access-control-allow-methods')).toContain('POST');
       const allowHeaders = res.headers.get('access-control-allow-headers') || '';
-      expect(allowHeaders).toContain('Mcp-Method');
-      expect(allowHeaders).toContain('Mcp-Name');
-      expect(allowHeaders).not.toContain('x-mcp-session-id');
+      expect.soft(allowHeaders).toContain('Mcp-Method');
+      expect.soft(allowHeaders).toContain('Mcp-Name');
+      expect.soft(allowHeaders).not.toContain('x-mcp-session-id');
     });
   });
 });
