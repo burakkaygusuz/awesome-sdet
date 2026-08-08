@@ -1,6 +1,6 @@
 # Agent Plugins, Skills & MCP Server Engineering Guide
 
-> A comprehensive technical guide for authoring, validating, and hardening **Agent Plugins 1.0.0**, **Skills**, and **Model Context Protocol (MCP)** servers for AI Coding Assistants across multi-framework SDET automation platforms (**Selenium**, **Playwright**, **Cypress**, **Appium**).
+> A comprehensive technical guide for authoring, validating, and hardening **Agent Plugins 1.0.0**, **Skills**, and **Model Context Protocol (MCP)** servers for AI Coding Assistants across multi-framework SDET automation platforms.
 >
 > Normative References:
 >
@@ -18,7 +18,7 @@
 1. [Agent Plugins 1.0.0 Manifest Specification](#1-agent-plugins-100-manifest-specification)
    - 1.1 [Root Plugin Manifest (`plugin.json`)](#11-root-plugin-manifest-pluginjson)
    - 1.2 [MCP Server Manifest (`mcp.json`)](#12-mcp-server-manifest-mcpjson)
-   - 1.3 [Canonical Schemas & Normative URL Validation](#13-canonical-schemas--normative-url-validation)
+   - 1.3 [Canonical Schemas & Validation Philosophy (Spec §5.4)](#13-canonical-schemas--validation-philosophy-spec-54)
 2. [Skills Authoring & Three-Level Progressive Loading](#2-skills-authoring--three-level-progressive-loading)
    - 2.1 [The Three-Level Token Architecture](#21-the-three-level-token-architecture)
    - 2.2 [Writing High-Precision `description` Fields](#22-writing-high-precision-description-fields)
@@ -78,7 +78,7 @@ The `plugin.json` file resides at the root of the repository and declares the pl
 }
 ```
 
-#### Normative Field Constraints:
+#### Normative Field Constraints
 
 - **`$schema`**: MUST point directly to `https://agent-plugins.org/schemas/1.0.0/plugin.schema.json`.
 - **`name`**: Lowercase alphanumeric string between 1 and 64 characters, matching regex `^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$`. Consecutive hyphens (`--`) and dots (`..`) are strictly forbidden.
@@ -98,25 +98,31 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "sdet-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["servers/dist/index.js", "--stdio"]
+    },
+    "sdet-mcp-http": {
       "type": "streamable-http",
-      "url": "http://127.0.0.1:3000/mcp",
-      "description": "Model Context Protocol Server providing test automation tools, documentation references, and runtime execution."
+      "url": "http://127.0.0.1:3000/mcp"
     }
   }
 }
 ```
 
-#### Supported Transport Types:
+#### Supported Transport Types & Zero-Config Execution
 
-- **`streamable-http`**: High-performance HTTP streaming transport with stateless request handling.
-- **`stdio`**: Standard input/output process transport for local CLI tools.
-- **`sse`**: Server-Sent Events transport.
+- **`stdio` (Primary)**: Spawns the MCP server on-demand as a local child process (`command: "node"`, `args: ["servers/dist/index.js", "--stdio"]`). AI coding assistants run this out of the box with zero background server management.
+- **`streamable-http`**: High-performance HTTP streaming transport (`url: "http://127.0.0.1:3000/mcp"`). Enables remote connections and distributed execution.
+- **`sse`**: Server-Sent Events transport (`type`, `url`, optional `headers`).
 
 ---
 
-### 1.3 Canonical Schemas & Normative URL Validation
+### 1.3 Canonical Schemas & Validation Philosophy (Spec §5.4)
 
-Do not commit local schema copies or map local copies in IDE settings. Always reference official canonical URLs to guarantee compliance and ensure effortless upstream schema evolution.
+1. **Canonical Schema URLs:** Always reference official canonical schema URLs (`https://agent-plugins.org/schemas/1.0.0/*.json`) rather than local schema mirrors.
+2. **Strict Property Rejection (`.strict()`):** All manifest schemas prohibit unrecognized top-level fields (`additionalProperties: false`). Manifests containing unknown keys (such as `description` inside an MCP server entry) MUST be rejected or skipped by spec-compliant clients.
+3. **Spec §5.4 Robustness Principle:** Clients **MUST NOT** reject manifests solely because `version` is non-standard semver (e.g. `2026.08-beta`), `author` is a string vs. object, or `homepage`/`repository` are loose URIs. Validation should strictly enforce core invariants while remaining robust on informational metadata.
 
 ---
 
@@ -132,18 +138,18 @@ Skills are organized hierarchically to protect the LLM context window while main
 | **Level 2** | `SKILL.md` body                             | Loaded only when the skill triggers      |    **Medium**     |
 | **Level 3** | `references/`, `scripts/`, `sdet-mcp` tools | Read on-demand when explicitly requested |    **Lowest**     |
 
-```
+```markdown
 skills/
 ├── selenium/
-│   ├── actions-api/
-│   │   ├── SKILL.md                 ← Level 2: Decision trees, gotchas, core patterns
-│   │   └── references/              ← Level 3: Language implementations
-│   │       ├── java.md
-│   │       ├── python.md
-│   │       └── typescript.md
+│ ├── actions-api/
+│ │ ├── SKILL.md ← Level 2: Decision trees, gotchas, core patterns
+│ │ └── references/ ← Level 3: Language implementations
+│ │ ├── java.md
+│ │ ├── python.md
+│ │ └── typescript.md
 └── cypress/
-    └── querying-selectors/
-        └── SKILL.md
+└── querying-selectors/
+└── SKILL.md
 ```
 
 ---
@@ -339,7 +345,7 @@ To achieve clean separation of concerns without sacrificing cross-framework migr
      └───────────────────┴─────────┬─────────┴───────────────────┘
                                    ▼
                  [ Dynamic Skill & MCP Tool Registry ]
-                 • skills/<framework>/ (Level 1/2 Knowledge)
+                 • skills/<skill_name>/ (Level 1/2 Knowledge)
                  • sdet-mcp runtime tools (Level 3 API Execution)
 ```
 

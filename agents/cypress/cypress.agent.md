@@ -18,18 +18,18 @@ Always consult the repository skills and dedicated `sdet-mcp` server tools befor
 
 | Feature / Domain                  | Repository Skill Path                                | MCP Tool (`sdet-mcp`)      | Target Languages       |
 | :-------------------------------- | :--------------------------------------------------- | :------------------------- | :--------------------- |
-| **Core Commands & Queries**       | `skills/cypress/core-concepts/SKILL.md`              | `read_cy_commands_docs`    | TypeScript, JavaScript |
-| **DOM Querying & Selectors**      | `skills/cypress/querying-selectors/SKILL.md`         | `read_cy_commands_docs`    | TypeScript, JavaScript |
-| **Retry-ability & Assertions**    | `skills/cypress/retryability-assertions/SKILL.md`    | `read_cy_commands_docs`    | TypeScript, JavaScript |
-| **User Interactions**             | `skills/cypress/interactions-actionability/SKILL.md` | `read_cy_commands_docs`    | TypeScript, JavaScript |
-| **Variables & Aliases**           | `skills/cypress/variables-aliases/SKILL.md`          | `read_cy_commands_docs`    | TypeScript, JavaScript |
-| **Network Mocking & Stubbing**    | `skills/cypress/continuous-integration/SKILL.md`     | `read_cy_network_docs`     | TypeScript, JavaScript |
-| **Session & Multi-Domain Auth**   | `skills/cypress/web-security-origin/SKILL.md`        | `read_cy_session_docs`     | TypeScript, JavaScript |
-| **Shadow DOM & Web Components**   | `skills/cypress/querying-selectors/SKILL.md`         | `read_cy_shadow_docs`      | TypeScript, JavaScript |
-| **Component Testing & Mount**     | `skills/cypress/core-concepts/SKILL.md`              | `read_cy_component_docs`   | TypeScript, JavaScript |
-| **Node Tasks & OS Commands**      | `skills/cypress/conditional-testing/SKILL.md`        | `read_cy_task_docs`        | TypeScript, JavaScript |
-| **Stubs, Spies & Timers**         | `skills/cypress/variables-aliases/SKILL.md`          | `read_cy_stubs_spies_docs` | TypeScript, JavaScript |
-| **Fixtures & Viewport Emulation** | `skills/cypress/continuous-integration/SKILL.md`     | `read_cy_fixtures_docs`    | TypeScript, JavaScript |
+| **Core Commands & Queries**       | `skills/cypress-core-concepts/SKILL.md`              | `read_cy_commands_docs`    | TypeScript, JavaScript |
+| **DOM Querying & Selectors**      | `skills/cypress-querying-selectors/SKILL.md`         | `read_cy_commands_docs`    | TypeScript, JavaScript |
+| **Retry-ability & Assertions**    | `skills/cypress-retryability-assertions/SKILL.md`    | `read_cy_commands_docs`    | TypeScript, JavaScript |
+| **User Interactions**             | `skills/cypress-interactions-actionability/SKILL.md` | `read_cy_commands_docs`    | TypeScript, JavaScript |
+| **Variables & Aliases**           | `skills/cypress-variables-aliases/SKILL.md`          | `read_cy_commands_docs`    | TypeScript, JavaScript |
+| **Network Mocking & Stubbing**    | `skills/cypress-continuous-integration/SKILL.md`     | `read_cy_network_docs`     | TypeScript, JavaScript |
+| **Session & Multi-Domain Auth**   | `skills/cypress-web-security-origin/SKILL.md`        | `read_cy_session_docs`     | TypeScript, JavaScript |
+| **Shadow DOM & Web Components**   | `skills/cypress-querying-selectors/SKILL.md`         | `read_cy_shadow_docs`      | TypeScript, JavaScript |
+| **Component Testing & Mount**     | `skills/cypress-core-concepts/SKILL.md`              | `read_cy_component_docs`   | TypeScript, JavaScript |
+| **Node Tasks & OS Commands**      | `skills/cypress-conditional-testing/SKILL.md`        | `read_cy_task_docs`        | TypeScript, JavaScript |
+| **Stubs, Spies & Timers**         | `skills/cypress-variables-aliases/SKILL.md`          | `read_cy_stubs_spies_docs` | TypeScript, JavaScript |
+| **Fixtures & Viewport Emulation** | `skills/cypress-continuous-integration/SKILL.md`     | `read_cy_fixtures_docs`    | TypeScript, JavaScript |
 
 ---
 

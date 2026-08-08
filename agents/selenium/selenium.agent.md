@@ -18,17 +18,17 @@ Always consult the repository skills and `sdet-mcp` server tools before generati
 
 | Feature / Domain                | Repository Skill Path                      | MCP Tool (`sdet-mcp`)        | Target Languages               |
 | :------------------------------ | :----------------------------------------- | :--------------------------- | :----------------------------- |
-| **Low-level Interactions**      | `skills/selenium/actions-api/SKILL.md`     | `read_se_actions_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **BiDirectional Protocol**      | `skills/selenium/bidi/SKILL.md`            | `read_se_bidi_docs`          | Java, Python, TS, JS, C#, Ruby |
-| **Auth & Cookies / Storage**    | `skills/selenium/cookies-storage/SKILL.md` | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **Design Patterns (POM)**       | `skills/selenium/design-patterns/SKILL.md` | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
-| **Synchronization & Waits**     | `skills/selenium/explicit-waits/SKILL.md`  | `execute_se_explicit_wait`   | Dynamic Wait Validator         |
-| **Distributed Grid Execution**  | `skills/selenium/grid-remote/SKILL.md`     | `read_se_grid_docs`          | Java, Python, TS, JS, C#, Ruby |
-| **Event Interception & Log**    | `skills/selenium/listeners/SKILL.md`       | `read_se_listeners_docs`     | Java, Python, TS, JS, C#, Ruby |
-| **OpenTelemetry & Metrics**     | `skills/selenium/observability/SKILL.md`   | `read_se_observability_docs` | Java, Python, TS, JS, C#, Ruby |
-| **PageFactory & Locators**      | `skills/selenium/pagefactory-pom/SKILL.md` | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
-| **Shadow DOM & Web Components** | `skills/selenium/shadow-root/SKILL.md`     | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **Thread Safety & Parallel**    | `skills/selenium/thread-safety/SKILL.md`   | `read_se_grid_docs`          | Java, Python, TS, JS, C#, Ruby |
+| **Low-level Interactions**      | `skills/selenium-actions-api/SKILL.md`     | `read_se_actions_docs`       | Java, Python, TS, JS, C#, Ruby |
+| **BiDirectional Protocol**      | `skills/selenium-bidi/SKILL.md`            | `read_se_bidi_docs`          | Java, Python, TS, JS, C#, Ruby |
+| **Auth & Cookies / Storage**    | `skills/selenium-cookies-storage/SKILL.md` | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
+| **Design Patterns (POM)**       | `skills/selenium-design-patterns/SKILL.md` | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
+| **Synchronization & Waits**     | `skills/selenium-explicit-waits/SKILL.md`  | `execute_se_explicit_wait`   | Dynamic Wait Validator         |
+| **Distributed Grid Execution**  | `skills/selenium-grid-remote/SKILL.md`     | `read_se_grid_docs`          | Java, Python, TS, JS, C#, Ruby |
+| **Event Interception & Log**    | `skills/selenium-listeners/SKILL.md`       | `read_se_listeners_docs`     | Java, Python, TS, JS, C#, Ruby |
+| **OpenTelemetry & Metrics**     | `skills/selenium-observability/SKILL.md`   | `read_se_observability_docs` | Java, Python, TS, JS, C#, Ruby |
+| **PageFactory & Locators**      | `skills/selenium-pagefactory-pom/SKILL.md` | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
+| **Shadow DOM & Web Components** | `skills/selenium-shadow-root/SKILL.md`     | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
+| **Thread Safety & Parallel**    | `skills/selenium-thread-safety/SKILL.md`   | `read_se_grid_docs`          | Java, Python, TS, JS, C#, Ruby |
 
 ---
 
