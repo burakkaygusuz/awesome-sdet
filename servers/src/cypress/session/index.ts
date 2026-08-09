@@ -1,19 +1,20 @@
 import { z } from 'zod';
-import { readCypressReferenceDoc } from '../common.js';
+import { readCypressReferenceDoc, SupportedLanguageSchema } from '../common.js';
 import type { ToolExecutionResult } from '../../server.js';
 
-export const CypressSessionDocsSchema = z.object({
-  language: z
-    .string()
-    .default('typescript')
-    .describe('Programming language for code examples (javascript or typescript)'),
-});
+export const CypressSessionDocsSchema = z
+  .object({
+    language: SupportedLanguageSchema,
+  })
+  .strict();
 
 export type CypressSessionDocsArgs = z.infer<typeof CypressSessionDocsSchema>;
 
-export function handleCypressSessionDocs(args: CypressSessionDocsArgs): ToolExecutionResult {
+export async function handleCypressSessionDocs(
+  args: CypressSessionDocsArgs
+): Promise<ToolExecutionResult> {
   const language = args.language || 'typescript';
-  const docs = readCypressReferenceDoc('session', language);
+  const docs = await readCypressReferenceDoc('session', language);
 
   return {
     content: [{ type: 'text', text: docs }],

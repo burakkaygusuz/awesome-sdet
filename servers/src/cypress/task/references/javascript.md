@@ -11,7 +11,6 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       on('task', {
         async resetDatabase() {
-          // Execute server-side database cleanup or API call
           await db.truncateAll();
           return null;
         },
@@ -27,7 +26,7 @@ module.exports = defineConfig({
 ```
 
 ```javascript
-// in test file
+// test/example.cy.js
 beforeEach(() => {
   cy.task('resetDatabase');
   cy.task('seedUser', { email: 'admin@example.com', role: 'admin' }).then((userId) => {
@@ -39,6 +38,5 @@ beforeEach(() => {
 ## 2. OS Command Execution (`cy.exec`)
 
 ```javascript
-// Run shell commands or CLI scripts
 cy.exec('npm run db:seed').its('code').should('eq', 0);
 ```

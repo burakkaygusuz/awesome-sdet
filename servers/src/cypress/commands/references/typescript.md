@@ -3,7 +3,6 @@
 ## 1. Finding Elements (`cy.get`, `cy.find`, `cy.contains`)
 
 ```typescript
-// Query elements with implicit retries
 cy.get('[data-testid="submit-btn"]').should('be.visible').click();
 cy.contains('button', 'Submit').should('not.be.disabled');
 ```

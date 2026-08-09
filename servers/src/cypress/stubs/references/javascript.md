@@ -3,7 +3,6 @@
 ## 1. Function Stubbing (`cy.stub`)
 
 ```javascript
-// Stub browser window prompt or method
 cy.visit('/', {
   onBeforeLoad(win) {
     cy.stub(win, 'prompt').returns('custom input').as('winPrompt');
@@ -16,7 +15,6 @@ cy.get('@winPrompt').should('be.calledWith', 'Enter your name');
 ## 2. Function Spying (`cy.spy`)
 
 ```javascript
-// Record method calls without modifying behavior
 const user = {
   notify: (msg) => console.log(msg),
 };
@@ -30,14 +28,13 @@ cy.get('@notifySpy').should('have.been.calledWith', 'Hello');
 ## 3. System Clock & Timer Control (`cy.clock`, `cy.tick`)
 
 ```javascript
-// Freeze clock and advance time deterministically
+// Freeze clock and advance time deterministically without real delays
 cy.clock();
 cy.visit('/dashboard');
 
-// Fast-forward 5000ms to trigger setTimeout or setInterval
+// Fast-forward virtual timer to trigger setTimeout/setInterval
 cy.tick(5000);
 cy.get('#session-timeout-banner').should('be.visible');
 
-// Restore clock
 cy.clock().then((clock) => clock.restore());
 ```

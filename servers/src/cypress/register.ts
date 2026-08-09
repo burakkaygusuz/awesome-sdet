@@ -31,7 +31,7 @@ export function registerCypressTools(
       title: 'Cypress Commands & Assertions Docs',
       description:
         'Returns Cypress core commands, DOM queries, and assertion code examples for a given language.',
-      inputSchema: CypressCommandsDocsSchema.shape,
+      inputSchema: CypressCommandsDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressCommandsDocs(args))
@@ -43,7 +43,7 @@ export function registerCypressTools(
       title: 'Cypress Network Interception Docs',
       description:
         'Returns cy.intercept, cy.request, and API stubbing code examples for a given language.',
-      inputSchema: CypressNetworkDocsSchema.shape,
+      inputSchema: CypressNetworkDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressNetworkDocs(args))
@@ -55,7 +55,7 @@ export function registerCypressTools(
       title: 'Cypress Session & Multi-Origin Docs',
       description:
         'Returns cy.session auth caching and cy.origin multi-domain testing code examples for a given language.',
-      inputSchema: CypressSessionDocsSchema.shape,
+      inputSchema: CypressSessionDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressSessionDocs(args))
@@ -67,7 +67,7 @@ export function registerCypressTools(
       title: 'Cypress Shadow DOM Docs',
       description:
         'Returns cy.shadow and Shadow DOM element traversal code examples for a given language.',
-      inputSchema: CypressShadowDocsSchema.shape,
+      inputSchema: CypressShadowDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressShadowDocs(args))
@@ -79,7 +79,7 @@ export function registerCypressTools(
       title: 'Cypress Component Testing Docs',
       description:
         'Returns Cypress component testing and mount API code examples for a given language.',
-      inputSchema: CypressComponentDocsSchema.shape,
+      inputSchema: CypressComponentDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressComponentDocs(args))
@@ -91,7 +91,7 @@ export function registerCypressTools(
       title: 'Cypress Node Task & OS Command Docs',
       description:
         'Returns cy.task Node.js event execution, database seeding, and cy.exec shell commands for a given language.',
-      inputSchema: CypressTaskDocsSchema.shape,
+      inputSchema: CypressTaskDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressTaskDocs(args))
@@ -103,7 +103,7 @@ export function registerCypressTools(
       title: 'Cypress Stubs, Spies & Timers Docs',
       description:
         'Returns cy.stub, cy.spy, cy.clock, and cy.tick time manipulation code examples for a given language.',
-      inputSchema: CypressStubsDocsSchema.shape,
+      inputSchema: CypressStubsDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressStubsDocs(args))
@@ -115,7 +115,7 @@ export function registerCypressTools(
       title: 'Cypress Fixtures & Viewport Docs',
       description:
         'Returns cy.fixture, cy.readFile, cy.writeFile, and cy.viewport emulation code examples for a given language.',
-      inputSchema: CypressFixturesDocsSchema.shape,
+      inputSchema: CypressFixturesDocsSchema,
       annotations,
     },
     safeHandler((args) => handleCypressFixturesDocs(args))

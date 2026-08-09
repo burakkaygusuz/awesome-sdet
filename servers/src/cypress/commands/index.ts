@@ -1,19 +1,20 @@
 import { z } from 'zod';
-import { readCypressReferenceDoc } from '../common.js';
+import { readCypressReferenceDoc, SupportedLanguageSchema } from '../common.js';
 import type { ToolExecutionResult } from '../../server.js';
 
-export const CypressCommandsDocsSchema = z.object({
-  language: z
-    .string()
-    .default('typescript')
-    .describe('Programming language for code examples (javascript or typescript)'),
-});
+export const CypressCommandsDocsSchema = z
+  .object({
+    language: SupportedLanguageSchema,
+  })
+  .strict();
 
 export type CypressCommandsDocsArgs = z.infer<typeof CypressCommandsDocsSchema>;
 
-export function handleCypressCommandsDocs(args: CypressCommandsDocsArgs): ToolExecutionResult {
+export async function handleCypressCommandsDocs(
+  args: CypressCommandsDocsArgs
+): Promise<ToolExecutionResult> {
   const language = args.language || 'typescript';
-  const docs = readCypressReferenceDoc('commands', language);
+  const docs = await readCypressReferenceDoc('commands', language);
 
   return {
     content: [{ type: 'text', text: docs }],

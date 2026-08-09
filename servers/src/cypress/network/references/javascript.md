@@ -3,7 +3,6 @@
 ## 1. Route Stubbing & Spying (`cy.intercept`)
 
 ```javascript
-// Intercept HTTP GET request and alias it
 cy.intercept('GET', '/api/v1/users', { fixture: 'users.json' }).as('getUsers');
 
 cy.visit('/dashboard');
