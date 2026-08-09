@@ -1,23 +1,36 @@
 # Cypress Fixtures, File I/O & Viewport — TypeScript API Reference (Cypress 15.x+)
 
-## 1. Fixture Data Loading (`cy.fixture`)
+## 1. Fixture Loading & Aliasing
 
 ```typescript
-cy.fixture<{ id: number; name: string }>('user.json').then((userData) => {
-  expect(userData.name).to.eq('Jane Doe');
+cy.fixture('users.json').as('userData');
+
+cy.get('@userData').then((users: any) => {
+  cy.get('#username').type(users.admin.username);
 });
+
+cy.fixture('profile-picture.png', 'binary')
+  .then(Cypress.Blob.binaryStringToBlob)
+  .then((fileBlob) => {
+    cy.get('input[type="file"]').attachFile({
+      fileContent: fileBlob,
+      fileName: 'profile-picture.png',
+      mimeType: 'image/png',
+    });
+  });
 ```
 
-## 2. Reading & Writing Files (`cy.readFile`, `cy.writeFile`)
+## 2. File I/O & Viewport Emulation
 
 ```typescript
-cy.readFile('cypress/fixtures/config.json').its('environment').should('eq', 'staging');
-cy.writeFile('cypress/downloads/output.txt', 'Test run completed successfully');
+cy.writeFile('cypress/fixtures/session.json', { token: 'auth-token-123' });
+cy.readFile('cypress/fixtures/session.json').its('token').should('eq', 'auth-token-123');
+
+cy.viewport('iphone-x');
+cy.viewport(1920, 1080);
 ```
 
-## 3. Dynamic Viewport Emulation (`cy.viewport`)
+## 3. Best Practices & Anti-Patterns
 
-```typescript
-cy.viewport(1280, 720);
-cy.viewport('iphone-x', 'portrait');
-```
+- **Use Fixture Aliases in Hooks**: Load fixtures in `beforeEach()` using `cy.fixture().as('alias')` to ensure fresh state for every test.
+- **Clean Generated Files**: Remove temporary test artifacts written with `cy.writeFile()` after suite completion.

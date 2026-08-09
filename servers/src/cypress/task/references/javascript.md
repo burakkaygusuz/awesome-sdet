@@ -1,42 +1,45 @@
 # Cypress Node.js Task & OS Command Execution — JavaScript API Reference (Cypress 15.x+)
 
-## 1. Node.js Event Handlers (`setupNodeEvents` & `cy.task`)
+## 1. Node Task Execution (`cy.task`)
+
+### Configuration & Task Handler (`cypress.config.js`)
 
 ```javascript
-// cypress.config.js
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       on('task', {
-        async resetDatabase() {
-          await db.truncateAll();
-          return null;
-        },
-        async seedUser(user) {
-          const created = await db.users.create(user);
-          return created.id;
+        seedDatabase(data) {
+          console.log('Seeding DB with', data.users, 'users');
+          return { success: true, count: data.users };
         },
       });
-      return config;
     },
   },
 });
 ```
 
+### Spec Execution (`spec.cy.js`)
+
 ```javascript
-// test/example.cy.js
-beforeEach(() => {
-  cy.task('resetDatabase');
-  cy.task('seedUser', { email: 'admin@example.com', role: 'admin' }).then((userId) => {
-    cy.visit(`/users/${userId}`);
-  });
+cy.task('seedDatabase', { users: 10 }).then((result) => {
+  expect(result.success).to.be.true;
+  expect(result.count).to.eq(10);
 });
 ```
 
-## 2. OS Command Execution (`cy.exec`)
+## 2. Shell Command Execution (`cy.exec`)
 
 ```javascript
-cy.exec('npm run db:seed').its('code').should('eq', 0);
+cy.exec('npm run db:reset', { failOnNonZeroExit: true, timeout: 20000 }).then((result) => {
+  expect(result.code).to.eq(0);
+  expect(result.stdout).to.contain('Database reset complete');
+});
 ```
+
+## 3. Best Practices & Anti-Patterns
+
+- **Return Value Requirement**: `cy.task` event handlers must always return a JSON-serializable value or `null`. Returning `undefined` triggers a Cypress execution error.
+- **Set Realistic Timeouts**: Assign explicit timeout options for long-running database migrations in `cy.exec`.

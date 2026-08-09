@@ -1,102 +1,55 @@
 # Cypress Component Testing & Framework Mount — JavaScript API Reference (Cypress 15.x+)
 
-Cypress supports Component Testing across major frontend frameworks (React, Vue, Angular, Svelte) and provides a public API for building custom framework definitions (Solid.js, Lit, Qwik).
-
-## 1. React (`cypress/react`)
+## 1. Multi-Framework Component Mounting (`mount`)
 
 ```javascript
+// React Component Mounting (cypress/react)
 import { mount } from 'cypress/react';
-import Stepper from './Stepper';
-
-describe('<Stepper />', () => {
-  it('renders and increments counter', () => {
-    mount(<Stepper initialCount={0} />);
-    cy.get('[data-cy="increment"]').click();
-    cy.get('[data-cy="counter"]').should('have.text', '1');
-  });
-});
-```
-
-## 2. Vue 3 (`cypress/vue`)
-
-```javascript
-import { mount } from 'cypress/vue';
-import Stepper from './Stepper.vue';
-
-describe('<Stepper />', () => {
-  it('mounts Vue component with props', () => {
-    mount(Stepper, { props: { initialCount: 5 } });
-    cy.get('button').click();
-    cy.get('.count').should('contain', '6');
-  });
-});
-```
-
-## 3. Angular (`cypress/angular`)
-
-```javascript
-import { mount } from 'cypress/angular';
-import { StepperComponent } from './stepper.component';
-
-describe('StepperComponent', () => {
-  it('mounts Angular component', () => {
-    mount(StepperComponent, {
-      componentProperties: { count: 10 },
-    });
-    cy.get('.counter-val').should('have.text', '10');
-  });
-});
-```
-
-## 4. Svelte (`cypress/svelte`)
-
-```javascript
-import { mount } from 'cypress/svelte';
-import Counter from './Counter.svelte';
-
-describe('Counter.svelte', () => {
-  it('mounts Svelte component with props', () => {
-    mount(Counter, { props: { count: 42 } });
-    cy.get('button').contains(42);
-  });
-});
-```
-
-## 5. Custom Framework Definitions & `cy.mount` Registration
-
-For custom UI frameworks (e.g. Solid.js, Preact, Lit) or global `cy.mount` usage:
-
-### A. Registering Global `cy.mount` Command (`cypress/support/component.js`)
-
-```javascript
-import { mount } from 'cypress/react'; // or custom framework mount adapter
+import Button from './Button';
 
 Cypress.Commands.add('mount', mount);
-```
 
-### B. Custom Framework Definition (`cypress-ct-*`)
-
-```javascript
-const { defineFrameworkDefinition } = require('cypress');
-
-module.exports = defineFrameworkDefinition({
-  type: '@org/cypress-ct-solid-js',
-  name: 'Solid.js',
-  supportedBundlers: ['vite'],
-  detectors: [
-    {
-      type: 'solid-js',
-      name: 'Solid',
-      package: 'solid-js',
-      minVersion: '^1.6.0',
-    },
-  ],
-  dependencies: () => [
-    {
-      type: 'solid-js',
-      name: 'Solid',
-      package: 'solid-js',
-    },
-  ],
+describe('<Button />', () => {
+  it('renders with label and fires click handler', () => {
+    const onClickSpy = cy.spy().as('onClick');
+    cy.mount(<Button label="Click Me" onClick={onClickSpy} />);
+    cy.get('button').contains('Click Me').click();
+    cy.get('@onClick').should('have.been.calledOnce');
+  });
 });
 ```
+
+## 2. Vue 3 & Angular Mounting
+
+```javascript
+// Vue 3 Component Mounting (cypress/vue)
+import { mount } from 'cypress/vue';
+import UserProfile from './UserProfile.vue';
+
+describe('<UserProfile />', () => {
+  it('renders user details', () => {
+    cy.mount(UserProfile, {
+      props: { username: 'cypress_user' },
+    });
+    cy.get('.username').should('contain.text', 'cypress_user');
+  });
+});
+```
+
+## 3. Custom Framework Definition (`defineFrameworkDefinition`)
+
+```javascript
+import { defineFrameworkDefinition } from 'cypress';
+
+export default defineFrameworkDefinition({
+  type: 'custom-framework',
+  name: 'Custom Framework',
+  supportedBundlers: ['vite', 'webpack'],
+  detectors: [{ type: 'dependency', name: 'custom-framework' }],
+});
+```
+
+## 4. Best Practices & Anti-Patterns
+
+- **Isolate Component State**: Test components in isolation without loading full application routing or server state.
+- **Use Spies for Callbacks**: Assert component event emissions with `cy.spy().as('spyName')` and Chai Sinon assertions.
