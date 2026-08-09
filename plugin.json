@@ -13,15 +13,11 @@
     "sdet",
     "test-automation",
     "e2e-testing",
-    "web-automation",
-    "api-testing",
-    "performance-testing",
-    "mobile-testing",
+    "selenium",
+    "cypress",
+    "vibium",
+    "appium",
     "mcp",
-    "agent-plugin",
-    "ai-agent",
-    "webdriver-bidi",
-    "ai-native-automation",
-    "browser-mapping"
+    "agent-plugin"
   ]
 }
