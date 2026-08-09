@@ -7,8 +7,10 @@
 ## 1. Network Interception (`vibe.route`)
 
 ```python
-def test_network_mocking(vibe):
-    def handle_user_api(route):
+from typing import Any
+
+def test_network_mocking(vibe: Any) -> None:
+    def handle_user_api(route: Any) -> None:
         route.fulfill(
             status=200,
             content_type="application/json",
@@ -26,7 +28,7 @@ def test_network_mocking(vibe):
 ## 2. Event Listeners
 
 ```python
-def setup_listeners(vibe):
+def setup_listeners(vibe: Any) -> None:
     vibe.on("console", lambda msg: print(f"Console: {msg.text}"))
     vibe.on("pageerror", lambda err: print(f"Page Error: {err}"))
 ```
@@ -36,8 +38,15 @@ def setup_listeners(vibe):
 ## 3. Clock Virtualization
 
 ```python
-def test_virtual_clock(vibe):
+def test_virtual_clock(vibe: Any) -> None:
     vibe.clock.install(time="2026-08-01T00:00:00Z")
     # Fast-forward virtual timer without real sleep delay
     vibe.clock.fast_forward(30000)
 ```
+
+---
+
+## Best Practices
+
+- **Route Precision**: Use precise glob patterns for `vibe.route` to intercept network traffic without degrading performance.
+- **Clock Virtualization**: Fast-forward timers using `vibe.clock.fast_forward()` rather than inserting `time.sleep()`.

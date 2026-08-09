@@ -7,7 +7,9 @@
 ## 1. Semantic Locator Strategies (`vibe.find`)
 
 ```python
-def test_semantic_locators(vibe):
+from typing import Any
+
+def test_semantic_locators(vibe: Any) -> None:
     submit_btn = vibe.find({"role": "button", "text": "Sign In"})
     submit_btn.click()
 
@@ -29,7 +31,7 @@ def test_semantic_locators(vibe):
 ## 2. Pierce Combinators (`>>` and `>>>`)
 
 ```python
-def test_piercing(vibe):
+def test_piercing(vibe: Any) -> None:
     form_btn = vibe.find("form.login-form >> button[type='submit']")
     form_btn.click()
 
@@ -43,8 +45,15 @@ def test_piercing(vibe):
 ## 3. Subtree Scoping & Chaining
 
 ```python
-def test_scoping(vibe):
+def test_scoping(vibe: Any) -> None:
     target_row = vibe.find({"role": "row", "text": "Alice"})
     edit_btn = target_row.find({"role": "button", "text": "Edit"})
     edit_btn.click()
 ```
+
+---
+
+## Best Practices
+
+- **Semantic First**: Prefer ARIA role + text attribute dictionaries (`{"role": "button", "text": "..."}`) over CSS/XPath selectors.
+- **Shadow DOM Piercing**: Use `>>>` to transparently traverse nested Shadow DOM roots in modern Web Component architectures.

@@ -9,7 +9,7 @@
 ```python
 from vibium import browser
 
-def run_vibium_sync():
+def run_vibium_sync() -> None:
     bro = browser.start(headless=True)
     try:
         vibe = bro.page()
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 import asyncio
 from vibium.async_api import browser
 
-async def run_vibium_async():
+async def run_vibium_async() -> None:
     bro = await browser.start(headless=True)
     try:
         vibe = await bro.page()
@@ -69,3 +69,10 @@ vibium click @e1
 # Differential snapshot check
 vibium map --diff
 ```
+
+---
+
+## Best Practices
+
+- **Explicit Lifecycle Management**: Always invoke `bro.stop()` or `await bro.stop()` inside `try ... finally` blocks.
+- **Async vs Sync Alignment**: Select `vibium.browser` for synchronous scripts and `vibium.async_api.browser` for asyncio frameworks.

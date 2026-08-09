@@ -7,7 +7,9 @@
 ## 1. Interaction Primitives
 
 ```python
-def test_interactions(vibe):
+from typing import Any
+
+def test_interactions(vibe: Any) -> None:
     btn = vibe.find({"role": "button", "text": "Log In"})
     btn.click()
 
@@ -33,3 +35,10 @@ def test_interactions(vibe):
     target = vibe.find("testid=column-done")
     source.drag_to(target)
 ```
+
+---
+
+## Best Practices
+
+- **Use `fill()` for Form Inputs**: `fill()` atomically sets field values and triggers change events; use `type()` only for real-time keypress validation testing.
+- **Actionability Checks**: Vibium auto-waits for elements to become visible, stable, and enabled before interacting. Avoid manual delays.

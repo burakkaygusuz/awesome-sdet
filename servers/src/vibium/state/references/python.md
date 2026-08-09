@@ -7,9 +7,10 @@
 ## 1. Storage State Snapshots
 
 ```python
+from typing import Any
 from vibium import browser
 
-def test_auth_storage_state():
+def test_auth_storage_state() -> None:
     # Capture authenticated state snapshot
     bro = browser.start(headless=True)
     try:
@@ -40,7 +41,7 @@ def test_auth_storage_state():
 ## 2. Multi-Tab Handling
 
 ```python
-def test_tabs(bro):
+def test_tabs(bro: Any) -> None:
     main_page = bro.page()
     new_page = bro.new_page()
     new_page.go("https://app.example.com/docs")
@@ -50,3 +51,10 @@ def test_tabs(bro):
     main_page.bring_to_front()
     new_page.close()
 ```
+
+---
+
+## Best Practices
+
+- **Reuse Storage State**: Save auth states to JSON and pass `storage_state="auth_state.json"` to browser initialization to avoid repetitive login steps.
+- **Tab Lifecycle**: Explicitly close secondary pages (`new_page.close()`) when done to maintain resource isolation.
