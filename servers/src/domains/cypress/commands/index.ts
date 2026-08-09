@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { readCypressReferenceDoc, SupportedLanguageSchema } from '../common.js';
-import type { ToolExecutionResult } from '../../server.js';
+import type { ToolExecutionResult } from '../../../server.js';
 
 export const CypressCommandsDocsSchema = z
   .object({

@@ -180,9 +180,13 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Robustness (Spec §5.4)', ()
     const masterAgent = path.join(agentsDir, 'sdet.agent.md');
     const seleniumAgent = path.join(agentsDir, 'selenium/selenium.agent.md');
     const cypressAgent = path.join(agentsDir, 'cypress/cypress.agent.md');
+    const vibiumAgent = path.join(agentsDir, 'vibium/vibium.agent.md');
+    const appiumAgent = path.join(agentsDir, 'appium/appium.agent.md');
 
     expect.soft(await fileExists(masterAgent)).toBe(true);
     expect.soft(await fileExists(seleniumAgent)).toBe(true);
     expect.soft(await fileExists(cypressAgent)).toBe(true);
+    expect.soft(await fileExists(vibiumAgent)).toBe(true);
+    expect.soft(await fileExists(appiumAgent)).toBe(true);
   });
 });

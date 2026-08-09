@@ -47,7 +47,8 @@ The repository is architected as an **evergreen, multi-framework SDET platform**
 │   │   ├── server.ts               # McpServer singleton registering Tools, Resources, and Prompts
 │   │   ├── resources/              # URI documentation resources (<protocol>://{domain}/{language})
 │   │   ├── prompts/                # Standard SDET workflow prompts (generate-test, migrate-test)
-│   │   └── <domain>/               # Domain-isolated tools, schemas, and reference doc loaders
+│   │   └── domains/                # Pluggable framework domains (selenium, cypress, vibium, appium)
+│   │       └── <domain>/           # Domain-isolated tools, schemas, and reference doc loaders
 │   └── test/                       # Protocol, discovery, transport, and runtime test suites
 ├── scripts/                        # Automated CI verification & manifest builder pipeline
 │   ├── schemas.ts                  # Strict data contracts with Spec §5.4 robustness

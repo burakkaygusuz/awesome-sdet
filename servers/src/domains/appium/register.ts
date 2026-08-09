@@ -1,6 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
-import type { safeToolHandler } from '../server.js';
+import type { safeToolHandler } from '../../server.js';
 import {
   handleAppiumCapabilitiesDocs,
   handleAppiumLocatorsDocs,

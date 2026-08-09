@@ -1,8 +1,8 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { readSeleniumReferenceDoc } from '../selenium/common.js';
-import { readCypressReferenceDoc } from '../cypress/common.js';
-import { readVibiumReferenceDoc } from '../vibium/common.js';
-import { readAppiumReferenceDoc } from '../appium/common.js';
+import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
+import { readCypressReferenceDoc } from '../domains/cypress/common.js';
+import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
+import { readAppiumReferenceDoc } from '../domains/appium/common.js';
 
 export function registerResources(server: McpServer): void {
   server.registerResource(

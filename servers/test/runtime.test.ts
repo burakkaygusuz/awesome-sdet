@@ -38,7 +38,7 @@ describe('Runtime Entrypoint Tests', () => {
   });
 
   it('reads MCP documentation references dynamically across supported languages', async () => {
-    const { handleActionsDocs } = await import('../src/selenium/index.js');
+    const { handleActionsDocs } = await import('../src/domains/selenium/index.js');
 
     for (const lang of ['typescript', 'python', 'java', 'csharp'] as const) {
       const res = await handleActionsDocs({ language: lang });
