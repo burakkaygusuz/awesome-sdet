@@ -2,6 +2,7 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { readSeleniumReferenceDoc } from '../selenium/common.js';
 import { readCypressReferenceDoc } from '../cypress/common.js';
 import { readVibiumReferenceDoc } from '../vibium/common.js';
+import { readAppiumReferenceDoc } from '../appium/common.js';
 
 export function registerResources(server: McpServer): void {
   server.registerResource(
@@ -92,6 +93,43 @@ export function registerResources(server: McpServer): void {
       const docLang = String(language || 'typescript');
       try {
         const text = await readVibiumReferenceDoc(docDomain, docLang);
+        return {
+          contents: [
+            {
+              uri: uri.href,
+              text,
+              mimeType: 'text/markdown',
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          contents: [
+            {
+              uri: uri.href,
+              text: `# Resource Error\n\n${error instanceof Error ? error.message : String(error)}`,
+              mimeType: 'text/markdown',
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.registerResource(
+    'appium-reference',
+    new ResourceTemplate('appium://{domain}/{language}', { list: undefined }),
+    {
+      title: 'Appium Documentation Reference',
+      description:
+        'Dynamic reference documentation for Appium 2.0 mobile automation across supported languages and domains.',
+      mimeType: 'text/markdown',
+    },
+    async (uri, { domain, language }) => {
+      const docDomain = String(domain || 'capabilities');
+      const docLang = String(language || 'typescript');
+      try {
+        const text = await readAppiumReferenceDoc(docDomain, docLang);
         return {
           contents: [
             {

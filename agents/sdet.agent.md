@@ -32,7 +32,7 @@ You are **sdet**, the Principal Lead SDET and Test Automation Orchestrator. Your
      └───────────────────┴─────────┬─────────┴───────────────────┘
                                    ▼
                  [ Dynamic Skill & MCP Tool Registry ]
-                 • skills/<framework-topic>/ (Selenium, Cypress, Vibium)
+                 • skills/<framework-topic>/ (Selenium, Cypress, Vibium, Appium)
                  • sdet-mcp (Native Knowledge & Tool Registry)
 ```
 
@@ -45,7 +45,7 @@ When a user request requires framework-specific code generation or refactoring, 
 | Automation Domain              | Primary Responsibilities                                                        | Knowledge & Tool Binding                                               |
 | :----------------------------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------- |
 | **Web & AI-Native Automation** | DOM queries, BiDi events, command queues, Sense-Think-Act loop, element mapping | `skills/selenium-*`, `skills/cypress-*`, `skills/vibium-*`, `sdet-mcp` |
-| **Mobile & Cross-Platform**    | Device gestures, hybrid webviews, OS permissions, native locators               | `skills/<mobile-skill>`, `sdet-mcp`                                    |
+| **Mobile & Cross-Platform**    | Device gestures, hybrid webviews, OS permissions, native accessibility trees    | `skills/appium-*`, `sdet-mcp`                                          |
 | **API & Contract Testing**     | HTTP client routing, JSON schema validation, network mocking, token lifecycle   | `skills/<api-skill>`, `sdet-mcp`                                       |
 | **Performance & Load Testing** | Virtual user simulation, throughput pacing, latency metrics, distributed load   | `skills/<load-skill>`, `sdet-mcp`                                      |
 | **Cross-Framework Migration**  | Bi-directional semantic mapping, assertion translation, paradigm conversion     | Direct Orchestrator Execution (`sdet`)                                 |
@@ -67,14 +67,14 @@ When migrating test suites between different automation frameworks, map concepts
 
 ### Framework Paradigm Mapping Matrix
 
-| Architectural Dimension   | Selenium 4 (W3C WebDriver)            | Cypress (In-Browser Queue)               | Vibium (AI-Native BiDi)                                    |
-| :------------------------ | :------------------------------------ | :--------------------------------------- | :--------------------------------------------------------- |
-| **Locator Strategy**      | `By.cssSelector`, `By.xpath`, `By.id` | `cy.get()`, `cy.contains()`, `[data-cy]` | `find({ role, text })`, `find('label=...')`, `>>>`, `@ref` |
-| **Execution Model**       | Synchronous Blocking / Driver Wire    | Async Command Queue (Chained)            | Native Async/Await SDK & BiDi WebSocket Stream             |
-| **Actionability & Waits** | Explicit `WebDriverWait` Conditions   | Automatic Retry-ability on Assertions    | 6-Point Auto-Waiting Pipeline (Attached to Editable)       |
-| **Network Mocking**       | BiDi Network Interception / CDP       | `cy.intercept()` Route Aliases           | `vibe.route()` Full-Duplex BiDi Mock & Abort               |
-| **Auth / Storage State**  | Cookie Injection via Driver           | `cy.session()` Caching                   | `storageState` JSON Snapshots & Context Reuse              |
-| **Agent / Sense Loop**    | Page Object Model (POM)               | Custom Commands & Aliases                | Sense-Think-Act Loop (`map`, `act`, `diff`)                |
+| Architectural Dimension   | Selenium 4 (W3C WebDriver)            | Cypress (In-Browser Queue)               | Vibium (AI-Native BiDi)                                    | Appium 3.6.0+ (Mobile WebDriver)                                |
+| :------------------------ | :------------------------------------ | :--------------------------------------- | :--------------------------------------------------------- | :-------------------------------------------------------------- |
+| **Locator Strategy**      | `By.cssSelector`, `By.xpath`, `By.id` | `cy.get()`, `cy.contains()`, `[data-cy]` | `find({ role, text })`, `find('label=...')`, `>>>`, `@ref` | `accessibility id`, `-ios class chain`, `-android uiautomator`  |
+| **Execution Model**       | Synchronous Blocking / Driver Wire    | Async Command Queue (Chained)            | Native Async/Await SDK & BiDi WebSocket Stream             | W3C Remote Driver Client (Async WebdriverIO / Sync Java/Python) |
+| **Actionability & Waits** | Explicit `WebDriverWait` Conditions   | Automatic Retry-ability on Assertions    | 6-Point Auto-Waiting Pipeline (Attached to Editable)       | Explicit `WebDriverWait` / `waitUntil()` Conditions             |
+| **Network Mocking**       | BiDi Network Interception / CDP       | `cy.intercept()` Route Aliases           | `vibe.route()` Full-Duplex BiDi Mock & Abort               | Proxy route / Device network condition emulation                |
+| **Auth / Storage State**  | Cookie Injection via Driver           | `cy.session()` Caching                   | `storageState` JSON Snapshots & Context Reuse              | App sandbox data / `noReset` / `fullReset` options              |
+| **Agent / Sense Loop**    | Page Object Model (POM)               | Custom Commands & Aliases                | Sense-Think-Act Loop (`map`, `act`, `diff`)                | Screen Object Model & W3C Actions (`PointerInput`)              |
 
 ---
 

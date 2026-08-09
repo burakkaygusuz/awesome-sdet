@@ -3,6 +3,7 @@ import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import { registerSeleniumTools } from './selenium/index.js';
 import { registerCypressTools } from './cypress/index.js';
 import { registerVibiumTools } from './vibium/index.js';
+import { registerAppiumTools } from './appium/index.js';
 import { registerResources } from './resources/index.js';
 import { registerPrompts } from './prompts/index.js';
 
@@ -60,15 +61,12 @@ export function createMcpServer(): McpServer {
     version: '1.0.0',
   });
 
-  // Tools Primitive Registration
   registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerVibiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
+  registerAppiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
 
-  // Resources Primitive Registration
   registerResources(server);
-
-  // Prompts Primitive Registration
   registerPrompts(server);
 
   return server;

@@ -130,6 +130,11 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         { name: 'read_vibium_interactions_docs', lang: 'java', expectText: 'Vibium' },
         { name: 'read_vibium_bidi_docs', lang: 'javascript', expectText: 'Vibium' },
         { name: 'read_vibium_state_docs', lang: 'typescript', expectText: 'Vibium' },
+        { name: 'read_appium_capabilities_docs', lang: 'typescript', expectText: 'Appium' },
+        { name: 'read_appium_locators_docs', lang: 'python', expectText: 'Appium' },
+        { name: 'read_appium_gestures_docs', lang: 'java', expectText: 'Appium' },
+        { name: 'read_appium_context_docs', lang: 'csharp', expectText: 'Appium' },
+        { name: 'read_appium_device_docs', lang: 'javascript', expectText: 'Appium' },
       ];
 
       for (const item of crossFrameworkTools) {
@@ -172,6 +177,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
         { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
         { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
+        { uri: 'appium://capabilities/typescript', expectText: 'Appium' },
       ];
 
       for (const t of templates) {
@@ -202,7 +208,6 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(promptNames).toContain('migrate-test');
       expect.soft(promptNames).toContain('diagnose-flakiness');
 
-      // Test generate-test
       const genRes = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 21,
@@ -222,7 +227,6 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/vibium-*');
 
-      // Test migrate-test
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 22,
@@ -242,7 +246,6 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         .soft(migData.result?.messages?.[0]?.content?.text)
         .toContain('Anti-Pattern Elimination');
 
-      // Test diagnose-flakiness
       const diagRes = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 23,
