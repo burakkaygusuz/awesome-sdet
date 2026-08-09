@@ -83,12 +83,12 @@ The `plugin.json` file resides at the root of the repository and declares the ge
     "sdet",
     "test-automation",
     "e2e-testing",
-    "api-testing",
-    "performance-testing",
-    "mobile-testing",
+    "selenium",
+    "cypress",
+    "vibium",
+    "appium",
     "mcp",
-    "agent-plugin",
-    "ai-agent"
+    "agent-plugin"
   ]
 }
 ```
@@ -399,11 +399,12 @@ When migrating test suites between different automation frameworks, map concepts
 
 To prevent code degradation, every framework agent enforces strict negative rules:
 
-| Automation Domain            | Strictly Prohibited Anti-Patterns                                                                            | Required Best Practice                                                                          |
-| :--------------------------- | :----------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
-| **Browser & Web Drivers**    | `Thread.sleep(ms)`, raw locators without explicit waits, mutable static driver instances in parallel suites. | Use explicit waits with dynamic conditions, thread-local driver isolation, and W3C BiDi events. |
-| **Command Queues (Chained)** | `async/await` inside test bodies, arbitrary sleep commands, assigning return values to `const`.              | Use retryable assertions, aliased network interceptions, and subject closures.                  |
-| **Async Web / Performance**  | Arbitrary pause commands, non-awaited asynchronous actions, unmetered virtual user loops.                    | Rely on built-in auto-waiting, web-first assertions, and throughput pacing.                     |
+| Automation Domain             | Strictly Prohibited Anti-Patterns                                                                                            | Required Best Practice                                                                          |
+| :---------------------------- | :--------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| **Browser & Web (Selenium)**  | `Thread.sleep(ms)`, raw locators without explicit waits, mutable static driver instances in parallel suites.                 | Use explicit waits with dynamic conditions, thread-local driver isolation, and W3C BiDi events. |
+| **Command Queues (Cypress)**  | `async/await` inside test bodies, arbitrary sleep commands (`cy.wait(ms)`), assigning return values to `const`.              | Use retryable assertions, aliased network interceptions, and subject closures.                  |
+| **AI-Native & BiDi (Vibium)** | Non-deterministic assertions, unconstrained vision loop retries without timeouts, brittle DOM selectors vs semantic intent.  | BiDi network event tapping, dynamic accessibility tree intent mapping, deterministic recording. |
+| **Mobile & Native (Appium)**  | Deprecated TouchAction API, hardcoded device UDIDs, unhandled context switching (`NATIVE_APP`/`WEBVIEW`), unclosed sessions. | W3C PointerInput actions, mobile: command extensions, Screen Object Model, and AppiumBy.        |
 
 ---
 
