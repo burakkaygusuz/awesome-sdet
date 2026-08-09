@@ -1,4 +1,4 @@
-# Page Object Model (POM) — Ruby API Reference (Ruby 3.0+ & Selenium 4.46.0+)
+# Page Object Model (POM) — Ruby API Reference (Ruby 3.2+ & Selenium 4.46.0+)
 
 > Official Selenium WebDriver Ruby Binding (`selenium-webdriver`) Page Object Patterns.
 
@@ -7,12 +7,14 @@
 ## Code Examples
 
 ```ruby
+# frozen_string_literal: true
+
 require 'selenium-webdriver'
 
 class LoginPage
-  USERNAME_INPUT = { id: 'username' }
-  PASSWORD_INPUT = { id: 'password' }
-  LOGIN_BUTTON   = { css: "button[type='submit']" }
+  USERNAME_INPUT = { id: 'username' }.freeze
+  PASSWORD_INPUT = { id: 'password' }.freeze
+  LOGIN_BUTTON   = { css: "button[type='submit']" }.freeze
 
   def initialize(driver, timeout: 10)
     @driver = driver
@@ -50,6 +52,6 @@ end
 
 ## Best Practices
 
-1. **Hash Locators**: Define locator constants as `{ id: 'username' }` or `{ css: 'button' }`.
+1. **Hash Locators**: Define locator constants as frozen hashes (e.g. `{ id: 'username' }.freeze`).
 2. **Method Chaining**: Return `self` from input wrapper methods.
-3. **Explicit Wait Blocks**: Use `@wait.until { @driver.find_element(...) }` for robust element location.
+3. **Explicit Wait Blocks**: Use `@wait.until { @driver.find_element(...) }` with keyword argument `timeout: 10` for robust element location.

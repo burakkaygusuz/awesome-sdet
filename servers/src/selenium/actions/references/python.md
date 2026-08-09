@@ -1,4 +1,4 @@
-# Selenium Actions API — Python API Reference (Selenium 4.46.0+)
+# Selenium Actions API — Python API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Python ActionChains (`selenium.webdriver.common.action_chains.ActionChains`).
 
@@ -14,7 +14,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 class ActionsExamples:
 
-    def demonstrate_actions(self, driver: WebDriver):
+    def demonstrate_actions(self, driver: WebDriver) -> None:
         actions = ActionChains(driver)
 
         source = driver.find_element(By.ID, "draggable")
