@@ -1,4 +1,4 @@
-# JavaScript API Reference — Selenium Observability & OpenTelemetry Tracing
+# Selenium Observability & OpenTelemetry Tracing — JavaScript API Reference (Selenium 4.x+)
 
 ## OpenTelemetry Tracing Configuration
 

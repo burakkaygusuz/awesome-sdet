@@ -3,7 +3,7 @@ name: vibium-semantic-selectors
 description: 'Author resilient element queries using Vibium semantic locators (role, text, label, testid, placeholder) and Shadow DOM pierce combinators (>>, >>>).'
 user-invocable: true
 license: MIT
-compatibility: Vibium 1.0+ / BiDi
+compatibility: Vibium 26.x+
 metadata:
   framework: vibium
   keywords:

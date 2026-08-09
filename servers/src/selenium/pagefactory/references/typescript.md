@@ -1,4 +1,4 @@
-# Page Object Model (POM) — TypeScript API Reference (TypeScript 5.0+ & Selenium 4.46.0+)
+# Page Object Model (POM) — TypeScript API Reference (Selenium 4.x+)
 
 > Official Selenium WebDriver TypeScript (`selenium-webdriver`) Async Page Object Patterns.
 

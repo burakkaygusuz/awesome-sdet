@@ -1,4 +1,4 @@
-# C# API Reference — Selenium Observability & OpenTelemetry Tracing
+# Selenium Observability & OpenTelemetry Tracing — C# API Reference (Selenium 4.x+)
 
 ## OpenTelemetry Tracing Configuration
 

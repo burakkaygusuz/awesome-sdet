@@ -3,7 +3,7 @@ name: appium-device-app-management
 description: 'Master Appium mobile device controls and application lifecycle: install, activate, terminate, background, clipboard, keyboard, orientation, and permissions.'
 user-invocable: true
 license: MIT
-compatibility: Appium 3.6.0+
+compatibility: Appium 3.x+
 metadata:
   framework: appium
   keywords:

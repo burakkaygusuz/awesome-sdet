@@ -1,4 +1,4 @@
-# Selenium Event Listeners — C# API Reference (Selenium 4.46.0+)
+# Selenium Event Listeners — C# API Reference (Selenium 4.x+)
 
 > Official Selenium 4 C# EventFiringWebDriver (`OpenQA.Selenium.Support.Events.EventFiringWebDriver`).
 

@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — JavaScript API Reference (Node.js 20+ & Selenium 4.46.0+)
+# Selenium Locator Strategies — JavaScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 JavaScript (Node.js `selenium-webdriver`) async locator strategies & relative locators.
 

@@ -1,4 +1,4 @@
-# Appium Hybrid Context Switching — C# API Reference (Appium 3.6.0+)
+# Appium Hybrid Context Switching — C# API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ .NET Client (`IContextAware`) hybrid context navigation and WebView DOM automation.
 

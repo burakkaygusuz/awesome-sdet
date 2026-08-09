@@ -3,7 +3,7 @@ name: cypress-retryability-assertions
 description: 'Master Cypress implicit retry-ability mechanics, command vs assertion timeouts, and avoiding arbitrary sleep anti-patterns.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

@@ -1,4 +1,4 @@
-# Selenium Event Interception & Decorators — Ruby API Reference (Selenium 4.46.0+)
+# Selenium Event Listeners — Ruby API Reference (Selenium 4.x+)
 
 > Custom Driver & Element Decorator patterns in Selenium 4 Ruby (replacing removed `AbstractEventListener`).
 

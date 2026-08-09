@@ -1,4 +1,4 @@
-# Appium W3C Actions API & Mobile Gestures — Java API Reference (Appium 3.6.0+)
+# Appium W3C Actions API & Mobile Gestures — Java API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Java Client (`PointerInput`, `Sequence`) W3C Actions touch gestures and mobile execute scripts.
 

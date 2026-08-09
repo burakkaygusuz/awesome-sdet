@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — C# API Reference (C# 12 / .NET 8+ & Selenium 4.46.0+)
+# Selenium Locator Strategies — C# API Reference (Selenium 4.x+)
 
 > Official Selenium 4 C# WebDriver binding (`OpenQA.Selenium`) locator strategies & C# 12 Primary Constructor patterns.
 

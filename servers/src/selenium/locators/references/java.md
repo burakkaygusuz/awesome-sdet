@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — Java API Reference (Java 17+ & Selenium 4.46.0+)
+# Selenium Locator Strategies — Java API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Java locator strategies (`org.openqa.selenium.By` & `org.openqa.selenium.support.locators.RelativeLocator`).
 

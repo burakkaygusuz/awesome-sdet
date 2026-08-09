@@ -3,7 +3,7 @@ name: cypress-web-security-origin
 description: 'Master Cypress cross-origin testing (cy.origin), same-origin policy, iframe isolation, and multi-domain authentication.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

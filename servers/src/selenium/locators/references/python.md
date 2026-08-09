@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — Python API Reference (Python 3.10+ & Selenium 4.x+)
+# Selenium Locator Strategies — Python API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Python locator strategies (`selenium.webdriver.common.by.By` & `selenium.webdriver.support.relative_locator.locate_with`).
 

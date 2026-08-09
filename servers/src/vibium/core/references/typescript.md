@@ -1,4 +1,4 @@
-# Vibium Core & CLI Architecture — TypeScript API Reference
+# Vibium Core & CLI Architecture — TypeScript API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) is an AI-native browser automation framework built on W3C WebDriver BiDi, unifying the Sense-Think-Act agent loop, `@ref` element mapping, and multi-language client libraries.
 

@@ -1,4 +1,4 @@
-# Appium Hybrid Context Switching — Python API Reference (Appium 3.6.0+)
+# Appium Hybrid Context Switching — Python API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Python Client context inspection and WebView switching.
 

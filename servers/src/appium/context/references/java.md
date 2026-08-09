@@ -1,4 +1,4 @@
-# Appium Hybrid Context Switching — Java API Reference (Appium 3.6.0+)
+# Appium Hybrid Context Switching — Java API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Java Client (`SupportsContextSwitching`) hybrid context navigation and WebView DOM automation.
 

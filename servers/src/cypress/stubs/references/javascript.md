@@ -1,4 +1,4 @@
-# Cypress Stubs, Spies & Clock Control (JavaScript)
+# Cypress Stubs, Spies & Clock Control — JavaScript API Reference (Cypress 15.x+)
 
 ## 1. Function Stubbing (`cy.stub`)
 

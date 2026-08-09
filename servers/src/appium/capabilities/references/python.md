@@ -1,4 +1,4 @@
-# Appium Driver Architecture & W3C Capabilities — Python API Reference (Appium 3.6.0+)
+# Appium Driver Architecture & W3C Capabilities — Python API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Python Client options classes, W3C capability negotiation, and remote driver management.
 

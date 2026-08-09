@@ -1,4 +1,4 @@
-# Page Object Model (POM) — Java API Reference (Java 17+ & Selenium 4.46.0+)
+# Page Object Model (POM) — Java API Reference (Selenium 4.x+)
 
 > Official Selenium PageFactory support library (`org.openqa.selenium.support` & `org.openqa.selenium.support.pagefactory`) updated for Selenium 4 (4.46.0+).
 

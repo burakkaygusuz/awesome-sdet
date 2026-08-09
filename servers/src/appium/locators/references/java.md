@@ -1,4 +1,4 @@
-# Appium Mobile Locator Strategies — Java API Reference (Appium 3.6.0+)
+# Appium Mobile Locator Strategies — Java API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Java Client (`AppiumBy`, `AppiumFieldDecorator`) locator strategies and Screen Object Model.
 

@@ -1,4 +1,4 @@
-# Selenium Actions API — Ruby API Reference (Selenium 4.46.0+)
+# Selenium Actions API — Ruby API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Ruby ActionBuilder (`driver.action`).
 

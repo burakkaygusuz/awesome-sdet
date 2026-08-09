@@ -1,4 +1,4 @@
-# Appium W3C Actions API & Mobile Gestures — TypeScript API Reference (Appium 3.6.0+)
+# Appium W3C Actions API & Mobile Gestures — TypeScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ & WebdriverIO v9.30.1+ TypeScript W3C Actions touch pointer gestures and mobile extensions.
 

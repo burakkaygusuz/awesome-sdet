@@ -1,4 +1,4 @@
-# Appium Mobile Locator Strategies — Python API Reference (Appium 3.6.0+)
+# Appium Mobile Locator Strategies — Python API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Python Client `AppiumBy` locator strategies and selector expressions.
 

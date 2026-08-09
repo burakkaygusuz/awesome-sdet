@@ -1,4 +1,4 @@
-# WebDriver BiDi Protocol — Java API Reference (Selenium 4.46.0+)
+# WebDriver BiDi Protocol — Java API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Java WebDriver BiDi (`org.openqa.selenium.bidi`).
 

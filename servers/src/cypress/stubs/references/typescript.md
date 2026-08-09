@@ -1,4 +1,4 @@
-# Cypress Stubs, Spies & Clock Control (TypeScript)
+# Cypress Stubs, Spies & Clock Control — TypeScript API Reference (Cypress 15.x+)
 
 ## 1. Function Stubbing (`cy.stub`)
 

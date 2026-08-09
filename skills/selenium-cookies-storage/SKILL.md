@@ -3,7 +3,7 @@ name: selenium-cookies-storage
 description: 'HTTP cookie management, UI auth bypass via session injection, and HTML5 Web Storage state. Trigger on cookies, auth bypass, LocalStorage, or SessionStorage.'
 user-invocable: true
 license: MIT
-compatibility: Selenium 4.0+
+compatibility: Selenium 4.x+
 metadata:
   framework: selenium
   keywords:

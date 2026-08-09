@@ -1,4 +1,4 @@
-# Cypress Network Interception & API Testing (TypeScript)
+# Cypress Network Interception & API Testing — TypeScript API Reference (Cypress 15.x+)
 
 ## 1. Route Stubbing & Spying (`cy.intercept`)
 

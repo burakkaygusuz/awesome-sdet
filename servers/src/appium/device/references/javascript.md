@@ -1,4 +1,4 @@
-# Appium Device & App Lifecycle Management — JavaScript API Reference (Appium 3.6.0+)
+# Appium Device & Application Management — JavaScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ WebdriverIO JavaScript application lifecycle controls and device state management.
 

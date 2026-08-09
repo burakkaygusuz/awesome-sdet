@@ -1,4 +1,4 @@
-# Appium Device & App Lifecycle Management — C# API Reference (Appium 3.6.0+)
+# Appium Device & Application Management — C# API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ .NET Client (`IInteractsWithApps`) application lifecycle controls and device state management.
 

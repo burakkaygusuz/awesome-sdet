@@ -1,4 +1,4 @@
-# Appium Hybrid Context Switching — TypeScript API Reference (Appium 3.6.0+)
+# Appium Hybrid Context Switching — TypeScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ WebdriverIO TypeScript hybrid application automation and WebView context switching.
 

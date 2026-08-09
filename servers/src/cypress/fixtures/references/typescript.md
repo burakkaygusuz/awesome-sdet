@@ -1,4 +1,4 @@
-# Cypress Fixtures, File I/O & Viewport Emulation (TypeScript)
+# Cypress Fixtures, File I/O & Viewport — TypeScript API Reference (Cypress 15.x+)
 
 ## 1. Fixture Data Loading (`cy.fixture`)
 

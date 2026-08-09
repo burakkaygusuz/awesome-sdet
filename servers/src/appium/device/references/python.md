@@ -1,4 +1,4 @@
-# Appium Device & App Lifecycle Management — Python API Reference (Appium 3.6.0+)
+# Appium Device & Application Management — Python API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Python Client application lifecycle operations, system clipboard, and device state controls.
 

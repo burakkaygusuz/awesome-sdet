@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — TypeScript API Reference (TypeScript 5.0+ & Selenium 4.46.0+)
+# Selenium Locator Strategies — TypeScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 TypeScript (`selenium-webdriver`) async locator strategies & relative locators.
 

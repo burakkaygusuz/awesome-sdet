@@ -1,4 +1,4 @@
-# WebDriver BiDi Protocol — TypeScript API Reference (Selenium 4.46.0+)
+# WebDriver BiDi Protocol — TypeScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 TypeScript / JavaScript WebDriver BiDi (`bidi`).
 

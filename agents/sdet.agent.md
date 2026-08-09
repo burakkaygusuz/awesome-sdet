@@ -67,7 +67,7 @@ When migrating test suites between different automation frameworks, map concepts
 
 ### Framework Paradigm Mapping Matrix
 
-| Architectural Dimension   | Selenium 4 (W3C WebDriver)            | Cypress (In-Browser Queue)               | Vibium (AI-Native BiDi)                                    | Appium 3.6.0+ (Mobile WebDriver)                                |
+| Architectural Dimension   | Selenium 4.x+ (W3C WebDriver)         | Cypress 15.x+ (In-Browser Queue)         | Vibium 26.x+ (AI-Native BiDi)                              | Appium 3.x+ (Mobile WebDriver)                                  |
 | :------------------------ | :------------------------------------ | :--------------------------------------- | :--------------------------------------------------------- | :-------------------------------------------------------------- |
 | **Locator Strategy**      | `By.cssSelector`, `By.xpath`, `By.id` | `cy.get()`, `cy.contains()`, `[data-cy]` | `find({ role, text })`, `find('label=...')`, `>>>`, `@ref` | `accessibility id`, `-ios class chain`, `-android uiautomator`  |
 | **Execution Model**       | Synchronous Blocking / Driver Wire    | Async Command Queue (Chained)            | Native Async/Await SDK & BiDi WebSocket Stream             | W3C Remote Driver Client (Async WebdriverIO / Sync Java/Python) |

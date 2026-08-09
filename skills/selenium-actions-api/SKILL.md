@@ -3,7 +3,7 @@ name: selenium-actions-api
 description: 'Low-level virtualized user interactions (mouse hover, context click, drag & drop, keyboard shortcuts, scroll wheel). Trigger on Actions API, ActionChains, or pointer input.'
 user-invocable: true
 license: MIT
-compatibility: Selenium 4.0+
+compatibility: Selenium 4.x+
 metadata:
   framework: selenium
   keywords:

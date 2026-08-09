@@ -1,4 +1,4 @@
-# Vibium State & Recording Management — Python API Reference
+# Vibium State & Recording Management — Python API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) provides authentication state snapshots (`storage_state`), session tracing, recording chunking/grouping, and multi-tab context isolation.
 

@@ -1,4 +1,4 @@
-# Appium Mobile Locator Strategies — JavaScript API Reference (Appium 3.6.0+)
+# Appium Mobile Locator Strategies — JavaScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ WebdriverIO JavaScript selector strategies, accessibility trees, and platform query engines.
 

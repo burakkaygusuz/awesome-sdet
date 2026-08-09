@@ -1,4 +1,4 @@
-# RemoteWebDriver & Enterprise Selenium Grid 4 — Ruby API Reference (Selenium 4.46.0+)
+# RemoteWebDriver & Enterprise Selenium Grid 4 — Ruby API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Ruby RemoteWebDriver & Grid Configuration.
 

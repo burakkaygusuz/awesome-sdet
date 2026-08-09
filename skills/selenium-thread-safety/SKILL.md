@@ -3,7 +3,7 @@ name: selenium-thread-safety
 description: 'Thread safety architecture, isolated driver lifecycle (DriverFactory), and parallel test execution. Trigger on thread safety, ThreadLocal, or parallel execution.'
 user-invocable: true
 license: MIT
-compatibility: Selenium 4.0+
+compatibility: Selenium 4.x+
 metadata:
   framework: selenium
   keywords:

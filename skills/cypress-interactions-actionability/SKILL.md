@@ -3,7 +3,7 @@ name: cypress-interactions-actionability
 description: 'Guidelines for user interaction commands, actionability safety checks, eliminating force options, and scroll behaviors in Cypress.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

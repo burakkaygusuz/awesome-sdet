@@ -3,7 +3,7 @@ name: vibium-bidi-network-events
 description: 'Leverage WebDriver BiDi protocol features in Vibium: real-time WebSocket event streams, network request interception/mocking, console logs, and clock virtualization.'
 user-invocable: true
 license: MIT
-compatibility: Vibium 1.0+ / BiDi
+compatibility: Vibium 26.x+
 metadata:
   framework: vibium
   keywords:

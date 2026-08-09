@@ -3,7 +3,7 @@ name: cypress-author
 description: 'Author, update, and fix Cypress E2E and Component tests. Trigger on Cypress test creation, spec refactoring, data-cy selector practices, custom commands, or fixing failing specs.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

@@ -3,7 +3,7 @@ name: cypress-querying-selectors
 description: 'Best practices for DOM element querying, selector hierarchy, scoping, and iframe traversal in Cypress.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

@@ -3,7 +3,7 @@ name: cypress-core-concepts
 description: 'Master Cypress core architecture, asynchronous command queue execution, chainable subjects, and Promise anti-patterns.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

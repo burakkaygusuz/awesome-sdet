@@ -1,4 +1,4 @@
-# TypeScript API Reference — Selenium Observability & OpenTelemetry Tracing
+# Selenium Observability & OpenTelemetry Tracing — TypeScript API Reference (Selenium 4.x+)
 
 ## OpenTelemetry Tracing Configuration
 

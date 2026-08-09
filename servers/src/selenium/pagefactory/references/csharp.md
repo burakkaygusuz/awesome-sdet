@@ -1,4 +1,4 @@
-# Page Object Model (POM) — C# API Reference (C# 12 / .NET 8+ & Selenium 4.46.0+)
+# Page Object Model (POM) — C# API Reference (Selenium 4.x+)
 
 > Official Selenium C# WebDriver binding (`OpenQA.Selenium`) modern Page Object Model pattern (Selenium 4+ & C# 12 / .NET 8 Primary Constructors).
 

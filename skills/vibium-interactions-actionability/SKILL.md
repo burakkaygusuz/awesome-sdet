@@ -3,7 +3,7 @@ name: vibium-interactions-actionability
 description: 'Execute resilient web interactions with Vibium auto-waiting actionability checks (visible, stable, enabled, editable), keyboard shortcuts, and mouse gestures.'
 user-invocable: true
 license: MIT
-compatibility: Vibium 1.0+ / BiDi
+compatibility: Vibium 26.x+
 metadata:
   framework: vibium
   keywords:

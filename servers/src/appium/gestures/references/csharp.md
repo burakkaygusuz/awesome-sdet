@@ -1,4 +1,4 @@
-# Appium W3C Actions API & Mobile Gestures — C# API Reference (Appium 3.6.0+)
+# Appium W3C Actions API & Mobile Gestures — C# API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ .NET Client (`PointerInputDevice`, `ActionSequence`) touch gestures and mobile execute scripts.
 

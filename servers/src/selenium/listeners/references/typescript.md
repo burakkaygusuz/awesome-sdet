@@ -1,4 +1,4 @@
-# Selenium Event Listeners — TypeScript API Reference (Selenium 4.46.0+)
+# Selenium Event Listeners — TypeScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 TypeScript Command & Event Listeners (`selenium-webdriver`).
 

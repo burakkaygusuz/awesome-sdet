@@ -1,4 +1,4 @@
-# Appium Mobile Locator Strategies — TypeScript API Reference (Appium 3.6.0+)
+# Appium Mobile Locator Strategies — TypeScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ & WebdriverIO v9.30.1+ TypeScript selector strategies, accessibility trees, and Screen Object Model.
 

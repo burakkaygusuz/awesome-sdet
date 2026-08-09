@@ -1,4 +1,4 @@
-# Vibium BiDi Protocol & Network Routing — Java API Reference
+# Vibium BiDi Protocol & Network Routing — Java API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) leverages the W3C WebDriver BiDi standard to provide high-performance network interception, live browser event listening, and clock virtualization.
 

@@ -1,4 +1,4 @@
-# Vibium Selectors & Locators — TypeScript API Reference
+# Vibium Selectors & Locators — TypeScript API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) provides high-resilience semantic locators, open Shadow DOM piercing combinators (`>>`, `>>>`), and chainable locator scoping.
 

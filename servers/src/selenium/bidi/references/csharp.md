@@ -1,4 +1,4 @@
-# WebDriver BiDi Protocol — C# API Reference (Selenium 4.46.0+)
+# WebDriver BiDi Protocol — C# API Reference (Selenium 4.x+)
 
 > Official Selenium 4 C# WebDriver BiDi (`OpenQA.Selenium.BiDi`).
 

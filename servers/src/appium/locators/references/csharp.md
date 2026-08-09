@@ -1,4 +1,4 @@
-# Appium Mobile Locator Strategies — C# API Reference (Appium 3.6.0+)
+# Appium Mobile Locator Strategies — C# API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ .NET Client (`MobileBy`) selector strategies and element queries.
 

@@ -1,4 +1,4 @@
-# Selenium Observability & OpenTelemetry Tracing — Ruby API Reference (Selenium 4.46.0+)
+# Selenium Observability & OpenTelemetry Tracing — Ruby API Reference (Selenium 4.x+)
 
 > OpenTelemetry environment integration & Selenium Grid 4 GraphQL observability.
 

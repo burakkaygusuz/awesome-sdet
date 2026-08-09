@@ -1,4 +1,4 @@
-# Appium W3C Actions API & Mobile Gestures — JavaScript API Reference (Appium 3.6.0+)
+# Appium W3C Actions API & Mobile Gestures — JavaScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ WebdriverIO JavaScript W3C Actions touch gestures and script extensions.
 

@@ -1,4 +1,4 @@
-# Selenium Actions API — JavaScript API Reference (Selenium 4.46.0+)
+# Selenium Actions API — JavaScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 JavaScript Actions API (`selenium-webdriver`).
 

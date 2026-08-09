@@ -1,4 +1,4 @@
-# Appium Driver Architecture & W3C Capabilities — TypeScript API Reference (Appium 3.6.0+)
+# Appium Driver Architecture & W3C Capabilities — TypeScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ & WebdriverIO v9.30.1+ TypeScript session setup, modular driver management, and W3C compliant capabilities.
 

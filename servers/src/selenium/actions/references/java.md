@@ -1,4 +1,4 @@
-# Selenium Actions API — Java API Reference (Selenium 4.46.0+)
+# Selenium Actions API — Java API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Java Actions API (`org.openqa.selenium.interactions.Actions`).
 

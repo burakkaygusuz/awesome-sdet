@@ -1,4 +1,4 @@
-# Cypress Core Commands & Assertions (JavaScript)
+# Cypress Core Commands & Assertions — JavaScript API Reference (Cypress 15.x+)
 
 ## 1. Finding Elements (`cy.get`, `cy.find`, `cy.contains`)
 

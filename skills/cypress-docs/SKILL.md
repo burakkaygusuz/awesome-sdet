@@ -3,7 +3,7 @@ name: cypress-docs
 description: 'Retrieve up-to-date, grounded official Cypress documentation and code examples. Trigger on Cypress API lookups, syntax queries, or verifying Cypress command signatures.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

@@ -1,4 +1,4 @@
-# Selenium Event Listeners — JavaScript API Reference (Selenium 4.46.0+)
+# Selenium Event Listeners — JavaScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 JavaScript Command & Event Listeners (`selenium-webdriver`).
 

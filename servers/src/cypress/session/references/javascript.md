@@ -1,4 +1,4 @@
-# Cypress Session & Multi-Origin Testing (JavaScript)
+# Cypress Session & Multi-Origin Testing — JavaScript API Reference (Cypress 15.x+)
 
 ## 1. Fast Auth Session Caching (`cy.session`)
 

@@ -1,4 +1,4 @@
-# Vibium Interactions & Actionability — Java API Reference
+# Vibium Interactions & Actionability — Java API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) automatically performs comprehensive actionability checks before executing any interaction, preventing race conditions and test flakiness.
 

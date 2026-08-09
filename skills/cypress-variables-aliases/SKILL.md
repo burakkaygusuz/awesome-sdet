@@ -3,7 +3,7 @@ name: cypress-variables-aliases
 description: "Master Cypress element and network request aliasing (.as('alias')), closure scoping, and avoiding JavaScript variable mutation anti-patterns."
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

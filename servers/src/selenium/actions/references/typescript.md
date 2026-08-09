@@ -1,4 +1,4 @@
-# Selenium Actions API — TypeScript API Reference (Selenium 4.46.0+)
+# Selenium Actions API — TypeScript API Reference (Selenium 4.x+)
 
 > Official Selenium 4 TypeScript / JavaScript Actions API (`selenium-webdriver`).
 

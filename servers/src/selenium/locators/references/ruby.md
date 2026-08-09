@@ -1,4 +1,4 @@
-# Selenium Locator Strategies — Ruby API Reference (Ruby 3.2+ & Selenium 4.46.0+)
+# Selenium Locator Strategies — Ruby API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Ruby WebDriver binding (`selenium-webdriver`) locator strategies & relative locators.
 

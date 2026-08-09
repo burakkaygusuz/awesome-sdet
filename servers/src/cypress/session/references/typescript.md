@@ -1,4 +1,4 @@
-# Cypress Session & Multi-Origin Testing (TypeScript)
+# Cypress Session & Multi-Origin Testing — TypeScript API Reference (Cypress 15.x+)
 
 ## 1. Fast Auth Session Caching (`cy.session`)
 

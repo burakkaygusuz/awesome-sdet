@@ -1,4 +1,4 @@
-# WebDriver BiDi Protocol — Ruby API Reference (Selenium 4.46.0+)
+# WebDriver BiDi Protocol — Ruby API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Ruby WebDriver BiDi (`bidi`) & LogInspector implementation.
 

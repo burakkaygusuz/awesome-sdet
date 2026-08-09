@@ -3,7 +3,7 @@ name: cypress-continuous-integration
 description: 'Set up, configure, and optimize Cypress in CI/CD pipelines (GitHub Actions, GitLab CI, CircleCI, Bitbucket, Docker, parallelization, Cypress Cloud).'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

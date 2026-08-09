@@ -3,7 +3,7 @@ name: appium-driver-capabilities
 description: 'Master Appium 3.6.0+ modular driver management, W3C capabilities (appium:options), UiAutomator2, XCUITest, and cross-platform session setup across languages.'
 user-invocable: true
 license: MIT
-compatibility: Appium 3.6.0+ / W3C WebDriver
+compatibility: Appium 3.x+
 metadata:
   framework: appium
   keywords:

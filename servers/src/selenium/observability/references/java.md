@@ -1,4 +1,4 @@
-# Java Reference — Selenium Observability & OpenTelemetry Tracing
+# Selenium Observability & OpenTelemetry Tracing — Java API Reference (Selenium 4.x+)
 
 ## OpenTelemetry Tracing Configuration
 

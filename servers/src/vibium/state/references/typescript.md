@@ -1,4 +1,4 @@
-# Vibium State & Recording Management — TypeScript API Reference
+# Vibium State & Recording Management — TypeScript API Reference (Vibium 26.x+)
 
 > Vibium (v26.5.31) provides authentication state snapshots (`storageState`), session tracing, recording chunking/grouping, and multi-tab context isolation.
 

@@ -1,4 +1,4 @@
-# Appium Device & App Lifecycle Management — TypeScript API Reference (Appium 3.6.0+)
+# Appium Device & Application Management — TypeScript API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ WebdriverIO TypeScript application lifecycle controls, system panos, and device state management.
 

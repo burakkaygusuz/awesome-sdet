@@ -3,7 +3,7 @@ name: cypress-conditional-testing
 description: 'Strategies for handling dynamic application state, avoiding flaky conditional testing anti-patterns in Cypress.'
 user-invocable: true
 license: MIT
-compatibility: Cypress 15.20+
+compatibility: Cypress 15.x+
 metadata:
   framework: cypress
   keywords:

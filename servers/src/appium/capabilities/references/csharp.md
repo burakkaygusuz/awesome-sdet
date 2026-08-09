@@ -1,4 +1,4 @@
-# Appium Driver Architecture & W3C Capabilities — C# API Reference (Appium 3.6.0+)
+# Appium Driver Architecture & W3C Capabilities — C# API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ .NET Client (`Appium.WebDriver` 5.x+) AppiumOptions and driver instantiation.
 

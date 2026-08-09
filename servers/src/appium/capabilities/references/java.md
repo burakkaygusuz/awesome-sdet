@@ -1,4 +1,4 @@
-# Appium Driver Architecture & W3C Capabilities — Java API Reference (Appium 3.6.0+)
+# Appium Driver Architecture & W3C Capabilities — Java API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Java Client (`io.appium:java-client` 9.x+) options builders, W3C capabilities, and driver factories.
 

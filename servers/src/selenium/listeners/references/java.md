@@ -1,4 +1,4 @@
-# EventFiringDecorator & Listeners — Java API Reference (Selenium 4.46.0+)
+# Selenium Event Listeners — Java API Reference (Selenium 4.x+)
 
 > Official Selenium 4 Java EventFiringDecorator and WebDriverListener (`org.openqa.selenium.support.events`).
 

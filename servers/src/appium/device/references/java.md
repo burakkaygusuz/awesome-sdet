@@ -1,4 +1,4 @@
-# Appium Device & App Lifecycle Management — Java API Reference (Appium 3.6.0+)
+# Appium Device & Application Management — Java API Reference (Appium 3.x+)
 
 > Official Appium 3.6.0+ Java Client (`InteractsWithApps`) application lifecycle controls, clipboard, and device orientation.
 

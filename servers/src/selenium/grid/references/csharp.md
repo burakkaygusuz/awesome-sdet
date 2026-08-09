@@ -1,4 +1,4 @@
-# RemoteWebDriver & Enterprise Selenium Grid 4 — C# API Reference
+# RemoteWebDriver & Enterprise Selenium Grid 4 — C# API Reference (Selenium 4.x+)
 
 ## Code Examples
 
