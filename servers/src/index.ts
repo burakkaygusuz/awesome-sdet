@@ -104,7 +104,6 @@ export async function handleMcpPostRequest(
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
 
-  // Read request body to validate wire protocol and headers
   let body = '';
   req.on('data', (chunk) => {
     body += chunk;
@@ -127,7 +126,6 @@ export async function handleMcpPostRequest(
         }
       }
 
-      // 1. Mandatory Mcp-Protocol-Version Header Validation
       const protocolVersionHeader = (
         req.headers['mcp-protocol-version'] as string | undefined
       )?.trim();
@@ -162,7 +160,6 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      // 2. Header ↔ Body _meta["io.modelcontextprotocol/protocolVersion"] Match Validation
       const bodyProtocolVersion = extractBodyProtocolVersion(jsonPayload);
       if (bodyProtocolVersion && bodyProtocolVersion !== protocolVersionHeader) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -171,36 +168,59 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32000,
-              message: `Protocol version mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${bodyProtocolVersion}'`,
+              code: -32020,
+              message: `Header mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${bodyProtocolVersion}'`,
             },
           })
         );
         return;
       }
 
-      // 3. Mcp-Method Header Mismatch Validation
       const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
-      if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
+      if (!mcpMethodHeader) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: { code: -32020, message: 'Missing required header: Mcp-Method' },
+          })
+        );
+        return;
+      }
+      if (jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32600,
-              message: `Header/Body mismatch: Mcp-Method header '${mcpMethodHeader}' does not match JSON-RPC method '${jsonPayload.method}'`,
+              code: -32020,
+              message: `Header mismatch: Mcp-Method header '${mcpMethodHeader}' does not match JSON-RPC method '${jsonPayload.method}'`,
             },
           })
         );
         return;
       }
 
-      // 4. Mcp-Name Header Mismatch Validation
+      const MCP_NAME_REQUIRED_METHODS = new Set(['tools/call', 'resources/read', 'prompts/get']);
+      const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
       const mcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
-      if (mcpNameHeader && jsonPayload.params && typeof jsonPayload.params === 'object') {
-        const paramTarget = (jsonPayload.params.name ?? jsonPayload.params.uri) as
-          string | undefined;
+      if (MCP_NAME_REQUIRED_METHODS.has(effectiveMethod ?? '')) {
+        if (!mcpNameHeader) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: jsonPayload.id ?? null,
+              error: { code: -32020, message: 'Missing required header: Mcp-Name' },
+            })
+          );
+          return;
+        }
+        const paramTarget = (
+          (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined
+        )?.trim();
         if (paramTarget && paramTarget !== mcpNameHeader) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
@@ -208,8 +228,26 @@ export async function handleMcpPostRequest(
               jsonrpc: '2.0',
               id: jsonPayload.id ?? null,
               error: {
-                code: -32602,
-                message: `Header/Body mismatch: Mcp-Name header '${mcpNameHeader}' does not match target parameter '${paramTarget}'`,
+                code: -32020,
+                message: `Header mismatch: Mcp-Name header '${mcpNameHeader}' does not match body parameter '${paramTarget}'`,
+              },
+            })
+          );
+          return;
+        }
+      } else if (mcpNameHeader) {
+        const paramTarget = (
+          (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined
+        )?.trim();
+        if (paramTarget && paramTarget !== mcpNameHeader) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: jsonPayload.id ?? null,
+              error: {
+                code: -32020,
+                message: `Header mismatch: Mcp-Name header '${mcpNameHeader}' does not match body parameter '${paramTarget}'`,
               },
             })
           );
@@ -217,8 +255,6 @@ export async function handleMcpPostRequest(
         }
       }
 
-      // Direct 2026-07-28 server/discover support
-      const effectiveMethod = jsonPayload.method || mcpMethodHeader;
       if (effectiveMethod === 'server/discover') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(
