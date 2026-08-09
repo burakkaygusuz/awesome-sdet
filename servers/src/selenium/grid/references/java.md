@@ -10,17 +10,15 @@ import org.openqa.selenium.HasDownloads;
 import java.net.URL;
 import java.util.List;
 
-// 1. Basic RemoteWebDriver Setup
 ChromeOptions options = new ChromeOptions();
 options.setCapability("se:downloadsEnabled", true);
 
 WebDriver driver = new RemoteWebDriver(new URL("http://localhost:4444/"), options);
 
-// 2. Custom Node Stereotype Matching (TOML Grid Configuration)
+// Custom Node Stereotype matching (TOML Grid stereotypes)
 options.setCapability("networkname:applicationName", "node_1");
 options.setCapability("nodename:applicationName", "app_1");
 
-// 3. Remote File Downloading
 List<String> downloadableFiles = ((HasDownloads) driver).getDownloadableFiles();
 ```
 

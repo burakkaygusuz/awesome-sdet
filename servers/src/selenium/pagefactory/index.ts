@@ -27,12 +27,14 @@ export const PageFactoryClassSchema = z
   ] as const)
   .describe('Selenium PageFactory class or annotation name.');
 
-export const PageFactoryDocsSchema = z.object({
-  className: PageFactoryClassSchema.optional().describe(
-    'Optional Selenium PageFactory class or annotation to look up (e.g. "PageFactory", "AjaxElementLocator", "FindBy"). Omit to receive the full reference.'
-  ),
-  language: SupportedLanguageSchema.optional(),
-});
+export const PageFactoryDocsSchema = z
+  .object({
+    className: PageFactoryClassSchema.optional().describe(
+      'Optional Selenium PageFactory class or annotation to look up (e.g. "PageFactory", "AjaxElementLocator", "FindBy"). Omit to receive the full reference.'
+    ),
+    language: SupportedLanguageSchema,
+  })
+  .strict();
 
 export type PageFactoryDocsArgs = z.infer<typeof PageFactoryDocsSchema>;
 export type PageFactoryClass = z.infer<typeof PageFactoryClassSchema>;
@@ -65,8 +67,8 @@ export async function loadPageFactoryEntries(): Promise<Record<string, string>> 
   return Object.fromEntries(entryCache.entries());
 }
 
-export async function handlePageFactoryDocs(args?: PageFactoryDocsArgs) {
-  const targetLanguage: SupportedLanguage = args?.language ?? 'java';
+export async function handlePageFactoryDocs(args: PageFactoryDocsArgs) {
+  const targetLanguage: SupportedLanguage = args.language;
   let text: string;
 
   if (args?.className) {

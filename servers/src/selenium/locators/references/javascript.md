@@ -14,11 +14,10 @@ class LocatorExamples {
    * @param {import('selenium-webdriver').WebDriver} driver
    */
   async demonstrateLocators(driver) {
-    // 1. Standard Locators
     const username = await driver.findElement(By.id('username'));
     const submitBtn = await driver.findElement(By.css("button.btn-success[type='submit']"));
 
-    // 2. Selenium 4 Relative Locators (Spatial)
+    // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
     const passwordInput = await driver.findElement(locateWith(By.tagName('input')).below(username));
     const cancelButton = await driver.findElement(
       locateWith(By.tagName('button')).toLeftOf(submitBtn)

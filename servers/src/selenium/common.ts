@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const SupportedLanguageSchema = z
   .enum(['java', 'python', 'typescript', 'javascript', 'csharp', 'ruby'] as const)
+  .default('java')
   .describe(
     'Target programming language: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
   );

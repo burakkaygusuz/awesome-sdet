@@ -10,7 +10,6 @@
 const { Builder } = require('selenium-webdriver');
 
 async function demonstrateListener(driver) {
-  // Listen for console log entry events asynchronously
   await driver.on('log.entryAdded', ({ text, level, timestamp }) => {
     console.log(`[${level}] ${timestamp}: ${text}`);
   });

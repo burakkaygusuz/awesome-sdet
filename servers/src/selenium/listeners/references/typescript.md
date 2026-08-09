@@ -10,7 +10,6 @@
 import { Builder, WebDriver } from 'selenium-webdriver';
 
 export async function demonstrateListener(driver: WebDriver): Promise<void> {
-  // Listen for console log entry events asynchronously
   await driver.on('log.entryAdded', ({ text, level, timestamp }: any) => {
     console.log(`[${level}] ${timestamp}: ${text}`);
   });

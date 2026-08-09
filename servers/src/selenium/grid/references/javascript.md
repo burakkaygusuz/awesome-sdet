@@ -5,7 +5,6 @@
 ```javascript
 const { Builder, Capabilities } = require('selenium-webdriver');
 
-// 1. RemoteWebDriver Setup with Downloads
 const caps = Capabilities.chrome();
 caps.set('se:downloadsEnabled', true);
 

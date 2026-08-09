@@ -16,11 +16,10 @@ export class LocatorExamples {
   private readonly dynamicXPath = By.xpath("//tr[td[text()='Active']]//button");
 
   async demonstrateLocators(driver: WebDriver): Promise<void> {
-    // 1. Standard Locators
     const username = await driver.findElement(this.usernameInput);
     const submitBtn = await driver.findElement(this.submitButton);
 
-    // 2. Selenium 4 Relative Locators (Spatial)
+    // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
     const passwordInput = await driver.findElement(locateWith(By.tagName('input')).below(username));
     const cancelButton = await driver.findElement(
       locateWith(By.tagName('button')).toLeftOf(submitBtn)

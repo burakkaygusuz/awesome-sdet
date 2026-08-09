@@ -31,7 +31,7 @@ export function registerSeleniumTools(
       title: 'Selenium Explicit Wait',
       description:
         'Validates a Selenium ExpectedConditions explicit wait configuration and returns the correct usage pattern.',
-      inputSchema: SeleniumWaitSchema.shape,
+      inputSchema: SeleniumWaitSchema,
       annotations,
     },
     safeHandler(() => handleSeleniumWait())
@@ -43,7 +43,7 @@ export function registerSeleniumTools(
       title: 'Selenium PageFactory & POM Docs',
       description:
         'Returns PageFactory API reference and Page Object Model (POM) code examples for a given language.',
-      inputSchema: PageFactoryDocsSchema.shape,
+      inputSchema: PageFactoryDocsSchema,
       annotations,
     },
     safeHandler((args) => handlePageFactoryDocs(args))
@@ -55,7 +55,7 @@ export function registerSeleniumTools(
       title: 'Selenium Locator Docs',
       description:
         'Returns locator strategy guide, performance hierarchy, best practices, and code examples for a given language.',
-      inputSchema: LocatorDocsSchema.shape,
+      inputSchema: LocatorDocsSchema,
       annotations,
     },
     safeHandler((args) => handleLocatorDocs(args))
@@ -67,7 +67,7 @@ export function registerSeleniumTools(
       title: 'Selenium BiDi Docs',
       description:
         'Returns W3C WebDriver BiDirectional (BiDi) protocol API reference and code examples for a given language.',
-      inputSchema: BidiDocsSchema.shape,
+      inputSchema: BidiDocsSchema,
       annotations,
     },
     safeHandler((args) => handleBidiDocs(args))
@@ -79,7 +79,7 @@ export function registerSeleniumTools(
       title: 'Selenium Actions API Docs',
       description:
         'Returns Actions API reference and code examples for low-level user interactions (mouse, keyboard, wheel) for a given language.',
-      inputSchema: ActionsDocsSchema.shape,
+      inputSchema: ActionsDocsSchema,
       annotations,
     },
     safeHandler((args) => handleActionsDocs(args))
@@ -91,7 +91,7 @@ export function registerSeleniumTools(
       title: 'Selenium Listeners Docs',
       description:
         'Returns EventFiringDecorator and WebDriverListener reference and code examples for event handling for a given language.',
-      inputSchema: ListenersDocsSchema.shape,
+      inputSchema: ListenersDocsSchema,
       annotations,
     },
     safeHandler((args) => handleListenersDocs(args))
@@ -103,7 +103,7 @@ export function registerSeleniumTools(
       title: 'Selenium Grid & RemoteWebDriver Docs',
       description:
         'Returns RemoteWebDriver API reference, Grid 4 capabilities, remote file download, custom TOML stereotypes, and cloud grid configuration for a given language.',
-      inputSchema: GridDocsSchema.shape,
+      inputSchema: GridDocsSchema,
       annotations,
     },
     safeHandler((args) => handleGridDocs(args))
@@ -115,7 +115,7 @@ export function registerSeleniumTools(
       title: 'Selenium Observability & OpenTelemetry Docs',
       description:
         'Returns OpenTelemetry tracing configuration and Grid 4 GraphQL API metrics querying code examples for a given language.',
-      inputSchema: ObservabilityDocsSchema.shape,
+      inputSchema: ObservabilityDocsSchema,
       annotations,
     },
     safeHandler((args) => handleObservabilityDocs(args))

@@ -21,11 +21,10 @@ namespace Com.Example.Locators
 
         public void DemonstrateLocators()
         {
-            // 1. Standard Locators with using static OpenQA.Selenium.By
             IWebElement username = driver.FindElement(UsernameInput);
             IWebElement submitBtn = driver.FindElement(SubmitButton);
 
-            // 2. Selenium 4 Relative Locators (Spatial)
+            // Selenium 4 Relative Locators (spatial queries: Below, LeftOf)
             IWebElement passwordInput = driver.FindElement(
                 RelativeBy.WithLocator(TagName("input")).Below(username)
             );

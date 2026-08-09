@@ -24,20 +24,13 @@ import org.openqa.selenium.WebElement;
 public class LocatorExamples {
 
     public void demonstrateLocators(WebDriver driver) {
-        // 1. By ID (Recommended)
         WebElement username = driver.findElement(id("username"));
-
-        // 2. By CSS Selector
         WebElement submitBtn = driver.findElement(cssSelector("button.btn-success[type='submit']"));
-
-        // 3. By Name & ClassName
         WebElement emailInput = driver.findElement(name("email"));
         List<WebElement> cardItems = driver.findElements(className("card-item"));
-
-        // 4. By XPath (Relative)
         WebElement dynamicCell = driver.findElement(xpath("//tr[td[text()='Active']]//button"));
 
-        // 5. Selenium 4 Relative Locators (Spatial)
+        // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
         WebElement passwordInput = driver.findElement(with(tagName("input")).below(username));
         WebElement cancelButton = driver.findElement(with(tagName("button")).toLeftOf(submitBtn));
     }

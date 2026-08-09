@@ -48,30 +48,33 @@ export const SeleniumExpectedConditionSchema = z
   ] as const)
   .describe('Selenium ExpectedCondition function name to evaluate.');
 
-export const SeleniumWaitSchema = z.object({
-  targetUrl: z
-    .string()
-    .max(2048)
-    .describe('Target webpage URL where the explicit wait condition applies.'),
-  condition: SeleniumExpectedConditionSchema,
-  locator: z
-    .object({
-      by: SeleniumByStrategySchema,
-      value: z
-        .string()
-        .max(512)
-        .describe('Locator expression value (e.g. element ID, CSS selector, or XPath string).'),
-    })
-    .describe('Element location strategy and query expression.'),
-  timeoutSeconds: z
-    .number()
-    .int()
-    .min(1)
-    .max(120)
-    .optional()
-    .default(10)
-    .describe('Maximum wait duration in seconds before timing out (default: 10s).'),
-});
+export const SeleniumWaitSchema = z
+  .object({
+    targetUrl: z
+      .string()
+      .max(2048)
+      .describe('Target webpage URL where the explicit wait condition applies.'),
+    condition: SeleniumExpectedConditionSchema,
+    locator: z
+      .object({
+        by: SeleniumByStrategySchema,
+        value: z
+          .string()
+          .max(512)
+          .describe('Locator expression value (e.g. element ID, CSS selector, or XPath string).'),
+      })
+      .strict()
+      .describe('Element location strategy and query expression.'),
+    timeoutSeconds: z
+      .number()
+      .int()
+      .min(1)
+      .max(120)
+      .optional()
+      .default(10)
+      .describe('Maximum wait duration in seconds before timing out (default: 10s).'),
+  })
+  .strict();
 
 export type SeleniumWaitArgs = z.infer<typeof SeleniumWaitSchema>;
 

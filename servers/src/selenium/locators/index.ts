@@ -17,12 +17,14 @@ export const LocatorStrategySchema = z
 
 export type LocatorStrategy = z.infer<typeof LocatorStrategySchema>;
 
-export const LocatorDocsSchema = z.object({
-  strategy: LocatorStrategySchema.optional().describe(
-    'Specific locator strategy to query (e.g. "id", "cssSelector", "xpath", "relativeLocators"). Omit for complete guide.'
-  ),
-  language: SupportedLanguageSchema.optional(),
-});
+export const LocatorDocsSchema = z
+  .object({
+    strategy: LocatorStrategySchema.optional().describe(
+      'Specific locator strategy to query (e.g. "id", "cssSelector", "xpath", "relativeLocators"). Omit for complete guide.'
+    ),
+    language: SupportedLanguageSchema,
+  })
+  .strict();
 
 export type LocatorDocsArgs = z.infer<typeof LocatorDocsSchema>;
 
@@ -42,8 +44,8 @@ export const STRATEGY_HIERARCHY_MARKDOWN = `## Strategy Hierarchy & Best Practic
 
 const FULL_HEADER = `# API Reference — Selenium Locator Strategies & Best Practices`;
 
-export async function handleLocatorDocs(args?: LocatorDocsArgs) {
-  const targetLanguage: SupportedLanguage = args?.language ?? 'java';
+export async function handleLocatorDocs(args: LocatorDocsArgs) {
+  const targetLanguage: SupportedLanguage = args.language;
   const langCodeExamples = await loadReferenceMarkdown(import.meta.url, targetLanguage);
   const combinedMarkdown = `${FULL_HEADER}\n\n${STRATEGY_HIERARCHY_MARKDOWN}\n\n---\n\n${langCodeExamples}`;
 

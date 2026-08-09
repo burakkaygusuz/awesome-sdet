@@ -5,7 +5,6 @@
 ```typescript
 import { Builder, Capabilities } from 'selenium-webdriver';
 
-// 1. RemoteWebDriver with Downloads Enabled
 const chromeCapabilities = Capabilities.chrome();
 chromeCapabilities.set('se:downloadsEnabled', true);
 
@@ -14,7 +13,7 @@ const driver = await new Builder()
   .withCapabilities(chromeCapabilities)
   .build();
 
-// 2. Custom Node Stereotypes
+// Match custom node stereotypes defined in Grid TOML config
 chromeCapabilities.set('nodename:applicationName', 'node_1');
 
 await driver.get('https://example.com');
