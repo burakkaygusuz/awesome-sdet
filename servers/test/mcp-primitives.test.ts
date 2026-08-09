@@ -104,6 +104,48 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(data.result?.isError).toBe(true);
       expect.soft((data.result?.content?.[0]?.text || '').length).toBeGreaterThan(0);
     });
+
+    it('tools/call rejects unrecognized hallucinated arguments via .strict() schema', async () => {
+      const res = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 52,
+        method: 'tools/call',
+        params: {
+          name: 'read_vibium_core_docs',
+          arguments: { language: 'typescript', unrecognized_hallucinated_param: 'unexpected' },
+        },
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.result?.isError).toBe(true);
+    });
+
+    it('tools/call successfully executes documentation tools across all supported frameworks', async () => {
+      const crossFrameworkTools = [
+        { name: 'read_se_actions_docs', lang: 'java', expectText: 'Selenium' },
+        { name: 'read_cy_commands_docs', lang: 'typescript', expectText: 'Cypress' },
+        { name: 'read_vibium_core_docs', lang: 'python', expectText: 'Vibium' },
+        { name: 'read_vibium_selectors_docs', lang: 'typescript', expectText: 'Vibium' },
+        { name: 'read_vibium_interactions_docs', lang: 'java', expectText: 'Vibium' },
+        { name: 'read_vibium_bidi_docs', lang: 'javascript', expectText: 'Vibium' },
+        { name: 'read_vibium_state_docs', lang: 'typescript', expectText: 'Vibium' },
+      ];
+
+      for (const item of crossFrameworkTools) {
+        const res = await mcpFetch(url, {
+          jsonrpc: '2.0',
+          id: 60,
+          method: 'tools/call',
+          params: { name: item.name, arguments: { language: item.lang } },
+        });
+
+        expect.soft(res.status).toBe(200);
+        const data = await parseMcpResponse(res);
+        expect.soft(data.result?.isError).toBeUndefined();
+        expect.soft(data.result?.content?.[0]?.text).toContain(item.expectText);
+      }
+    });
   });
 
   describe('resources', () => {
@@ -124,6 +166,27 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(readData.result?.contents).toBeDefined();
       expect.soft((readData.result?.contents?.[0]?.text || '').length).toBeGreaterThan(0);
     });
+
+    it('resources/read dynamically fetches resources across all framework templates', async () => {
+      const templates = [
+        { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
+        { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
+        { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
+      ];
+
+      for (const t of templates) {
+        const readRes = await mcpFetch(url, {
+          jsonrpc: '2.0',
+          id: 12,
+          method: 'resources/read',
+          params: { uri: t.uri },
+        });
+        expect.soft(readRes.status).toBe(200);
+        const readData = await parseMcpResponse(readRes);
+        expect.soft(readData.result?.contents).toBeDefined();
+        expect.soft(readData.result?.contents?.[0]?.text).toContain(t.expectText);
+      }
+    });
   });
 
   describe('prompts', () => {
@@ -132,26 +195,91 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(listRes.status).toBe(200);
       const listData = await parseMcpResponse(listRes);
       const prompts = listData.result?.prompts || [];
-      expect.soft(prompts.length).toBeGreaterThanOrEqual(1);
+      expect.soft(prompts.length).toBe(3);
 
-      const targetPrompt = prompts[0];
-      const getRes = await mcpFetch(url, {
+      const promptNames = prompts.map((p: { name: string }) => p.name);
+      expect.soft(promptNames).toContain('generate-test');
+      expect.soft(promptNames).toContain('migrate-test');
+      expect.soft(promptNames).toContain('diagnose-flakiness');
+
+      // Test generate-test
+      const genRes = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 21,
         method: 'prompts/get',
         params: {
-          name: targetPrompt.name,
+          name: 'generate-test',
           arguments: {
-            framework: 'cypress',
+            framework: 'vibium',
             language: 'typescript',
-            featureDescription: 'Dynamic user authentication test',
+            featureDescription: 'Dynamic user authentication test with biometric MFA',
           },
         },
       });
-      expect.soft(getRes.status).toBe(200);
-      const getData = await parseMcpResponse(getRes);
-      expect.soft(getData.result?.messages).toBeDefined();
-      expect.soft((getData.result?.messages?.[0]?.content?.text || '').length).toBeGreaterThan(0);
+      expect.soft(genRes.status).toBe(200);
+      const genData = await parseMcpResponse(genRes);
+      expect.soft(genData.result?.messages).toBeDefined();
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/vibium-*');
+
+      // Test migrate-test
+      const migRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 22,
+        method: 'prompts/get',
+        params: {
+          name: 'migrate-test',
+          arguments: {
+            sourceFramework: 'selenium',
+            targetFramework: 'cypress',
+            sourceCode: 'cy.visit("/login"); cy.get("#submit").click();',
+          },
+        },
+      });
+      expect.soft(migRes.status).toBe(200);
+      const migData = await parseMcpResponse(migRes);
+      expect
+        .soft(migData.result?.messages?.[0]?.content?.text)
+        .toContain('Anti-Pattern Elimination');
+
+      // Test diagnose-flakiness
+      const diagRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 23,
+        method: 'prompts/get',
+        params: {
+          name: 'diagnose-flakiness',
+          arguments: {
+            framework: 'selenium',
+            failureLog:
+              'StaleElementReferenceException: element is not attached to the page document',
+            testCode: 'driver.findElement(By.id("btn")).click();',
+          },
+        },
+      });
+      expect.soft(diagRes.status).toBe(200);
+      const diagData = await parseMcpResponse(diagRes);
+      expect.soft(diagData.result?.messages?.[0]?.content?.text).toContain('Phase 1 - Trace');
+    });
+
+    it('prompts/get rejects invalid framework or language enums via Zod v4 schema', async () => {
+      const res = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 24,
+        method: 'prompts/get',
+        params: {
+          name: 'generate-test',
+          arguments: {
+            framework: '__invalid_framework__',
+            language: 'typescript',
+            featureDescription: 'Valid feature description with enough length',
+          },
+        },
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error).toBeDefined();
     });
   });
 });
