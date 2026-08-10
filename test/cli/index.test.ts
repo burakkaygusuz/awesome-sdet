@@ -10,8 +10,10 @@ vi.mock('../../cli/installer.js');
 describe('CLI Workflow & Argument Runner (runCli)', () => {
   let exitSpy: MockInstance;
   let consoleLogSpy: MockInstance;
+  let originalArgv: string[];
 
   beforeEach(() => {
+    originalArgv = [...process.argv];
     exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.mocked(p.spinner).mockReturnValue({
@@ -23,12 +25,10 @@ describe('CLI Workflow & Argument Runner (runCli)', () => {
       clear: vi.fn(),
       isCancelled: false,
     });
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    exitSpy.mockRestore();
-    consoleLogSpy.mockRestore();
+    process.argv = originalArgv;
   });
 
   it('should display help and return without executing installation when -h is passed', async () => {
@@ -133,7 +133,7 @@ describe('CLI Workflow & Argument Runner (runCli)', () => {
 
   it('should handle interactive cancellation gracefully with exit code 0', async () => {
     process.argv = ['node', 'bin.js'];
-    vi.mocked(p.multiselect).mockResolvedValue(Symbol('clack:cancel') as never);
+    vi.mocked(p.multiselect).mockResolvedValue(Symbol('clack:cancel'));
     vi.mocked(p.isCancel).mockReturnValue(true);
 
     await runCli();
