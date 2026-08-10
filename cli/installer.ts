@@ -2,10 +2,10 @@ import fs from 'node:fs/promises';
 import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { mergeCodexConfig, mergeMcpConfig, mergeOpencodeConfig } from './config-merger.js';
+import { getAgentsForFrameworks, getSkillsForFrameworksAsync } from './matrix.js';
 import type { InstallOptions, InstallResult, McpServerEntry } from './types.js';
-import { getSkillsForFrameworksAsync, getAgentsForFrameworks } from './matrix.js';
-import { mergeMcpConfig, mergeOpencodeConfig, mergeCodexConfig } from './config-merger.js';
-import { generateAgentsMarkdown } from './agents-generator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,9 +75,12 @@ export async function runInstallation(options: InstallOptions): Promise<InstallR
   const agentResults = await Promise.all(agentCopyPromises);
   const agentsCopied = agentResults.reduce<number>((a, b) => a + b, 0);
 
-  // 3. Write universal AGENTS.md
-  const agentsMdContent = generateAgentsMarkdown();
-  await fs.writeFile(path.join(dest, 'AGENTS.md'), agentsMdContent, 'utf8');
+  // 3. Copy universal AGENTS.md directly from REPO_ROOT (Single Source of Truth)
+  const sourceAgentsMd = path.join(REPO_ROOT, 'AGENTS.md');
+  const targetAgentsMd = path.join(dest, 'AGENTS.md');
+  if (await pathExists(sourceAgentsMd)) {
+    await fs.copyFile(sourceAgentsMd, targetAgentsMd);
+  }
 
   // 4. Update MCP and harness configs selectively based on target filters
   const mcpServerEntry: McpServerEntry = {

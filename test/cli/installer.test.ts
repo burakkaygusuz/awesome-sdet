@@ -1,10 +1,15 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { runInstallation } from '../../cli/installer.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, '../../');
 
 async function pathExists(p: string): Promise<boolean> {
   try {
@@ -57,6 +62,11 @@ describe('CLI Installer Engine', () => {
     expect.soft(installedAgents).toContain('selenium.agent.md');
     expect.soft(installedAgents).toContain('vibium.agent.md');
     expect.soft(installedAgents).toContain('appium.agent.md');
+
+    // Verify AGENTS.md matches the canonical root AGENTS.md (Single Source of Truth)
+    const canonicalAgentsMd = await fs.readFile(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8');
+    const installedAgentsMd = await fs.readFile(path.join(targetDir, 'AGENTS.md'), 'utf8');
+    expect.soft(installedAgentsMd).toBe(canonicalAgentsMd);
 
     // Verify all 4 harness configs exist and are valid
     expect.soft(await pathExists(path.join(targetDir, 'AGENTS.md'))).toBe(true);
