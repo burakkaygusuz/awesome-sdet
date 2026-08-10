@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sdet-mcp": {
+      "command": "node",
+      "args": ["servers/dist/index.js", "--stdio"]
+    }
+  }
+}

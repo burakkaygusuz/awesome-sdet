@@ -1,7 +1,9 @@
+import type http from 'node:http';
+
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { mcpFetch, parseMcpResponse, listenServer, closeServer } from './helpers.js';
-import { createHttpServer } from '../dist/index.js';
-import http from 'node:http';
+
+import { createHttpServer } from '../../servers/dist/index.js';
+import { closeServer, listenServer, mcpFetch, parseMcpResponse } from '../helpers.js';
 
 describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
   let server: http.Server;
@@ -30,7 +32,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
     });
 
     it('resolves via Mcp-Method header when body has no method field', async () => {
-      const { MCP_HEADERS } = await import('./helpers.js');
+      const { MCP_HEADERS } = await import('../helpers.js');
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
@@ -67,7 +69,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const tools = listData.result?.tools || [];
       expect.soft(tools.length).toBeGreaterThanOrEqual(1);
 
-      const docTool = tools.find((t) => t.name.startsWith('read_')) || tools[0];
+      const docTool = tools.find((t: { name: string }) => t.name.startsWith('read_')) || tools[0];
       const res = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 40,

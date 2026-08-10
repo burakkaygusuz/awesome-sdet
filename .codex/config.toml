@@ -1,0 +1,8 @@
+# OpenAI Codex CLI Configuration
+[mcp_servers.sdet-mcp]
+command = "node"
+args = ["servers/dist/index.js", "--stdio"]
+startup_timeout_sec = 15
+
+[mcp_servers.sdet-mcp-http]
+url = "http://127.0.0.1:3000/mcp"

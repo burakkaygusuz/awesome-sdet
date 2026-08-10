@@ -1,9 +1,11 @@
-import http from 'node:http';
-import { AddressInfo } from 'node:net';
+import type http from 'node:http';
+import type { AddressInfo } from 'node:net';
+
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { afterAll, beforeAll, describe, it, expect } from 'vitest';
-import { createHttpServer } from '../dist/index.js';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { createHttpServer } from '../../servers/dist/index.js';
 
 describe('MCP SDK Client Integration', () => {
   let server: http.Server;
@@ -26,10 +28,6 @@ describe('MCP SDK Client Integration', () => {
   });
 
   // SDK Client Integration test — skipped pending SDK 2026-07-28 support.
-  // The SDK client (StreamableHTTPClientTransport) does not yet send the mandatory
-  // `Mcp-Protocol-Version` header required by the 2026-07-28 spec, so it fails
-  // our gateway validation. Re-enable on @modelcontextprotocol/sdk v1.31.x+:
-  //   remove `.skip`, delete the SDK upgrade shim in src/index.ts, and verify.
   it.skip('connects, lists primitives, and executes a tool without static snapshots', async () => {
     const transport = new StreamableHTTPClientTransport(new URL(url));
     const client = new Client({ name: 'test-sdk-client', version: '1.0.0' });

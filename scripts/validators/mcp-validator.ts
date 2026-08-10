@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { McpManifestSchema } from '../schemas.ts';
+import { McpManifestSchema } from '../schemas.js';
 
 export async function validateMcpManifest(rootDir: string): Promise<boolean> {
   const mcpPath = path.join(rootDir, 'mcp.json');

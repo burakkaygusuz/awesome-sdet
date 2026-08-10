@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { REQUIRED_FRONTMATTER, type Skill } from '../schemas.ts';
+import { REQUIRED_FRONTMATTER, type Skill } from '../schemas.js';
 
 export function parseFrontmatter(
   content: string,

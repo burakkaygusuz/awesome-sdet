@@ -3,12 +3,31 @@
   "version": "1.0.0",
   "private": true,
   "description": "Skills and agents registry for SDETs",
+  "bin": {
+    "awesome-sdet": "./dist/cli/bin.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "agents",
+    "servers/dist",
+    "plugin.json",
+    "mcp.json",
+    "AGENTS.md"
+  ],
+  "dependencies": {
+    "@clack/prompts": "^1.7.0",
+    "picocolors": "^1.1.1"
+  },
   "packageManager": "pnpm@10.32.1",
   "scripts": {
+    "build": "pnpm --dir servers build && tsc",
+    "build:cli": "tsc",
     "typecheck": "tsc --noEmit",
-    "validate": "node scripts/validate.ts",
-    "lint:skills": "node scripts/validate.ts",
-    "test": "pnpm --dir servers test",
+    "validate": "node dist/scripts/validate.js",
+    "lint:skills": "node dist/scripts/validate.js",
+    "test": "pnpm run build && vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check .",
@@ -21,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.3",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@types/node": "^26.1.2",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
@@ -32,6 +52,7 @@
     "skills-check": "^1.2.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10",
     "zod": "^4.4.3"
   },
   "type": "module",
