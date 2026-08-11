@@ -1,7 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { MCP_HEADERS, mcpFetch, parseMcpResponse, listenServer, closeServer } from './helpers.js';
-import { createHttpServer } from '../dist/index.js';
 import http from 'node:http';
+
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { createHttpServer } from '../../servers/src/index.js';
+import { closeServer, listenServer, MCP_HEADERS, mcpFetch, parseMcpResponse } from '../helpers.js';
 
 describe('MCP 2026-07-28 Protocol Validation', () => {
   let server: http.Server;

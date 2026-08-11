@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import type { Skill } from './schemas.ts';
-import { validatePluginManifest } from './validators/plugin-validator.ts';
-import { validateMcpManifest } from './validators/mcp-validator.ts';
-import { collectAllSkills } from './validators/skills-validator.ts';
-import { collectAgents } from './validators/agent-validator.ts';
+import type { Skill } from './schemas.js';
+import { validatePluginManifest } from './validators/plugin-validator.js';
+import { validateMcpManifest } from './validators/mcp-validator.js';
+import { collectAllSkills } from './validators/skills-validator.js';
+import { collectAgents } from './validators/agent-validator.js';
 
 export async function validate(): Promise<void> {
   const rootDir = process.cwd();
@@ -56,7 +56,7 @@ export async function validate(): Promise<void> {
   );
 }
 
-if (process.argv[1]?.endsWith('validate.ts')) {
+if (process.argv[1]?.includes('validate')) {
   validate().catch((err) => {
     console.error('Validation crashed:', err);
     process.exit(1);

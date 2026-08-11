@@ -3,19 +3,14 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "./",
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "./",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "ignoreDeprecations": "6.0",
+    "declaration": true,
     "types": ["node"]
   },
-  "include": ["scripts/**/*"]
+  "include": ["scripts/**/*", "test/**/*"]
 }

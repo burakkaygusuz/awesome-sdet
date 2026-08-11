@@ -4,7 +4,7 @@
     "sdet-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["servers/dist/index.js", "--stdio"]
+      "args": ["${PLUGIN_ROOT}/servers/dist/index.js", "--stdio"]
     },
     "sdet-mcp-http": {
       "type": "streamable-http",

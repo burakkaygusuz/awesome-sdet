@@ -18,6 +18,9 @@ importers:
       '@eslint/markdown':
         specifier: ^8.0.3
         version: 8.0.3
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.30.0
+        version: 1.30.0(zod@4.4.3)
       '@types/node':
         specifier: ^26.1.2
         version: 26.1.2
@@ -51,6 +54,9 @@ importers:
       typescript-eslint:
         specifier: ^8.66.0
         version: 8.66.0(eslint@10.8.0)(typescript@6.0.3)
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(vite@8.2.0(@types/node@26.1.2)(yaml@2.9.0))
       zod:
         specifier: ^4.4.3
         version: 4.4.3

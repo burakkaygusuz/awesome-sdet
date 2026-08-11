@@ -2,15 +2,16 @@ import { execFile } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+
 import { describe, expect, it } from 'vitest';
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const entrypoint = join(__dirname, '../dist/index.js');
+const entrypoint = join(__dirname, '../../servers/dist/index.js');
 
 describe('Runtime Entrypoint Tests', () => {
   it('compiled entrypoint exposes a closable HTTP server factory', async () => {
-    const { createHttpServer } = await import('../dist/index.js');
+    const { createHttpServer } = await import('../../servers/src/index.js');
     const server = createHttpServer();
 
     expect.soft(typeof server.listen).toBe('function');
@@ -38,7 +39,7 @@ describe('Runtime Entrypoint Tests', () => {
   });
 
   it('reads MCP documentation references dynamically across supported languages', async () => {
-    const { handleActionsDocs } = await import('../src/domains/selenium/index.js');
+    const { handleActionsDocs } = await import('../../servers/src/domains/selenium/index.js');
 
     for (const lang of ['typescript', 'python', 'java', 'csharp'] as const) {
       const res = await handleActionsDocs({ language: lang });

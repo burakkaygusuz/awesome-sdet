@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node -e \"fs.cpSync('src', 'dist', { recursive: true, filter: (f) => !f.endsWith('.ts') })\"",
-    "test": "pnpm run build && vitest run",
-    "test:watch": "vitest",
+    "test": "pnpm --dir .. test -- test/mcp",
+    "test:watch": "pnpm --dir .. test:watch -- test/mcp",
     "start": "node dist/index.js",
     "dev": "tsc --watch"
   },

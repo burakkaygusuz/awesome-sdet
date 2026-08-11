@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { PluginManifestSchema } from '../schemas.ts';
+import { PluginManifestSchema } from '../schemas.js';
 
 export async function validatePluginManifest(rootDir: string): Promise<boolean> {
   const pluginPath = path.join(rootDir, 'plugin.json');

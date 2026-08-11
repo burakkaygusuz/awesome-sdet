@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
@@ -115,9 +116,9 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Robustness (Spec §5.4)', ()
     const robustPlugin = {
       $schema: 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json',
       name: 'awesome-sdet',
-      version: '2026.08-beta.1+build123', // Non-standard semver allowed per §5.4
-      author: 'Burak Kaygusuz', // String author allowed per §5.4
-      homepage: 'git+ssh://github.com/burakkaygusuz', // Loose URI allowed per §5.4
+      version: '2026.08-beta.1+build123',
+      author: 'Burak Kaygusuz',
+      homepage: 'git+ssh://github.com/burakkaygusuz',
       repository: 'https://github.com/burakkaygusuz/awesome-sdet',
     };
 
@@ -156,6 +157,13 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Robustness (Spec §5.4)', ()
 
     const invalidParsed = McpManifestSchema.safeParse(invalidMcp);
     expect.soft(invalidParsed.success).toBe(false);
+  });
+
+  it('mcp.json sdet-mcp stdio server should use ${PLUGIN_ROOT} in args', async () => {
+    const mcpPath = path.join(rootDir, 'mcp.json');
+    const mcp = await readJsonFile<{ mcpServers: Record<string, { args?: string[] }> }>(mcpPath);
+    expect(mcp.mcpServers['sdet-mcp']).toBeDefined();
+    expect(mcp.mcpServers['sdet-mcp'].args).toContain('${PLUGIN_ROOT}/servers/dist/index.js');
   });
 
   it('verifies standard 1-level skill discovery in skills/ directory with asynchronous I/O', async () => {

@@ -38,8 +38,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test MCP server build and HTTP protocol
-        run: pnpm --dir servers test
+      - name: Test MCP server build and test suites
+        run: pnpm test
 
   validate-and-audit:
     name: Validate Skills & Security Audit
@@ -58,6 +58,9 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build Project
+        run: pnpm run build
 
       - name: Run TypeScript Typecheck
         run: pnpm run typecheck
