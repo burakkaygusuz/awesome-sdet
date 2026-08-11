@@ -1,7 +1,7 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import { createHttpServer } from '../servers/dist/index.js';
+import { createHttpServer } from '../servers/src/index.js';
 
 export const MCP_HEADERS = {
   'Content-Type': 'application/json',

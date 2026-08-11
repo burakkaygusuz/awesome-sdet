@@ -5,7 +5,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { createHttpServer } from '../../servers/dist/index.js';
+import { createHttpServer } from '../../servers/src/index.js';
 
 describe('MCP SDK Client Integration', () => {
   let server: http.Server;

@@ -11,7 +11,7 @@ const entrypoint = join(__dirname, '../../servers/dist/index.js');
 
 describe('Runtime Entrypoint Tests', () => {
   it('compiled entrypoint exposes a closable HTTP server factory', async () => {
-    const { createHttpServer } = await import('../../servers/dist/index.js');
+    const { createHttpServer } = await import('../../servers/src/index.js');
     const server = createHttpServer();
 
     expect.soft(typeof server.listen).toBe('function');
