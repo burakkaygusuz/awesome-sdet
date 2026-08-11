@@ -99,7 +99,7 @@ java -jar selenium.jar node --config node.toml
 
 ## 7. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_appium_capabilities_docs`
 - **Parameters**: `language` (`typescript` | `javascript` | `python` | `java` | `csharp`)

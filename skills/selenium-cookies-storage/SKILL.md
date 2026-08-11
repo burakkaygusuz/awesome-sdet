@@ -40,7 +40,7 @@ Executing manual login forms via UI elements in every test case slows down execu
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_se_locator_docs`
 - **Parameters**: `language` (`java` | `python` | `typescript` | `javascript` | `csharp` | `ruby`)

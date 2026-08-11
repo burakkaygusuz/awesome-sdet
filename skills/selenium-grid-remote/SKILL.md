@@ -39,7 +39,7 @@ Running large enterprise test suites sequentially on a local machine takes hours
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_se_grid_docs`
 - **Parameters**: `language` (`java` | `python` | `typescript` | `javascript` | `csharp` | `ruby`)

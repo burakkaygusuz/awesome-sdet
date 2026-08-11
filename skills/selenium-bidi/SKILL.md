@@ -40,7 +40,7 @@ Eliminates the polling overhead inherent in standard HTTP request-response WebDr
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_se_bidi_docs`
 - **Parameters**: `language` (`java` | `python` | `typescript` | `javascript` | `csharp` | `ruby`)

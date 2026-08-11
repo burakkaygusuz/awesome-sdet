@@ -49,7 +49,7 @@ Replaces legacy, deprecated `TouchAction` APIs with the official W3C WebDriver s
 
 ## 6. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_appium_gestures_docs`
 - **Parameters**: `gesture` (`tap` | `double_tap` | `long_press` | `swipe` | `scroll` | `drag_and_drop` | `pinch_zoom`), `language` (`typescript` | `javascript` | `python` | `java` | `csharp`)

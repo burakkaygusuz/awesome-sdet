@@ -53,7 +53,7 @@ jobs:
         with:
           build: npm run build
           start: npm start
-          wait-on: 'http://localhost:3000'
+          wait-on: 'https://example.com'
           record: true
           parallel: true
         env:
@@ -71,7 +71,7 @@ cypress:
   image: cypress/browsers:22.15.0
   script:
     - npm ci
-    - npx start-server-and-test start http://localhost:3000 "cypress run --record --key $CYPRESS_RECORD_KEY"
+    - npx start-server-and-test start https://example.com "cypress run --record --key $CYPRESS_RECORD_KEY"
   artifacts:
     when: always
     paths:
@@ -111,7 +111,7 @@ pipelines:
           - cypress
         script:
           - npm ci
-          - npx start-server-and-test start http://localhost:3000 "cypress run"
+          - npx start-server-and-test start https://example.com "cypress run"
 definitions:
   caches:
     cypress: ~/.cache/Cypress
@@ -123,17 +123,17 @@ Used to run automated regression suites deterministically on every pull request,
 
 ## 4. Best Practices & Anti-Patterns
 
-| Best Practice                                                                                          | Anti-Pattern                                                                                  |
-| :----------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
-| **`cypress-io/github-action@v7`**: Use major version `@v7` for GitHub Actions                          | **Deprecated Action Versions**: Using legacy `@v4` or `@v5` action tags                       |
-| **`cypress-io/cypress@6.1.0`**: Pin exact CircleCI orb versions                                        | **Unpinned Orbs**: Relying on loose orb version tags in production                            |
-| **`start-server-and-test`**: Use `npx start-server-and-test start http://localhost:3000 'cypress run'` | **Unwaited Background Server**: Launching `npm start &` without waiting for port availability |
-| **Cache `~/.cache/Cypress`**: Cache the Cypress binary directory across CI pipeline runs               | **Re-downloading Cypress Binary**: Re-installing the 500MB+ Cypress binary on every job run   |
-| **Explicit Docker Tags**: Pin exact Docker tags (`cypress/browsers:22.15.0`)                           | **Unstable `:latest` Tag**: Using `cypress/browsers:latest` which mutates without notice      |
+| Best Practice                                                                                        | Anti-Pattern                                                                                  |
+| :--------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| **`cypress-io/github-action@v7`**: Use major version `@v7` for GitHub Actions                        | **Deprecated Action Versions**: Using legacy `@v4` or `@v5` action tags                       |
+| **`cypress-io/cypress@6.1.0`**: Pin exact CircleCI orb versions                                      | **Unpinned Orbs**: Relying on loose orb version tags in production                            |
+| **`start-server-and-test`**: Use `npx start-server-and-test start https://example.com 'cypress run'` | **Unwaited Background Server**: Launching `npm start &` without waiting for port availability |
+| **Cache `~/.cache/Cypress`**: Cache the Cypress binary directory across CI pipeline runs             | **Re-downloading Cypress Binary**: Re-installing the 500MB+ Cypress binary on every job run   |
+| **Explicit Docker Tags**: Pin exact Docker tags (`cypress/browsers:22.15.0`)                         | **Unstable `:latest` Tag**: Using `cypress/browsers:latest` which mutates without notice      |
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_task_docs`, `read_cy_commands_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

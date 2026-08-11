@@ -40,7 +40,7 @@ Used to eliminate non-deterministic test failures caused by asynchronous UI rend
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_session_docs`, `read_cy_task_docs`, `read_cy_network_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

@@ -43,7 +43,7 @@ Accelerates test suite execution by caching authentication tokens, provides rich
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_vibium_state_docs`
 - **Parameters**: `language` (`typescript` | `javascript` | `python` | `java`)

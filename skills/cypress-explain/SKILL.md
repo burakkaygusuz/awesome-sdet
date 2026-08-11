@@ -38,14 +38,14 @@ Used when auditing legacy Cypress test suites, onboarding team members, or debug
 | Best Practice                                                  | Anti-Pattern                                                       |
 | :------------------------------------------------------------- | :----------------------------------------------------------------- |
 | **Wait on Aliased Routes**: `cy.wait('@getUsers')`             | **Arbitrary Sleep**: `cy.wait(5000)`                               |
-| **Set `baseUrl` in Config**: `e2e: { baseUrl: '...' }`         | **Hardcoded Host URLs**: `cy.visit('http://localhost:3000/path')`  |
+| **Set `baseUrl` in Config**: `e2e: { baseUrl: '...' }`         | **Hardcoded Host URLs**: `cy.visit('https://example.com')`         |
 | **Programmatic Auth State**: `cy.session()` or `cy.request()`  | **UI Login in Every Spec**: Repeating UI login steps in every spec |
 | **Start Fresh Chains**: Start new `cy.get()` query             | **Deprecated `cy.end()`**: Using `.end()` to break chains          |
 | **Use `.then()` Closures**: `cy.get('.el').then(($el) => ...)` | **Variable Assignment**: `const btn = cy.get('button')`            |
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_commands_docs`, `read_cy_network_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

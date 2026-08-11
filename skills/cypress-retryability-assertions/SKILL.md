@@ -40,7 +40,7 @@ Eliminates test flakiness and speeds up test execution cycles by relying on dyna
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_commands_docs`, `read_cy_network_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

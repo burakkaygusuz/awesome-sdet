@@ -34,17 +34,17 @@ Used to generate maintainable, production-ready Cypress specs that adhere to tea
 
 ## 4. Best Practices & Anti-Patterns
 
-| Best Practice                                                            | Anti-Pattern                                                                  |
-| :----------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
-| **Set `baseUrl` in Config**: `e2e: { baseUrl: 'http://localhost:3000' }` | **Hardcoded URLs in Specs**: `cy.visit('http://localhost:3000/login')`        |
-| **Use `data-cy` Selectors**: `cy.get('[data-cy="submit-btn"]')`          | **Brittle CSS Paths**: `cy.get('div > span:nth-child(2)')`                    |
-| **Programmatic Auth State**: `cy.session()` or `cy.request()`            | **UI Login in Every Spec**: Navigating through full UI login in every test    |
-| **Asynchronous `cy.env('KEY')`**: Use `cy.env('API_KEY').then(...)`      | **Deprecated `Cypress.env()`**: Synchronous environment variable access       |
-| **Reuse Custom Commands**: Utilize `cy.getBySel('submit')`               | **Duplicated Query Boilerplate**: Re-writing custom DOM queries in every spec |
+| Best Practice                                                          | Anti-Pattern                                                                  |
+| :--------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| **Set `baseUrl` in Config**: `e2e: { baseUrl: 'https://example.com' }` | **Hardcoded URLs in Specs**: `cy.visit('https://example.com')`                |
+| **Use `data-cy` Selectors**: `cy.get('[data-cy="submit-btn"]')`        | **Brittle CSS Paths**: `cy.get('div > span:nth-child(2)')`                    |
+| **Programmatic Auth State**: `cy.session()` or `cy.request()`          | **UI Login in Every Spec**: Navigating through full UI login in every test    |
+| **Asynchronous `cy.env('KEY')`**: Use `cy.env('API_KEY').then(...)`    | **Deprecated `Cypress.env()`**: Synchronous environment variable access       |
+| **Reuse Custom Commands**: Utilize `cy.getBySel('submit')`             | **Duplicated Query Boilerplate**: Re-writing custom DOM queries in every spec |
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_commands_docs`, `read_cy_component_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

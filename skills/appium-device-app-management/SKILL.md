@@ -44,7 +44,7 @@ Enables end-to-end mobile testing of complex user journeys involving multi-app w
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_appium_device_docs`
 - **Parameters**: `language` (`typescript` | `javascript` | `python` | `java` | `csharp`)

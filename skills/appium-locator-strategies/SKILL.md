@@ -53,7 +53,7 @@ Mobile UI hierarchies are heavy accessibility trees. Utilizing native query engi
 
 ## 6. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_appium_locators_docs`
 - **Parameters**: `strategy` (`accessibility_id` | `ios_class_chain` | `ios_predicate_string` | `android_uiautomator` | `id` | `xpath`), `language` (`typescript` | `javascript` | `python` | `java` | `csharp`)

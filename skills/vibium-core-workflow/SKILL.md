@@ -43,7 +43,7 @@ Replaces heavyweight CDP wrappers and brittle HTTP-polling automation with stand
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_vibium_core_docs`
 - **Parameters**: `language` (`typescript` | `javascript` | `python` | `java`)

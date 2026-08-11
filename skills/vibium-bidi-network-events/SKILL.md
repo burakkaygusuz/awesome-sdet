@@ -43,7 +43,7 @@ Enables deterministic API mocking, eliminated flaky timer waits, real-time error
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_vibium_bidi_docs`
 - **Parameters**: `language` (`typescript` | `javascript` | `python` | `java`)

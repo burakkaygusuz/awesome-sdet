@@ -38,7 +38,7 @@ Eliminates repetitive manual logging or try-catch blocks across test scripts, es
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_se_listeners_docs`
 - **Parameters**: `language` (`java` | `python` | `typescript` | `javascript` | `csharp` | `ruby`)

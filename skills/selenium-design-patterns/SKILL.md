@@ -43,7 +43,7 @@ Eliminates code duplication across test scripts, minimizes framework maintenance
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_se_pagefactory_docs`
 - **Parameters**: `language` (`java` | `python` | `typescript` | `javascript` | `csharp` | `ruby`)

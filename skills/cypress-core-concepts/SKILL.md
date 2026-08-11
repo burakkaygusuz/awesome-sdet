@@ -41,7 +41,7 @@ Essential for understanding Cypress's execution loop, avoiding Promise anti-patt
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_commands_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

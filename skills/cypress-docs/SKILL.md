@@ -38,7 +38,7 @@ Used whenever an AI agent requires official Cypress API documentation or syntax 
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tools**: `read_cy_commands_docs`, `read_cy_network_docs`, `read_cy_session_docs`, `read_cy_component_docs`, `read_cy_shadow_docs`, `read_cy_task_docs`, `read_cy_stubs_spies_docs`, `read_cy_fixtures_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

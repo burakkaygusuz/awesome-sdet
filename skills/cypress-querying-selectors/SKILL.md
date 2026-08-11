@@ -40,7 +40,7 @@ Used to ensure tests do not break during UI restyling, CSS framework migrations,
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_commands_docs`, `read_cy_shadow_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)

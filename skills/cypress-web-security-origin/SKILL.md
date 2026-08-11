@@ -32,15 +32,15 @@ Required whenever tests need to interact with third-party OAuth authentication p
 
 ## 4. Best Practices & Anti-Patterns
 
-| Best Practice                                                                             | Anti-Pattern                                                                              |
-| :---------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| **Wrap Third-Party Domain in `cy.origin()`**: `cy.origin('https://auth0.com', () => ...)` | **Direct `cy.get()` Across Origins**: Querying non-origin domain directly                 |
-| **Pass Args to Callback**: `cy.origin(url, { args: { user } }, ({ user }) => ...)`        | **Referencing Outer Scope Variables**: Direct access to outer JS scope in `cy.origin`     |
-| **Return to Primary Origin**: Automatic context restoration upon callback exit            | **Disabling Web Security Globally**: Turning off `chromeWebSecurity: false` unnecessarily |
+| Best Practice                                                                               | Anti-Pattern                                                                              |
+| :------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------- |
+| **Wrap Third-Party Domain in `cy.origin()`**: `cy.origin('https://example.com', () => ...)` | **Direct `cy.get()` Across Origins**: Querying non-origin domain directly                 |
+| **Pass Args to Callback**: `cy.origin(url, { args: { user } }, ({ user }) => ...)`          | **Referencing Outer Scope Variables**: Direct access to outer JS scope in `cy.origin`     |
+| **Return to Primary Origin**: Automatic context restoration upon callback exit              | **Disabling Web Security Globally**: Turning off `chromeWebSecurity: false` unnecessarily |
 
 ## 5. Dynamic Tool Schemas & API Reference
 
-Fetch language-specific code implementations and API schemas using the `sdet-mcp` tool:
+Retrieve language-specific code implementations and API schemas via `sdet-mcp`:
 
 - **Tool**: `read_cy_session_docs`
 - **Parameters**: `language` (`typescript` | `javascript`)
