@@ -115,7 +115,7 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
     "sdet-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["servers/dist/index.js", "--stdio"]
+      "args": ["${PLUGIN_ROOT}/servers/dist/index.js", "--stdio"]
     },
     "sdet-mcp-http": {
       "type": "streamable-http",
@@ -127,7 +127,7 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
 
 #### Supported Transport Types & Zero-Config Execution
 
-- **`stdio` (Primary)**: Spawns the MCP server on-demand as a local child process (`command: "node"`, `args: ["servers/dist/index.js", "--stdio"]`). AI coding assistants run this out of the box with zero background server management.
+- **`stdio` (Primary)**: Spawns the MCP server on-demand as a local child process (`command: "node"`, `args: ["${PLUGIN_ROOT}/servers/dist/index.js", "--stdio"]`). AI coding assistants expand `${PLUGIN_ROOT}` to the filesystem-resolved plugin directory and run this out of the box with zero background server management.
 - **`streamable-http`**: High-performance HTTP streaming transport (`url: "http://127.0.0.1:3000/mcp"`). Enables remote connections and distributed execution.
 - **`sse`**: Server-Sent Events transport (`type`, `url`, optional `headers`).
 
@@ -443,8 +443,8 @@ pnpm run format:check && pnpm run lint
 # 4. High-severity dependency & skill security audits
 pnpm run audit && pnpm run audit:skills
 
-# 5. MCP Server build and Vitest suite
-pnpm --dir servers test
+# 5. Build and run complete Vitest test suites
+pnpm test
 ```
 
 ---
@@ -457,7 +457,7 @@ When adding or extending skills, manifests, or tools in the repository, ensure a
 Plugin & MCP Manifests
 ☐ plugin.json conforms to https://agent-plugins.org/schemas/1.0.0/plugin.schema.json
 ☐ author is a structured object { "name": "...", "url": "..." }
-☐ mcp.json conforms to https://agent-plugins.org/schemas/1.0.0/mcp.schema.json
+☐ mcp.json conforms to https://agent-plugins.org/schemas/1.0.0/mcp.schema.json and uses ${PLUGIN_ROOT}
 ☐ Canonical schema URLs used directly without local duplicate schemas
 
 Skills Authoring
