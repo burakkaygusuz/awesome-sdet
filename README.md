@@ -1,85 +1,121 @@
-# Awesome SDET
+# Awesome SDET — Agent Plugin 🚀
 
-> Enterprise Agent Plugin & Model Context Protocol (MCP) Registry for Software Development Engineers in Test (SDET).
+Enterprise SDET Agent Plugin for AI coding assistants featuring test automation skills and a secure Model Context Protocol (MCP) server.
 
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/burakkaygusuz/awesome-sdet/actions)
-![Node](https://img.shields.io/badge/node-%3E%3D26.0.0-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![pnpm](https://img.shields.io/badge/pnpm-%3E%3D10.0.0-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
-![Agent Plugins](https://img.shields.io/badge/Agent_Plugins-1.0.0-blue?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.org/specification) and [MCP Specification (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28).
 
 ---
 
-## 📌 Overview
+## ⚡ Quick Start & Installation
 
-`awesome-sdet` is an enterprise-grade agent plugin compliant with the **Agent Plugins** specification and **Model Context Protocol (MCP)** ecosystem. Designed for AI coding assistants and autonomous agents (Claude Code, Cursor, AGY), it provides type-safe, multi-language, and multi-framework test automation tools and structured agentic skills.
+Install `awesome-sdet` into your AI assistant of choice:
 
-For in-depth architectural specifications, authoring rules, and hardening standards, see the [Agent Plugins, Skills & MCP Server Engineering Guide](docs/agent-plugins-guide.md).
+### 1. Claude Code
 
----
-
-## 🏛️ Architecture
-
-The repository is organized into modular layers that separate specification contracts, skill knowledge bases, runtime protocols, and validation logic:
-
-- **Plugin & MCP Manifests**: Root metadata declarations configuring agent capabilities and MCP transports.
-- **Skills Registry (`skills/`)**: Multi-framework SDET automation knowledge bases adhering to progressive token loading.
-- **Model Context Protocol Servers (`servers/`)**: Hardened MCP runtime servers providing dynamic documentation tools and language references.
-- **Validation Pipeline (`scripts/`)**: SOLID-compliant verification and manifest generation tools.
-- **Engineering Documentation (`docs/`)**: Technical guides for plugin authors, maintainers, and security auditors.
-
----
-
-## 🧩 Key Capabilities
-
-- **Standardized Plugin Manifests**: Normative metadata declarations conforming to official canonical schemas.
-- **Progressive Disclosure Skills**: Three-level architecture (Frontmatter triggers, core decision guidance, and on-demand reference material) designed to maximize token efficiency in LLM context windows.
-- **Hardened MCP Services**: Stateless, non-blocking transport architectures with strict input validation, security annotations, and resilient error handling.
-- **Extensible Test Automation Scope**: Multi-language, multi-framework automation coverage designed for enterprise SDET workflows.
-- **Automated Verification Pipeline**: Integrated validation covering TypeScript type safety, manifest schema contracts, security audits, and unit testing.
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js**: `>= 26.0.0`
-- **pnpm**: `>= 10.0.0`
-
-### Installation & Build
+Add the plugin directly:
 
 ```bash
-# Install workspace dependencies
+claude plugin add github:burakkaygusuz/awesome-sdet
+```
+
+Or add to your project's `.claude/settings.json`:
+
+```json
+{
+  "plugins": ["github:burakkaygusuz/awesome-sdet"]
+}
+```
+
+---
+
+### 2. OpenCode
+
+Install via the OpenCode CLI:
+
+```bash
+opencode plugin install github:burakkaygusuz/awesome-sdet
+```
+
+Or declare in `opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/schema.json",
+  "plugins": ["github:burakkaygusuz/awesome-sdet"]
+}
+```
+
+---
+
+### 3. Codex & Antigravity (Workspace / Global Plugin)
+
+Clone or add as submodule into your agent plugins directory:
+
+```bash
+# Workspace level
+git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awesome-sdet
+
+# Global level
+git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
+```
+
+---
+
+### 4. Cursor / VS Code (Manual MCP Configuration)
+
+Add the MCP server to your `mcpSettings.json` or `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "sdet-mcp": {
+      "command": "node",
+      "args": ["<path-to-awesome-sdet>/servers/dist/index.js", "--stdio"]
+    }
+  }
+}
+```
+
+---
+
+## 📦 What's Included?
+
+- **32 Test Automation Skills (`skills/`):**
+  - **Cypress (11 skills):** Web E2E, Component testing, Network interception & performance.
+  - **Selenium (11 skills):** WebDriver BiDi, Grid distribution, session management.
+  - **Vibium (5 skills):** AI-native Sense-Think-Act automation.
+  - **Appium (5 skills):** Native iOS & Android testing.
+- **5 SDET Agents (`agents/`):**
+  - Specialized agent definitions for SDET generalist, Cypress, Selenium, Vibium, and Appium.
+- **SDET MCP Server (`mcp.json` / `servers/`):**
+  - Out-of-the-box test plan validation, test code linting, framework matrix recommendations.
+- **Universal Directives (`AGENTS.md`):**
+  - Shift-left testing, deterministic synchronization, zero-flakiness rules.
+
+---
+
+## 🛠️ Development & Validation
+
+```bash
+# Install dependencies
 pnpm install
 
-# Build MCP servers and runtime assets
-pnpm --dir servers build
-```
+# Build MCP server and scripts
+pnpm run build
 
----
+# Run test suites (Manifests, MCP protocol & tool primitives)
+pnpm test
 
-## 🔍 Validation & Quality Pipeline
-
-```bash
-# 1. Typecheck TypeScript scripts
-pnpm run typecheck
-
-# 2. Validate Plugin, MCP, and Skill manifests
+# Validate Agent Plugin manifest and skills
 pnpm run validate
 
-# 3. Format and lint checks
-pnpm run format:check && pnpm run lint
-
-# 4. Security audits for dependencies and skills
-pnpm run audit && pnpm run audit:skills
-
-# 5. Execute MCP Server test suite
-pnpm --dir servers test
+# Lint and format
+pnpm run lint
+pnpm run format:check
 ```
 
 ---
 
-## 📜 License
+## 📄 License
 
-MIT License © 2026 [Burak Kaygusuz](https://github.com/burakkaygusuz)
+MIT © [Burak Kaygusuz](https://github.com/burakkaygusuz)

@@ -159,6 +159,13 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Robustness (Spec §5.4)', ()
     expect.soft(invalidParsed.success).toBe(false);
   });
 
+  it('mcp.json sdet-mcp stdio server should use ${PLUGIN_ROOT} in args', async () => {
+    const mcpPath = path.join(rootDir, 'mcp.json');
+    const mcp = await readJsonFile<{ mcpServers: Record<string, { args?: string[] }> }>(mcpPath);
+    expect(mcp.mcpServers['sdet-mcp']).toBeDefined();
+    expect(mcp.mcpServers['sdet-mcp'].args).toContain('${PLUGIN_ROOT}/servers/dist/index.js');
+  });
+
   it('verifies standard 1-level skill discovery in skills/ directory with asynchronous I/O', async () => {
     const skillsDir = path.join(rootDir, 'skills');
     expect.soft(await fileExists(skillsDir)).toBe(true);
