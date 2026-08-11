@@ -47,23 +47,16 @@ Or declare in `opencode.json`:
 
 ---
 
-### 3. Codex & Antigravity (Workspace / Global Plugin)
+### 3. Cursor
 
-Clone or add as submodule into your agent plugins directory:
+Install via Cursor Plugins or clone into local plugins:
 
 ```bash
-# Workspace level
-git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awesome-sdet
-
-# Global level
-git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
+# Clone into Cursor local plugins
+git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.cursor/plugins/local/awesome-sdet
 ```
 
----
-
-### 4. Cursor / VS Code (Manual MCP Configuration)
-
-Add the MCP server to your `mcpSettings.json` or `.cursor/mcp.json`:
+Or configure the SDET MCP server in `.cursor/mcp.json`:
 
 ```json
 {
@@ -74,6 +67,41 @@ Add the MCP server to your `mcpSettings.json` or `.cursor/mcp.json`:
     }
   }
 }
+```
+
+---
+
+### 4. VS Code & GitHub Copilot
+
+Install from source via the Command Palette (`Chat: Install Plugin From Source`) with:
+
+```text
+https://github.com/burakkaygusuz/awesome-sdet.git
+```
+
+Or register the plugin path in `.vscode/settings.json`:
+
+```json
+{
+  "chat.plugins.enabled": true,
+  "chat.plugins.paths": {
+    "<path-to-awesome-sdet>": true
+  }
+}
+```
+
+---
+
+### 5. Codex & Antigravity (Workspace / Global Plugin)
+
+Clone or add as submodule into your agent plugins directory:
+
+```bash
+# Workspace level
+git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awesome-sdet
+
+# Global level
+git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
 ```
 
 ---
