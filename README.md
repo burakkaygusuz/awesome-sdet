@@ -89,6 +89,7 @@ Add the MCP server to your `mcpSettings.json` or `.cursor/mcp.json`:
   - Specialized agent definitions for SDET generalist, Cypress, Selenium, Vibium, and Appium.
 - **SDET MCP Server (`mcp.json` / `servers/`):**
   - Out-of-the-box test plan validation, test code linting, framework matrix recommendations.
+  - Dual transports: On-demand `stdio` subprocess execution and high-performance `streamable-http` endpoint (`http://127.0.0.1:3000/mcp`).
 - **Universal Directives (`AGENTS.md`):**
   - Shift-left testing, deterministic synchronization, zero-flakiness rules.
 
@@ -100,8 +101,11 @@ Add the MCP server to your `mcpSettings.json` or `.cursor/mcp.json`:
 # Install dependencies
 pnpm install
 
-# Build MCP server and scripts
+# Build MCP server and TypeScript assets
 pnpm run build
+
+# Run TypeScript typecheck
+pnpm run typecheck
 
 # Run test suites (Manifests, MCP protocol & tool primitives)
 pnpm test
@@ -112,6 +116,9 @@ pnpm run validate
 # Lint and format
 pnpm run lint
 pnpm run format:check
+
+# Security audits
+pnpm run audit:all
 ```
 
 ---
