@@ -39,6 +39,7 @@ export interface JsonRpcResponse {
   jsonrpc: string;
   id: number;
   result?: {
+    resultType?: string;
     protocolVersion?: string;
     serverInfo?: { name: string; version: string; description?: string };
     capabilities?: Record<string, unknown>;

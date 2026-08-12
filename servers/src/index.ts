@@ -300,6 +300,7 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id,
             result: {
+              resultType: 'complete',
               protocolVersion: PROTOCOL_VERSION_2026_07_28,
               serverInfo: {
                 name: SERVER_NAME,

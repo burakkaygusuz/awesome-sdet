@@ -243,7 +243,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(data.error?.message).toContain('Invalid Request');
     });
 
-    it('returns 200 with matching id for valid server/discover request', async () => {
+    it('returns 200 with matching id and resultType complete for valid server/discover request', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
@@ -253,6 +253,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
       expect.soft(data.id).toBe('discover-req-42');
+      expect.soft(data.result?.resultType).toBe('complete');
       expect.soft(data.result?.serverInfo?.name).toBe('sdet-mcp');
       expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
     });
