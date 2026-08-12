@@ -32,6 +32,29 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(data.error?.message).toContain('Missing required header: Mcp-Protocol-Version');
     });
 
+    it('rejects request having body _meta protocolVersion but missing Mcp-Protocol-Version header with HTTP 400 and -32000', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 95,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32000);
+      expect.soft(data.error?.message).toContain('Missing required header: Mcp-Protocol-Version');
+    });
+
     it('rejects unsupported protocol version with HTTP 400 and -32000', async () => {
       const res = await fetch(url, {
         method: 'POST',
