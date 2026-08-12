@@ -257,11 +257,48 @@ export async function handleMcpPostRequest(
       }
 
       if (effectiveMethod === 'server/discover') {
+        if (jsonPayload.jsonrpc !== '2.0') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: null,
+              error: { code: -32600, message: 'Invalid Request: jsonrpc must be "2.0"' },
+            })
+          );
+          return;
+        }
+
+        if (jsonPayload.id === undefined) {
+          res.writeHead(202);
+          res.end();
+          return;
+        }
+
+        const isString = typeof jsonPayload.id === 'string';
+        const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
+        const isNull = jsonPayload.id === null;
+
+        if (!isString && !isInteger && !isNull) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: null,
+              error: {
+                code: -32600,
+                message: 'Invalid Request: id must be a string, integer, or null',
+              },
+            })
+          );
+          return;
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
             jsonrpc: '2.0',
-            id: jsonPayload.id ?? 1,
+            id: jsonPayload.id,
             result: {
               protocolVersion: PROTOCOL_VERSION_2026_07_28,
               serverInfo: {

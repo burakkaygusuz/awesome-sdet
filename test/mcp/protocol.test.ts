@@ -203,4 +203,58 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(res.headers.get('referrer-policy')).toBe('no-referrer');
     });
   });
+
+  describe('server/discover protocol & notification compliance', () => {
+    it('does not send JSON-RPC response to notifications without id', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'server/discover' }),
+      });
+
+      expect.soft(res.status).toBe(202);
+      const text = await res.text();
+      expect.soft(text).toBe('');
+    });
+
+    it('rejects invalid jsonrpc version on server/discover with HTTP 400 and -32600', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
+        body: JSON.stringify({ jsonrpc: '1.0', id: 101, method: 'server/discover' }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32600);
+      expect.soft(data.error?.message).toContain('Invalid Request');
+    });
+
+    it('rejects non-primitive id on server/discover with HTTP 400 and -32600', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: true, method: 'server/discover' }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32600);
+      expect.soft(data.error?.message).toContain('Invalid Request');
+    });
+
+    it('returns 200 with matching id for valid server/discover request', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 'discover-req-42', method: 'server/discover' }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe('discover-req-42');
+      expect.soft(data.result?.serverInfo?.name).toBe('sdet-mcp');
+      expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
+    });
+  });
 });
