@@ -115,7 +115,7 @@ export async function runRelease(): Promise<void> {
   }
 
   console.log(`\n📝 Creating release commit and git tag...`);
-  execSync(`git add package.json plugin.json servers/package.json servers/dist`, {
+  execSync(`git add package.json plugin.json servers/package.json`, {
     stdio: 'inherit',
   });
   execSync(`git commit -m "chore(release): v${newVersion}"`, { stdio: 'inherit' });
