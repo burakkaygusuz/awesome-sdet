@@ -21,6 +21,21 @@ export function mcpFetch(
     MCP_NAME_METHODS.has(body.method) && body.params
       ? ((body.params.name ?? body.params.uri) as string | undefined)
       : undefined;
+
+  const standardMeta = {
+    'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+    'io.modelcontextprotocol/clientCapabilities': {},
+    ...((body.params?._meta as Record<string, unknown>) || {}),
+  };
+
+  const payload = {
+    ...body,
+    params: {
+      ...(body.params || {}),
+      _meta: standardMeta,
+    },
+  };
+
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -29,7 +44,7 @@ export function mcpFetch(
       ...(mcpName ? { 'Mcp-Name': mcpName } : {}),
       ...extraHeaders,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
 }
 

@@ -44,7 +44,19 @@ describe('Runtime Entrypoint Tests', () => {
       stdoutData += String(chunk);
     });
 
-    child.stdin?.write(`${JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' })}\n`);
+    child.stdin?.write(
+      `${JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/list',
+        params: {
+          _meta: {
+            'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+            'io.modelcontextprotocol/clientCapabilities': {},
+          },
+        },
+      })}\n`
+    );
     child.stdin?.end();
 
     await new Promise<void>((resolve) => child.on('exit', () => resolve()));

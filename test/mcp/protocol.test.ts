@@ -57,7 +57,12 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           jsonrpc: '2.0',
           id: 94,
           method: 'tools/list',
-          params: { _meta: { 'io.modelcontextprotocol/protocolVersion': '2025-11-25' } },
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2025-11-25',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
         }),
       });
 
@@ -73,7 +78,17 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
-        body: JSON.stringify({ jsonrpc: '2.0', id: 89, method: 'tools/list' }),
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 89,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
       });
 
       expect.soft(res.status).toBe(200);
@@ -86,7 +101,17 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/call' },
-        body: JSON.stringify({ jsonrpc: '2.0', id: 90, method: 'tools/list' }),
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 90,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
       });
 
       expect.soft(res.status).toBe(400);
@@ -105,7 +130,14 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           jsonrpc: '2.0',
           id: 92,
           method: 'tools/call',
-          params: { name: 'read_se_locator_docs', arguments: { language: 'typescript' } },
+          params: {
+            name: 'read_se_locator_docs',
+            arguments: { language: 'typescript' },
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
         }),
       });
 
@@ -123,7 +155,13 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           jsonrpc: '2.0',
           id: 91,
           method: 'tools/call',
-          params: { name: 'read_selenium_docs' },
+          params: {
+            name: 'read_selenium_docs',
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
         }),
       });
 
@@ -247,7 +285,17 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
-        body: JSON.stringify({ jsonrpc: '2.0', id: 'discover-req-42', method: 'server/discover' }),
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'discover-req-42',
+          method: 'server/discover',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
       });
 
       expect.soft(res.status).toBe(200);
@@ -256,6 +304,129 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(data.result?.resultType).toBe('complete');
       expect.soft(data.result?.serverInfo?.name).toBe('sdet-mcp');
       expect.soft(data.result?.protocolVersion).toBe('2026-07-28');
+    });
+  });
+
+  describe('MCP 2026-07-28 per-request _meta envelope validation', () => {
+    it('rejects request missing params._meta completely with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 201, method: 'tools/list' }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('_meta');
+    });
+
+    it('rejects request missing io.modelcontextprotocol/protocolVersion in _meta with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 202,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('io.modelcontextprotocol/protocolVersion');
+    });
+
+    it('rejects request missing io.modelcontextprotocol/clientCapabilities in _meta with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 203,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('io.modelcontextprotocol/clientCapabilities');
+    });
+
+    it('rejects non-standard params.protocolVersion fallback with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 204,
+          method: 'tools/list',
+          params: {
+            protocolVersion: '2026-07-28',
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('_meta');
+    });
+
+    it('rejects non-standard root _meta fallback with HTTP 400 and -32602', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 205,
+          method: 'tools/list',
+          _meta: {
+            'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+            'io.modelcontextprotocol/clientCapabilities': {},
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32602);
+      expect.soft(data.error?.message).toContain('_meta');
+    });
+
+    it('accepts valid 2026-07-28 request containing mandatory _meta with HTTP 200', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 206,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe(206);
+      expect.soft(Array.isArray(data.result?.tools)).toBe(true);
     });
   });
 });

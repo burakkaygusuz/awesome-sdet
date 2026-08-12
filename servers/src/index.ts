@@ -61,30 +61,87 @@ export function handleCorsPreflight(
   return true;
 }
 
+export const PROTOCOL_VERSION_META_KEY = 'io.modelcontextprotocol/protocolVersion';
+export const CLIENT_CAPABILITIES_META_KEY = 'io.modelcontextprotocol/clientCapabilities';
+
+export interface EnvelopeValidationResult {
+  ok: boolean;
+  code?: number;
+  message?: string;
+  protocolVersion?: string;
+}
+
 export function extractBodyProtocolVersion(payload: Record<string, unknown>): string | undefined {
   if (!payload || typeof payload !== 'object') return undefined;
 
   const params = payload.params as Record<string, unknown> | undefined;
-  if (params && typeof params === 'object') {
+  if (params && typeof params === 'object' && !Array.isArray(params)) {
     const meta = params._meta as Record<string, unknown> | undefined;
-    if (meta && typeof meta === 'object') {
-      const v = (meta['io.modelcontextprotocol/protocolVersion'] || meta.protocolVersion) as
-        string | undefined;
-      if (typeof v === 'string') return v.trim();
+    if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
+      const v = meta[PROTOCOL_VERSION_META_KEY];
+      if (typeof v === 'string' && v.trim().length > 0) return v.trim();
     }
-    if (typeof params.protocolVersion === 'string') {
-      return params.protocolVersion.trim();
-    }
-  }
-
-  const rootMeta = payload._meta as Record<string, unknown> | undefined;
-  if (rootMeta && typeof rootMeta === 'object') {
-    const v = (rootMeta['io.modelcontextprotocol/protocolVersion'] || rootMeta.protocolVersion) as
-      string | undefined;
-    if (typeof v === 'string') return v.trim();
   }
 
   return undefined;
+}
+
+export function validateRequestEnvelope(
+  payload: Record<string, unknown>
+): EnvelopeValidationResult {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return {
+      ok: false,
+      code: -32600,
+      message: 'Invalid Request: payload must be an object',
+    };
+  }
+
+  const params = payload.params as Record<string, unknown> | undefined;
+  if (!params || typeof params !== 'object' || Array.isArray(params)) {
+    return {
+      ok: false,
+      code: -32602,
+      message: 'Invalid params: missing required per-request envelope key(s): _meta',
+    };
+  }
+
+  const meta = params._meta as Record<string, unknown> | undefined;
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+    return {
+      ok: false,
+      code: -32602,
+      message: 'Invalid params: missing required per-request envelope key(s): _meta',
+    };
+  }
+
+  const protocolVersion = meta[PROTOCOL_VERSION_META_KEY];
+  if (typeof protocolVersion !== 'string' || protocolVersion.trim().length === 0) {
+    return {
+      ok: false,
+      code: -32602,
+      message: `Invalid _meta envelope for protocol revision ${PROTOCOL_VERSION_2026_07_28}: ${PROTOCOL_VERSION_META_KEY}: missing`,
+    };
+  }
+
+  const clientCapabilities = meta[CLIENT_CAPABILITIES_META_KEY];
+  if (
+    clientCapabilities === undefined ||
+    typeof clientCapabilities !== 'object' ||
+    clientCapabilities === null ||
+    Array.isArray(clientCapabilities)
+  ) {
+    return {
+      ok: false,
+      code: -32602,
+      message: `Invalid _meta envelope for protocol revision ${PROTOCOL_VERSION_2026_07_28}: ${CLIENT_CAPABILITIES_META_KEY}: missing`,
+    };
+  }
+
+  return {
+    ok: true,
+    protocolVersion: protocolVersion.trim(),
+  };
 }
 
 export async function handleMcpPostRequest(
@@ -127,10 +184,8 @@ export async function handleMcpPostRequest(
         req.headers['mcp-protocol-version'] as string | undefined
       )?.trim();
       const protocolVersionHeader = rawProtocolVersionHeader?.split(',')[0]?.trim();
-      const bodyProtocolVersion = extractBodyProtocolVersion(jsonPayload);
-      const effectiveProtocolVersion = protocolVersionHeader ?? bodyProtocolVersion;
 
-      if (!effectiveProtocolVersion) {
+      if (!protocolVersionHeader) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -145,7 +200,7 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      if (!SUPPORTED_PROTOCOL_VERSIONS.has(effectiveProtocolVersion)) {
+      if (!SUPPORTED_PROTOCOL_VERSIONS.has(protocolVersionHeader)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -153,32 +208,48 @@ export async function handleMcpPostRequest(
             id: jsonPayload.id ?? null,
             error: {
               code: -32000,
-              message: `Unsupported protocol version: '${effectiveProtocolVersion}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
+              message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
             },
           })
         );
         return;
       }
 
-      if (
-        protocolVersionHeader &&
-        bodyProtocolVersion &&
-        bodyProtocolVersion !== protocolVersionHeader
-      ) {
+      // Validate basic JSON-RPC 2.0 structure for messages
+      if (jsonPayload.jsonrpc !== undefined && jsonPayload.jsonrpc !== '2.0') {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
-            error: {
-              code: -32020,
-              message: `Header mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${bodyProtocolVersion}'`,
-            },
+            error: { code: -32600, message: 'Invalid Request: jsonrpc must be "2.0"' },
           })
         );
         return;
       }
 
+      if (jsonPayload.id !== undefined) {
+        const isString = typeof jsonPayload.id === 'string';
+        const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
+        const isNull = jsonPayload.id === null;
+
+        if (!isString && !isInteger && !isNull) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: null,
+              error: {
+                code: -32600,
+                message: 'Invalid Request: id must be a string, integer, or null',
+              },
+            })
+          );
+          return;
+        }
+      }
+
+      // Check header consistency
       const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
       if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -210,6 +281,44 @@ export async function handleMcpPostRequest(
               error: {
                 code: -32020,
                 message: `Header mismatch: Mcp-Name header '${mcpNameHeader}' does not match body parameter '${paramTarget}'`,
+              },
+            })
+          );
+          return;
+        }
+      }
+
+      // If this is a request, validate the per-request _meta envelope
+      const isRequest = jsonPayload.method !== undefined && jsonPayload.id !== undefined;
+      if (isRequest) {
+        const envelopeValidation = validateRequestEnvelope(jsonPayload);
+        if (!envelopeValidation.ok) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: jsonPayload.id ?? null,
+              error: {
+                code: envelopeValidation.code ?? -32602,
+                message: envelopeValidation.message,
+              },
+            })
+          );
+          return;
+        }
+
+        if (
+          envelopeValidation.protocolVersion &&
+          envelopeValidation.protocolVersion !== protocolVersionHeader
+        ) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              id: jsonPayload.id ?? null,
+              error: {
+                code: -32020,
+                message: `Header mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${envelopeValidation.protocolVersion}'`,
               },
             })
           );
