@@ -1,6 +1,6 @@
 {
   "name": "sdet-mcp",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Modular, test-framework-based MCP server following official modelcontextprotocol/servers architecture",
   "type": "module",
   "main": "dist/index.js",
