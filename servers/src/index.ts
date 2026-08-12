@@ -3,6 +3,7 @@ import { pathToFileURL } from 'node:url';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createMcpServer, PROTOCOL_VERSION_2026_07_28 } from './server.js';
+import { SERVER_NAME, SERVER_VERSION, SERVER_DESCRIPTION } from './version.js';
 
 export const rawPort = process.env.PORT || '3000';
 export const PORT = Number.parseInt(rawPort, 10);
@@ -264,10 +265,9 @@ export async function handleMcpPostRequest(
             result: {
               protocolVersion: PROTOCOL_VERSION_2026_07_28,
               serverInfo: {
-                name: 'sdet-mcp',
-                version: '1.0.0',
-                description:
-                  'Model Context Protocol Server providing test automation tools, resources, and runtime execution.',
+                name: SERVER_NAME,
+                version: SERVER_VERSION,
+                description: SERVER_DESCRIPTION,
               },
               capabilities: {
                 tools: { listChanged: false },

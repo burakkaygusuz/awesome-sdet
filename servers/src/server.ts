@@ -6,6 +6,7 @@ import { registerVibiumTools } from './domains/vibium/index.js';
 import { registerAppiumTools } from './domains/appium/index.js';
 import { registerResources } from './resources/index.js';
 import { registerPrompts } from './prompts/index.js';
+import { SERVER_NAME, SERVER_VERSION } from './version.js';
 
 export const PROTOCOL_VERSION_2026_07_28 = '2026-07-28';
 
@@ -57,8 +58,8 @@ export const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = {
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({
-    name: 'sdet-mcp',
-    version: '1.0.0',
+    name: SERVER_NAME,
+    version: SERVER_VERSION,
   });
 
   registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);

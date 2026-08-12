@@ -27,6 +27,10 @@
     "audit": "pnpm audit --audit-level high",
     "audit:skills": "skills-check audit",
     "audit:all": "pnpm audit --audit-level high && skills-check audit",
+    "release": "node dist/scripts/release.js",
+    "release:patch": "node dist/scripts/release.js patch",
+    "release:minor": "node dist/scripts/release.js minor",
+    "release:major": "node dist/scripts/release.js major",
     "prepare": "husky"
   },
   "devDependencies": {
