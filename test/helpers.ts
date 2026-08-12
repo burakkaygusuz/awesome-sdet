@@ -1,7 +1,5 @@
-import http from 'node:http';
+import type http from 'node:http';
 import type { AddressInfo } from 'node:net';
-
-import { createHttpServer } from '../servers/src/index.js';
 
 export const MCP_HEADERS = {
   'Content-Type': 'application/json',
@@ -76,16 +74,6 @@ export async function parseMcpResponse(res: Response): Promise<JsonRpcResponse> 
     return JSON.parse(jsonStr);
   }
   return JSON.parse(rawText);
-}
-
-export function startTestServer(): { getUrl: () => string; server: http.Server } {
-  const server = createHttpServer();
-  const url = '';
-
-  return {
-    server,
-    getUrl: () => url,
-  };
 }
 
 export async function listenServer(server: http.Server): Promise<string> {

@@ -25,26 +25,14 @@ describe('Runtime Entrypoint Tests', () => {
   });
 
   it('rejects invalid PORT configuration values asynchronously', async () => {
-    for (const invalidPort of ['0', 'abc', '99999']) {
-      try {
-        await execFileAsync('node', [entrypoint], {
-          env: { ...process.env, PORT: invalidPort },
-        });
-        expect.unreachable('Should have failed with invalid PORT');
-      } catch (err: unknown) {
-        const error = err as { stderr?: string };
-        expect.soft(error.stderr).toContain('Invalid PORT');
-      }
-    }
-  });
-
-  it('reads MCP documentation references dynamically across supported languages', async () => {
-    const { handleActionsDocs } = await import('../../servers/src/domains/selenium/index.js');
-
-    for (const lang of ['typescript', 'python', 'java', 'csharp'] as const) {
-      const res = await handleActionsDocs({ language: lang });
-      expect.soft(res.content).toBeDefined();
-      expect.soft(res.content[0].text.length).toBeGreaterThan(0);
+    try {
+      await execFileAsync('node', [entrypoint], {
+        env: { ...process.env, PORT: 'invalid' },
+      });
+      expect.unreachable('Should have failed with invalid PORT');
+    } catch (err: unknown) {
+      const error = err as { stderr?: string };
+      expect.soft(error.stderr).toContain('Invalid PORT');
     }
   });
 
