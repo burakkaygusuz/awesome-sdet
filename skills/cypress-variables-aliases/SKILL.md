@@ -1,6 +1,6 @@
 ---
 name: cypress-variables-aliases
-description: "Master Cypress element and network request aliasing (.as('alias')), closure scoping, and avoiding JavaScript variable mutation anti-patterns."
+description: 'Manage test state, closures, and aliases for elements, fixtures, and intercepted routes in Cypress. Use when sharing data across test steps via aliases and cy.get(@alias), or avoiding mutable variable anti-patterns.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

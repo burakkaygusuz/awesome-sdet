@@ -1,6 +1,6 @@
 ---
 name: cypress-explain
-description: 'Audit, explain, and critique existing Cypress test suites. Trigger on Cypress test code review, flakiness analysis, selector vulnerability audit, or anti-pattern detection.'
+description: 'Review, audit, and explain Cypress test suites for flakiness, performance, and best practices. Use when conducting test code reviews, auditing selector vulnerabilities, or identifying Cypress anti-patterns.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

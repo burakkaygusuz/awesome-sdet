@@ -1,6 +1,6 @@
 ---
 name: appium-driver-capabilities
-description: 'Master Appium 3.6.0+ modular driver management, W3C capabilities (appium:options), UiAutomator2, XCUITest, and cross-platform session setup across languages.'
+description: 'Configure Appium drivers and W3C compliant session capabilities (appium:options). Use when initializing UiAutomator2 for Android or XCUITest for iOS, configuring device capabilities, or setting up mobile automation test sessions.'
 user-invocable: true
 license: MIT
 compatibility: Appium 3.x+

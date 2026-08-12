@@ -1,6 +1,6 @@
 ---
 name: vibium-semantic-selectors
-description: 'Author resilient element queries using Vibium semantic locators (role, text, label, testid, placeholder) and Shadow DOM pierce combinators (>>, >>>).'
+description: 'Target web elements using accessible semantic locators and Shadow DOM combinators in Vibium. Use when querying by role, accessible text, label, testid, or piercing Shadow DOM boundaries with >> and >>>.'
 user-invocable: true
 license: MIT
 compatibility: Vibium 26.x+

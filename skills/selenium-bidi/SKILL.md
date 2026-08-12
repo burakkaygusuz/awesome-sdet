@@ -1,6 +1,6 @@
 ---
 name: selenium-bidi
-description: 'W3C WebDriver BiDirectional (BiDi) protocol features: console log inspection, network interception, and browsing context. Trigger on BiDi, LogInspector, network mocking, or WebSocket events.'
+description: 'Leverage the W3C WebDriver BiDirectional (BiDi) protocol in Selenium 4+. Use when listening to real-time console logs, intercepting or mocking network requests, capturing JavaScript errors, or handling WebSocket events.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

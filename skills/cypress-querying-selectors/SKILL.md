@@ -1,6 +1,6 @@
 ---
 name: cypress-querying-selectors
-description: 'Best practices for DOM element querying, selector hierarchy, scoping, and iframe traversal in Cypress.'
+description: 'Query and scope DOM elements using resilient selector hierarchies and accessibility attributes in Cypress. Use when targeting elements with data-* attributes, traversing nested DOM structures, or querying inside iframes.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

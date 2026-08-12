@@ -1,6 +1,6 @@
 ---
 name: cypress-conditional-testing
-description: 'Strategies for handling dynamic application state, avoiding flaky conditional testing anti-patterns in Cypress.'
+description: 'Handle dynamic application state and deterministic flow control in Cypress. Use when dealing with A/B testing variations, server-side feature flags, or avoiding flaky conditional DOM branching anti-patterns.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

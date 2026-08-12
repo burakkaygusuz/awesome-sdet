@@ -1,6 +1,6 @@
 ---
 name: vibium-state-recording
-description: 'Manage browser sessions, multi-page contexts, auth state snapshots (storage restore), and session video/trace recording with Vibium.'
+description: 'Manage browser sessions, storage state snapshots, and execution recording in Vibium. Use when restoring authenticated session snapshots, managing multi-page contexts, or recording video and trace artifacts for debugging.'
 user-invocable: true
 license: MIT
 compatibility: Vibium 26.x+

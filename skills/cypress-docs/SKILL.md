@@ -1,6 +1,6 @@
 ---
 name: cypress-docs
-description: 'Retrieve up-to-date, grounded official Cypress documentation and code examples. Trigger on Cypress API lookups, syntax queries, or verifying Cypress command signatures.'
+description: 'Look up official Cypress documentation, API signatures, and verified code patterns. Use when searching for Cypress command syntax, configuration options, or verifying framework capabilities.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

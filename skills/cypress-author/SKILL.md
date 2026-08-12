@@ -1,6 +1,6 @@
 ---
 name: cypress-author
-description: 'Author, update, and fix Cypress E2E and Component tests. Trigger on Cypress test creation, spec refactoring, data-cy selector practices, custom commands, or fixing failing specs.'
+description: 'Author, update, and fix Cypress E2E and Component tests. Use when creating new test specs, refactoring test suites, implementing data-cy selectors, writing custom commands, or fixing failing assertions.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

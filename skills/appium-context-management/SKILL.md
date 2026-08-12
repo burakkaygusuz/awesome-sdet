@@ -1,6 +1,6 @@
 ---
 name: appium-context-management
-description: 'Master Appium hybrid mobile automation and context switching: NATIVE_APP vs WEBVIEW, Chromedriver auto-download, and Safari view controller handling.'
+description: 'Automate hybrid mobile applications and switch contexts between NATIVE_APP and WEBVIEW in Appium. Use when interacting with embedded webviews, managing Chromedriver auto-downloads, or automating Safari view controllers.'
 user-invocable: true
 license: MIT
 compatibility: Appium 3.x+

@@ -1,6 +1,6 @@
 ---
 name: cypress-web-security-origin
-description: 'Master Cypress cross-origin testing (cy.origin), same-origin policy, iframe isolation, and multi-domain authentication.'
+description: 'Handle cross-origin navigation, third-party authentication, and multi-domain workflows in Cypress. Use when automating OAuth logins across domains with cy.origin(), or managing same-origin policy constraints.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

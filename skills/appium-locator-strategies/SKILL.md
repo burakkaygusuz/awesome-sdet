@@ -1,6 +1,6 @@
 ---
 name: appium-locator-strategies
-description: 'Master Appium mobile locator strategies: Accessibility ID, iOS Class Chain, iOS Predicates, Android UiAutomator selectors, and mobile accessibility trees.'
+description: 'Locate mobile elements using resilient platform-native selector strategies in Appium. Use when querying Accessibility IDs, iOS Class Chains, iOS Predicates, Android UiScrollable / UiSelector queries, or traversing mobile accessibility hierarchies.'
 user-invocable: true
 license: MIT
 compatibility: Appium 3.x+

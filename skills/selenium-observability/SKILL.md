@@ -1,6 +1,6 @@
 ---
 name: selenium-observability
-description: 'OpenTelemetry client-side tracing, Jaeger/OTLP exporters, and Grid 4 GraphQL metrics. Trigger on OpenTelemetry, tracing, Jaeger, or Grid GraphQL.'
+description: 'Enable end-to-end distributed tracing and observability in Selenium test suites. Use when integrating OpenTelemetry with Jaeger/OTLP exporters, tracing HTTP/command spans, or querying Selenium Grid GraphQL metrics.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

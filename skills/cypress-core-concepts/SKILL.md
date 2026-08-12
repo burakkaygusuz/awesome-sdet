@@ -1,6 +1,6 @@
 ---
 name: cypress-core-concepts
-description: 'Master Cypress core architecture, asynchronous command queue execution, chainable subjects, and Promise anti-patterns.'
+description: 'Understand and apply Cypress core architecture, asynchronous command queuing, and subject chaining. Use when debugging command execution order, handling async returned values, or fixing Promise and async/await anti-patterns.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

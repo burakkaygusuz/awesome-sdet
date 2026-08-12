@@ -1,6 +1,6 @@
 ---
 name: appium-gestures-actions
-description: 'Master mobile touch gestures and W3C Actions API: tap, long press, swipe, scroll, drag and drop, pinch-zoom, and native mobile execution commands.'
+description: 'Execute mobile touch interactions and complex multi-finger gestures using the W3C Actions API in Appium. Use when performing taps, swipes, scrolls, drag-and-drop, pinch-to-zoom, or executing native mobile gesture commands.'
 user-invocable: true
 license: MIT
 compatibility: Appium 3.x+

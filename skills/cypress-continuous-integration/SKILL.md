@@ -1,6 +1,6 @@
 ---
 name: cypress-continuous-integration
-description: 'Set up, configure, and optimize Cypress in CI/CD pipelines (GitHub Actions, GitLab CI, CircleCI, Bitbucket, Docker, parallelization, Cypress Cloud).'
+description: 'Set up, configure, and optimize Cypress test execution in CI/CD pipelines. Use when creating GitHub Actions, GitLab CI, or CircleCI workflows, running Cypress in Docker, enabling parallelization, or configuring Cypress Cloud.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

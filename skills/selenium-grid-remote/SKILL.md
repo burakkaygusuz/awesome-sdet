@@ -1,6 +1,6 @@
 ---
 name: selenium-grid-remote
-description: 'RemoteWebDriver, enterprise Selenium Grid 4 infrastructure, TOML node stereotypes, and cloud grid scaling. Trigger on RemoteWebDriver, Grid 4, or TOML stereotypes.'
+description: 'Configure and scale distributed test execution on Selenium Grid 4 and cloud providers. Use when initializing RemoteWebDriver, configuring TOML node stereotypes, or managing parallel browser grids.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

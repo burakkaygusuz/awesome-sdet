@@ -1,6 +1,6 @@
 ---
 name: cypress-retryability-assertions
-description: 'Master Cypress implicit retry-ability mechanics, command vs assertion timeouts, and avoiding arbitrary sleep anti-patterns.'
+description: 'Leverage Cypress automatic retry-ability and condition-based assertion synchronization. Use when asserting DOM states, adjusting assertion timeouts, or eliminating arbitrary cy.wait(ms) delays.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

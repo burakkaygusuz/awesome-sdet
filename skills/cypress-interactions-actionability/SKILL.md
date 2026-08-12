@@ -1,6 +1,6 @@
 ---
 name: cypress-interactions-actionability
-description: 'Guidelines for user interaction commands, actionability safety checks, eliminating force options, and scroll behaviors in Cypress.'
+description: 'Perform resilient user interactions and leverage automatic actionability safety checks in Cypress. Use when clicking, typing, selecting, or scrolling elements, or when eliminating brittle force: true workarounds.'
 user-invocable: true
 license: MIT
 compatibility: Cypress 15.x+

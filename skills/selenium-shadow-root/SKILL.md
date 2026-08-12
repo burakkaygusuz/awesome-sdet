@@ -1,6 +1,6 @@
 ---
 name: selenium-shadow-root
-description: 'Shadow DOM element traversal via SearchContext.getShadowRoot(), nested shadow roots, and W3C CSS rules. Trigger on Shadow DOM, getShadowRoot, or Web Components.'
+description: 'Traverse and interact with Shadow DOM trees and Web Components in Selenium. Use when querying open shadow roots via getShadowRoot(), piercing nested shadow roots, or locating custom elements.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

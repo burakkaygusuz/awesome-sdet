@@ -1,6 +1,6 @@
 ---
 name: appium-device-app-management
-description: 'Master Appium mobile device controls and application lifecycle: install, activate, terminate, background, clipboard, keyboard, orientation, and permissions.'
+description: 'Manage mobile device controls, hardware simulation, and application lifecycle states in Appium. Use when installing, activating, terminating, or backgrounding apps, handling permissions, rotating orientation, or managing clipboard and keyboard input.'
 user-invocable: true
 license: MIT
 compatibility: Appium 3.x+

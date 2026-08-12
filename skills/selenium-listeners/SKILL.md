@@ -1,6 +1,6 @@
 ---
 name: selenium-listeners
-description: 'Event interception, command decorators (EventFiringDecorator), automated logging, and driver lifecycle hooks. Trigger on EventFiringDecorator or WebDriverListener.'
+description: 'Intercept WebDriver commands and listen to lifecycle events in Selenium. Use when adding automated screenshot capture on failure, detailed logging, or metrics via EventFiringDecorator and WebDriverListener.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

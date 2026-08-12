@@ -1,6 +1,6 @@
 ---
 name: selenium-cookies-storage
-description: 'HTTP cookie management, UI auth bypass via session injection, and HTML5 Web Storage state. Trigger on cookies, auth bypass, LocalStorage, or SessionStorage.'
+description: 'Manage browser cookies, LocalStorage, SessionStorage, and fast session injection in Selenium. Use when bypassing repetitive UI login flows, seeding auth tokens, or verifying client-side storage state.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

@@ -1,6 +1,6 @@
 ---
 name: selenium-explicit-waits
-description: 'Synchronization architecture, condition-based waiting strategies (WebDriverWait, FluentWait), and ExpectedConditions. Trigger on explicit wait, WebDriverWait, or ExpectedConditions.'
+description: 'Synchronize test execution using condition-based explicit waiting strategies in Selenium. Use when handling dynamic asynchronous DOM updates with WebDriverWait, FluentWait, or ExpectedConditions without hardcoded sleeps.'
 user-invocable: true
 license: MIT
 compatibility: Selenium 4.x+

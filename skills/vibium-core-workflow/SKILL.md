@@ -1,6 +1,6 @@
 ---
 name: vibium-core-workflow
-description: 'Master AI-native browser automation workflows with Vibium: sense-think-act loop, @ref mapping, differential state checks, CLI vs Native MCP vs SDK selection.'
+description: 'Execute AI-native browser automation using the Vibium Sense-Think-Act workflow. Use when inspecting accessibility trees via @ref mapping, computing differential UI state changes, or orchestrating multi-step web tasks.'
 user-invocable: true
 license: MIT
 compatibility: Vibium 26.x+
