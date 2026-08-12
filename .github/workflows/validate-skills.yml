@@ -71,8 +71,14 @@ jobs:
       - name: Run Skill Security Audit
         run: pnpm run audit:skills
 
-      - name: Run Schema Linter
-        run: pnpm run lint:skills
+      - name: Run Schema Linter & Validation
+        run: pnpm run validate
+
+      - name: Run ESLint
+        run: pnpm run lint
+
+      - name: Run Prettier Format Check
+        run: pnpm run format:check
 
       - name: Run Skills Check CI
         uses: voodootikigod/skills-check@v1.2.1
