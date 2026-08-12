@@ -1,5 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
+import { McpServer, type ToolAnnotations } from '@modelcontextprotocol/server';
 import { registerSeleniumTools } from './domains/selenium/index.js';
 import { registerCypressTools } from './domains/cypress/index.js';
 import { registerVibiumTools } from './domains/vibium/index.js';
@@ -26,7 +25,7 @@ export const GLOBAL_CACHE_SCOPE = 'global' as const;
 
 export function safeToolHandler<T>(
   handler: (args: T) => ToolExecutionResult | Promise<ToolExecutionResult>
-) {
+): (args: T, extra?: unknown) => Promise<ToolExecutionResult> {
   return async (args: T): Promise<ToolExecutionResult> => {
     try {
       const result = await handler(args);
