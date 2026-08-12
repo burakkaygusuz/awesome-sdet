@@ -105,7 +105,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           jsonrpc: '2.0',
           id: 92,
           method: 'tools/call',
-          params: { name: 'read_selenium_docs', arguments: { topic: 'locators' } },
+          params: { name: 'read_se_locator_docs', arguments: { language: 'typescript' } },
         }),
       });
 

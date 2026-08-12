@@ -1,7 +1,7 @@
 import http from 'node:http';
 import { pathToFileURL } from 'node:url';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
+import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import { createMcpServer, PROTOCOL_VERSION_2026_07_28 } from './server.js';
 import { SERVER_NAME, SERVER_VERSION, SERVER_DESCRIPTION } from './version.js';
 
@@ -283,18 +283,12 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      // ─── SDK 2026-07-28 Compatibility Shim ────────────────────────────────
-      // @modelcontextprotocol/sdk@1.30.x wire-level transport reads rawHeaders via
-      // @hono/node-server (immutable Web Standard Request), so it cannot accept
-      // 2026-07-28 — the version our gateway validated above.
+      // ─── MCP 2026-07-28 Gateway Transport Bridge ──────────────────────────
+      // @modelcontextprotocol/server v2.0 wire transport validates headers via
+      // @hono/node-server against its current internal release list (up to 2025-11-25).
       //
-      // Splice mcp-protocol-version from rawHeaders before the SDK sees the request.
-      // The SDK then falls back to its default negotiated version for tool execution.
-      //
-      // SDK upgrade path (remove this shim on @modelcontextprotocol/sdk v1.31.x+):
-      //   1. Delete the rawHeaders loop below.
-      //   2. Keep SUPPORTED_PROTOCOL_VERSIONS as { '2026-07-28' } in index.ts.
-      //   3. Unskip the SDK Client Integration test in mcp-http.test.ts.
+      // Splice mcp-protocol-version from rawHeaders before handing to the transport.
+      // The gateway above has already validated the 2026-07-28 protocol contract.
       // ────────────────────────────────────────────────────────────────────────
       const rawHeaders = req.rawHeaders;
       for (let i = rawHeaders.length - 2; i >= 0; i -= 2) {
@@ -304,7 +298,7 @@ export async function handleMcpPostRequest(
       }
 
       // Route JSON-RPC payload to Streamable HTTP Transport via standard SDK contract
-      const transport = new StreamableHTTPServerTransport({
+      const transport = new NodeStreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
       res.on('close', () => transport.close());

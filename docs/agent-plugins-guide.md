@@ -221,7 +221,7 @@ server.registerTool('read_se_locator_docs', {
   title: 'Selenium Locator Strategy Docs',
   description:
     'Returns element location strategies, relative locators, and multi-language code examples.',
-  inputSchema: LocatorDocsSchema.shape,
+  inputSchema: LocatorDocsSchema,
   annotations: SAFE_READONLY_ANNOTATIONS,
 });
 ```

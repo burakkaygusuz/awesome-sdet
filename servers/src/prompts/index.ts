@@ -1,4 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 export const SupportedFrameworkSchema = z
@@ -22,14 +22,14 @@ export function registerPrompts(server: McpServer): void {
       title: 'Generate Test Suite',
       description:
         'Generates a production-grade, resilient test suite for a target framework and language',
-      argsSchema: {
+      argsSchema: z.object({
         framework: SupportedFrameworkSchema,
         language: SupportedLanguageSchema,
         featureDescription: z
           .string()
           .min(5)
           .describe('Detailed description of the user journey, assertions, and test expectations'),
-      },
+      }),
     },
     ({ framework, language, featureDescription }) => ({
       messages: [
@@ -63,7 +63,7 @@ Core Quality Invariants:
       title: 'Migrate Test Suite',
       description:
         'Translates test suites between automation frameworks while eliminating anti-patterns',
-      argsSchema: {
+      argsSchema: z.object({
         sourceFramework: SupportedFrameworkSchema.describe(
           'Source framework (selenium, cypress, vibium, appium)'
         ),
@@ -71,7 +71,7 @@ Core Quality Invariants:
           'Target framework to migrate to (selenium, cypress, vibium, appium)'
         ),
         sourceCode: z.string().min(5).describe('Source test code to translate'),
-      },
+      }),
     },
     ({ sourceFramework, targetFramework, sourceCode }) => ({
       messages: [
@@ -102,13 +102,13 @@ ${sourceCode}
       title: 'Diagnose Test Flakiness',
       description:
         'Performs systematic root-cause analysis and provides deterministic fixes for flaky tests',
-      argsSchema: {
+      argsSchema: z.object({
         framework: SupportedFrameworkSchema.describe(
           'Testing framework where failure occurred (selenium, cypress, vibium, appium)'
         ),
         failureLog: z.string().min(5).describe('Stack trace, console error, or CI log'),
         testCode: z.string().min(5).describe('Failing test source code'),
-      },
+      }),
     },
     ({ framework, failureLog, testCode }) => ({
       messages: [

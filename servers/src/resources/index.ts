@@ -1,4 +1,4 @@
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/server';
 import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
 import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
@@ -14,7 +14,7 @@ export function registerResources(server: McpServer): void {
         'Dynamic reference documentation for Selenium 4 across supported languages and domains.',
       mimeType: 'text/markdown',
     },
-    async (uri, { domain, language }) => {
+    async (uri: URL, { domain, language }) => {
       const docDomain = String(domain || 'actions');
       const docLang = String(language || 'typescript');
       try {
@@ -51,7 +51,7 @@ export function registerResources(server: McpServer): void {
         'Dynamic reference documentation for Cypress across supported domains (commands, component, fixtures, network, session, shadow, stubs, task) and languages (javascript, typescript).',
       mimeType: 'text/markdown',
     },
-    async (uri, { domain, language }) => {
+    async (uri: URL, { domain, language }) => {
       const docDomain = String(domain || 'commands');
       const docLang = String(language || 'typescript');
       try {
@@ -88,7 +88,7 @@ export function registerResources(server: McpServer): void {
         'Dynamic reference documentation for Vibium across supported languages and domains.',
       mimeType: 'text/markdown',
     },
-    async (uri, { domain, language }) => {
+    async (uri: URL, { domain, language }) => {
       const docDomain = String(domain || 'core');
       const docLang = String(language || 'typescript');
       try {
@@ -125,7 +125,7 @@ export function registerResources(server: McpServer): void {
         'Dynamic reference documentation for Appium 2.0 mobile automation across supported languages and domains.',
       mimeType: 'text/markdown',
     },
-    async (uri, { domain, language }) => {
+    async (uri: URL, { domain, language }) => {
       const docDomain = String(domain || 'capabilities');
       const docLang = String(language || 'typescript');
       try {
@@ -161,7 +161,7 @@ export function registerResources(server: McpServer): void {
       description: 'Universal SDET testing standards, assertions, and execution invariants.',
       mimeType: 'text/markdown',
     },
-    async (uri) => ({
+    async (uri: URL) => ({
       contents: [
         {
           uri: uri.href,
