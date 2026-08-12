@@ -80,7 +80,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
       expect.soft(data.result?.ttlMs).toBe(3600000);
-      expect.soft(data.result?.cacheScope).toBe('global');
+      expect.soft(data.result?.cacheScope).toBe('public');
       expect.soft(Array.isArray(data.result?.content)).toBe(true);
     });
 

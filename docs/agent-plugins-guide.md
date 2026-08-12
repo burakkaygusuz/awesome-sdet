@@ -310,7 +310,7 @@ Under the MCP 2026-07-28 stateless wire protocol, reverse proxies and API gatewa
 
 1. **`Mcp-Method` Header Matching:** When the `Mcp-Method` header is present, the server verifies it matches `body.method`. Mismatches are rejected with HTTP 400 and JSON-RPC error code `-32600`.
 2. **`Mcp-Name` Target Identifier Matching:** When `Mcp-Name` is present, it must match `params.name` (tools/prompts) or `params.uri` (resources). Mismatches are rejected with HTTP 400 and `-32602`.
-3. **Protocol Version Validation (`Mcp-Protocol-Version`):** The server explicitly validates incoming protocol version headers against supported versions (`2026-07-28`, `2025-11-25`), rejecting unsupported versions with HTTP 400 and `-32000`.
+3. **Protocol Version Validation (`Mcp-Protocol-Version`):** The server explicitly validates incoming protocol version headers against the supported modern version (`2026-07-28`), rejecting unsupported versions with HTTP 400 and `-32000`.
 
 ---
 

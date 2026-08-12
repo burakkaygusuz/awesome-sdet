@@ -5,13 +5,19 @@ import { registerVibiumTools } from './domains/vibium/index.js';
 import { registerAppiumTools } from './domains/appium/index.js';
 import { registerResources } from './resources/index.js';
 import { registerPrompts } from './prompts/index.js';
-import { SERVER_NAME, SERVER_VERSION } from './version.js';
+import {
+  SERVER_NAME,
+  SERVER_VERSION,
+  PROTOCOL_VERSION_2026_07_28,
+  DEFAULT_DOCS_CACHE_TTL_MS,
+  PUBLIC_CACHE_SCOPE,
+} from './version.js';
 
-export const PROTOCOL_VERSION_2026_07_28 = '2026-07-28';
+export { PROTOCOL_VERSION_2026_07_28, DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE };
 
 export interface CacheableResult {
   ttlMs?: number;
-  cacheScope?: 'global' | 'session' | 'user';
+  cacheScope?: 'public' | 'private';
 }
 
 export interface ToolExecutionResult extends CacheableResult {
@@ -19,9 +25,6 @@ export interface ToolExecutionResult extends CacheableResult {
   content: Array<{ type: 'text'; text: string }>;
   isError?: boolean;
 }
-
-export const DEFAULT_DOCS_CACHE_TTL_MS = 3_600_000; // 1 hour TTL for immutable reference docs
-export const GLOBAL_CACHE_SCOPE = 'global' as const;
 
 export function safeToolHandler<T>(
   handler: (args: T) => ToolExecutionResult | Promise<ToolExecutionResult>
@@ -31,7 +34,7 @@ export function safeToolHandler<T>(
       const result = await handler(args);
       return {
         ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
-        cacheScope: GLOBAL_CACHE_SCOPE,
+        cacheScope: PUBLIC_CACHE_SCOPE,
         ...result,
       };
     } catch (error) {
@@ -56,10 +59,30 @@ export const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = {
 };
 
 export function createMcpServer(): McpServer {
-  const server = new McpServer({
-    name: SERVER_NAME,
-    version: SERVER_VERSION,
-  });
+  const server = new McpServer(
+    {
+      name: SERVER_NAME,
+      version: SERVER_VERSION,
+    },
+    {
+      supportedProtocolVersions: [PROTOCOL_VERSION_2026_07_28],
+      cacheHints: {
+        'tools/list': { ttlMs: DEFAULT_DOCS_CACHE_TTL_MS, cacheScope: PUBLIC_CACHE_SCOPE },
+        'prompts/list': { ttlMs: DEFAULT_DOCS_CACHE_TTL_MS, cacheScope: PUBLIC_CACHE_SCOPE },
+        'resources/list': { ttlMs: DEFAULT_DOCS_CACHE_TTL_MS, cacheScope: PUBLIC_CACHE_SCOPE },
+        'resources/templates/list': {
+          ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
+          cacheScope: PUBLIC_CACHE_SCOPE,
+        },
+        'server/discover': { ttlMs: DEFAULT_DOCS_CACHE_TTL_MS, cacheScope: PUBLIC_CACHE_SCOPE },
+      },
+      capabilities: {
+        tools: { listChanged: false },
+        resources: { subscribe: false, listChanged: false },
+        prompts: { listChanged: false },
+      },
+    }
+  );
 
   registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
@@ -71,3 +94,5 @@ export function createMcpServer(): McpServer {
 
   return server;
 }
+
+export { PUBLIC_CACHE_SCOPE as GLOBAL_CACHE_SCOPE } from './version.js';

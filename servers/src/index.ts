@@ -9,11 +9,7 @@ export const rawPort = process.env.PORT || '3000';
 export const PORT = Number.parseInt(rawPort, 10);
 export const ALLOWED_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-export const SUPPORTED_PROTOCOL_VERSIONS = new Set([
-  PROTOCOL_VERSION_2026_07_28,
-  '2025-11-25',
-  '2024-11-05',
-]);
+export const SUPPORTED_PROTOCOL_VERSIONS = new Set([PROTOCOL_VERSION_2026_07_28]);
 
 export const mcpServer = createMcpServer();
 
@@ -157,7 +153,7 @@ export async function handleMcpPostRequest(
             id: jsonPayload.id ?? null,
             error: {
               code: -32000,
-              message: `Unsupported protocol version: '${effectiveProtocolVersion}'. Supported versions: '${PROTOCOL_VERSION_2026_07_28}', '2025-11-25'`,
+              message: `Unsupported protocol version: '${effectiveProtocolVersion}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
             },
           })
         );
@@ -281,20 +277,6 @@ export async function handleMcpPostRequest(
           })
         );
         return;
-      }
-
-      // ─── MCP 2026-07-28 Gateway Transport Bridge ──────────────────────────
-      // @modelcontextprotocol/server v2.0 wire transport validates headers via
-      // @hono/node-server against its current internal release list (up to 2025-11-25).
-      //
-      // Splice mcp-protocol-version from rawHeaders before handing to the transport.
-      // The gateway above has already validated the 2026-07-28 protocol contract.
-      // ────────────────────────────────────────────────────────────────────────
-      const rawHeaders = req.rawHeaders;
-      for (let i = rawHeaders.length - 2; i >= 0; i -= 2) {
-        if (rawHeaders[i].toLowerCase() === 'mcp-protocol-version') {
-          rawHeaders.splice(i, 2);
-        }
       }
 
       // Route JSON-RPC payload to Streamable HTTP Transport via standard SDK contract

@@ -1,8 +1,14 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/server';
+import { DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE } from '../version.js';
 import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
 import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
 import { readAppiumReferenceDoc } from '../domains/appium/common.js';
+
+const RESOURCE_CACHE_HINT = {
+  ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
+  cacheScope: PUBLIC_CACHE_SCOPE,
+};
 
 export function registerResources(server: McpServer): void {
   server.registerResource(
@@ -13,8 +19,12 @@ export function registerResources(server: McpServer): void {
       description:
         'Dynamic reference documentation for Selenium 4 across supported languages and domains.',
       mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
     },
-    async (uri: URL, { domain, language }) => {
+    async (
+      uri: URL,
+      { domain, language }: { domain?: string | string[]; language?: string | string[] }
+    ) => {
       const docDomain = String(domain || 'actions');
       const docLang = String(language || 'typescript');
       try {
@@ -50,8 +60,12 @@ export function registerResources(server: McpServer): void {
       description:
         'Dynamic reference documentation for Cypress across supported domains (commands, component, fixtures, network, session, shadow, stubs, task) and languages (javascript, typescript).',
       mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
     },
-    async (uri: URL, { domain, language }) => {
+    async (
+      uri: URL,
+      { domain, language }: { domain?: string | string[]; language?: string | string[] }
+    ) => {
       const docDomain = String(domain || 'commands');
       const docLang = String(language || 'typescript');
       try {
@@ -87,8 +101,12 @@ export function registerResources(server: McpServer): void {
       description:
         'Dynamic reference documentation for Vibium across supported languages and domains.',
       mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
     },
-    async (uri: URL, { domain, language }) => {
+    async (
+      uri: URL,
+      { domain, language }: { domain?: string | string[]; language?: string | string[] }
+    ) => {
       const docDomain = String(domain || 'core');
       const docLang = String(language || 'typescript');
       try {
@@ -124,8 +142,12 @@ export function registerResources(server: McpServer): void {
       description:
         'Dynamic reference documentation for Appium 2.0 mobile automation across supported languages and domains.',
       mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
     },
-    async (uri: URL, { domain, language }) => {
+    async (
+      uri: URL,
+      { domain, language }: { domain?: string | string[]; language?: string | string[] }
+    ) => {
       const docDomain = String(domain || 'capabilities');
       const docLang = String(language || 'typescript');
       try {
@@ -160,6 +182,7 @@ export function registerResources(server: McpServer): void {
       title: 'Universal SDET Quality Guidelines',
       description: 'Universal SDET testing standards, assertions, and execution invariants.',
       mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
     },
     async (uri: URL) => ({
       contents: [
