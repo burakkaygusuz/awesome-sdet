@@ -127,11 +127,14 @@ export async function handleMcpPostRequest(
         }
       }
 
-      const protocolVersionHeader = (
+      const rawProtocolVersionHeader = (
         req.headers['mcp-protocol-version'] as string | undefined
       )?.trim();
+      const protocolVersionHeader = rawProtocolVersionHeader?.split(',')[0]?.trim();
+      const bodyProtocolVersion = extractBodyProtocolVersion(jsonPayload);
+      const effectiveProtocolVersion = protocolVersionHeader ?? bodyProtocolVersion;
 
-      if (!protocolVersionHeader) {
+      if (!effectiveProtocolVersion) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -146,7 +149,7 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      if (!SUPPORTED_PROTOCOL_VERSIONS.has(protocolVersionHeader)) {
+      if (!SUPPORTED_PROTOCOL_VERSIONS.has(effectiveProtocolVersion)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -154,15 +157,18 @@ export async function handleMcpPostRequest(
             id: jsonPayload.id ?? null,
             error: {
               code: -32000,
-              message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported versions: '${PROTOCOL_VERSION_2026_07_28}', '2025-11-25'`,
+              message: `Unsupported protocol version: '${effectiveProtocolVersion}'. Supported versions: '${PROTOCOL_VERSION_2026_07_28}', '2025-11-25'`,
             },
           })
         );
         return;
       }
 
-      const bodyProtocolVersion = extractBodyProtocolVersion(jsonPayload);
-      if (bodyProtocolVersion && bodyProtocolVersion !== protocolVersionHeader) {
+      if (
+        protocolVersionHeader &&
+        bodyProtocolVersion &&
+        bodyProtocolVersion !== protocolVersionHeader
+      ) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -178,18 +184,7 @@ export async function handleMcpPostRequest(
       }
 
       const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
-      if (!mcpMethodHeader) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(
-          JSON.stringify({
-            jsonrpc: '2.0',
-            id: jsonPayload.id ?? null,
-            error: { code: -32020, message: 'Missing required header: Mcp-Method' },
-          })
-        );
-        return;
-      }
-      if (jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
+      if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -204,39 +199,9 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      const MCP_NAME_REQUIRED_METHODS = new Set(['tools/call', 'resources/read', 'prompts/get']);
       const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
       const mcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
-      if (MCP_NAME_REQUIRED_METHODS.has(effectiveMethod ?? '')) {
-        if (!mcpNameHeader) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              jsonrpc: '2.0',
-              id: jsonPayload.id ?? null,
-              error: { code: -32020, message: 'Missing required header: Mcp-Name' },
-            })
-          );
-          return;
-        }
-        const paramTarget = (
-          (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined
-        )?.trim();
-        if (paramTarget && paramTarget !== mcpNameHeader) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              jsonrpc: '2.0',
-              id: jsonPayload.id ?? null,
-              error: {
-                code: -32020,
-                message: `Header mismatch: Mcp-Name header '${mcpNameHeader}' does not match body parameter '${paramTarget}'`,
-              },
-            })
-          );
-          return;
-        }
-      } else if (mcpNameHeader) {
+      if (mcpNameHeader) {
         const paramTarget = (
           (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined
         )?.trim();

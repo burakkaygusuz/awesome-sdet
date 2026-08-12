@@ -27,8 +27,8 @@ describe('MCP SDK Client Integration', () => {
     );
   });
 
-  // SDK Client Integration test — skipped pending SDK 2026-07-28 support.
-  it.skip('connects, lists primitives, and executes a tool without static snapshots', async () => {
+  // SDK Client Integration test — validates generic StreamableHTTP client compatibility
+  it('connects, lists primitives, and executes a tool without static snapshots', async () => {
     const transport = new StreamableHTTPClientTransport(new URL(url));
     const client = new Client({ name: 'test-sdk-client', version: '1.0.0' });
 

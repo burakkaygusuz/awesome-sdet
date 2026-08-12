@@ -69,17 +69,17 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
   });
 
   describe('Mcp-Method header', () => {
-    it('rejects missing Mcp-Method with HTTP 400 and -32020', async () => {
+    it('allows standard requests without Mcp-Method header', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
         body: JSON.stringify({ jsonrpc: '2.0', id: 89, method: 'tools/list' }),
       });
 
-      expect.soft(res.status).toBe(400);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect.soft(data.error?.code).toBe(-32020);
-      expect.soft(data.error?.message).toContain('Missing required header: Mcp-Method');
+      expect.soft(data.id).toBe(89);
+      expect.soft(Array.isArray(data.result?.tools)).toBe(true);
     });
 
     it('rejects Mcp-Method / body method mismatch with HTTP 400 and -32020', async () => {
@@ -97,22 +97,22 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
   });
 
   describe('Mcp-Name header', () => {
-    it('rejects missing Mcp-Name for tools/call with HTTP 400 and -32020', async () => {
+    it('allows tools/call requests without Mcp-Name header', async () => {
       const res = await fetch(url, {
         method: 'POST',
-        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/call' },
+        headers: MCP_HEADERS,
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: 92,
           method: 'tools/call',
-          params: { name: 'some_tool', arguments: {} },
+          params: { name: 'read_selenium_docs', arguments: { topic: 'locators' } },
         }),
       });
 
-      expect.soft(res.status).toBe(400);
+      expect.soft(res.status).toBe(200);
       const data = await parseMcpResponse(res);
-      expect.soft(data.error?.code).toBe(-32020);
-      expect.soft(data.error?.message).toContain('Missing required header: Mcp-Name');
+      expect.soft(data.id).toBe(92);
+      expect.soft(Array.isArray(data.result?.content)).toBe(true);
     });
 
     it('rejects Mcp-Name / body name mismatch with HTTP 400 and -32020', async () => {
@@ -123,7 +123,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           jsonrpc: '2.0',
           id: 91,
           method: 'tools/call',
-          params: { name: 'actual_tool_name' },
+          params: { name: 'read_selenium_docs' },
         }),
       });
 
