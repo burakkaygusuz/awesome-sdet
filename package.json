@@ -17,7 +17,6 @@
     "build": "pnpm --dir servers build && tsc",
     "typecheck": "tsc --noEmit",
     "validate": "node dist/scripts/validate.js",
-    "lint:skills": "node dist/scripts/validate.js",
     "test": "pnpm run build && vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -36,7 +35,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.3",
-    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/client": "^2.0.0",
     "@types/node": "^26.1.2",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
