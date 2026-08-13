@@ -73,18 +73,56 @@ export function syncVersions(
 
 export async function runRelease(): Promise<void> {
   const args = process.argv.slice(2);
-  const bumpArg = args[0] || 'patch';
+  const bumpArg = args.find((a) => !a.startsWith('--')) || 'patch';
   const isDryRun = args.includes('--dry-run');
+  const isBumpOnly = args.includes('--bump-only') || args.includes('--prepare-branch');
+  const isTagOnly = args.includes('--tag-only');
 
   const targets = getVersionTargets();
   const rootPkg = JSON.parse(fs.readFileSync(targets.rootPkgPath, 'utf8'));
   const currentVersion: string = rootPkg.version;
+
+  if (isTagOnly) {
+    console.log(`\n🏷️ Awesome SDET Tag Release Automation`);
+    console.log(`--------------------------------------`);
+    console.log(`Current version: v${currentVersion}`);
+    console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
+
+    if (isDryRun) {
+      console.log(`✅ Dry-run: Would create tag v${currentVersion} and push to origin.`);
+      return;
+    }
+
+    console.log(`📝 Creating git tag v${currentVersion}...`);
+    execSync(`git tag -a "v${currentVersion}" -m "Release v${currentVersion}"`, {
+      stdio: 'inherit',
+    });
+    console.log(`⬆️ Pushing tag to origin...`);
+    execSync(`git push origin "v${currentVersion}"`, { stdio: 'inherit' });
+
+    console.log(`🎉 Creating GitHub Release with gh CLI...`);
+    try {
+      execSync(
+        `gh release create "v${currentVersion}" --title "v${currentVersion}" --generate-notes`,
+        { stdio: 'inherit' }
+      );
+      console.log(`\n✨ Successfully published GitHub Release v${currentVersion}!`);
+    } catch (error) {
+      console.error(
+        '⚠️ Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
+        error
+      );
+    }
+    return;
+  }
+
   const newVersion = calculateNextVersion(currentVersion, bumpArg);
 
   console.log(`\n🚀 Awesome SDET Release Automation`);
   console.log(`-----------------------------------`);
   console.log(`Current version: v${currentVersion}`);
   console.log(`Next release:    v${newVersion}`);
+  console.log(`Bump only:       ${isBumpOnly ? 'YES' : 'NO'}`);
   console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
 
   if (!isDryRun) {
@@ -114,11 +152,17 @@ export async function runRelease(): Promise<void> {
     return;
   }
 
+  if (isBumpOnly) {
+    console.log(`\n📝 Version files updated to v${newVersion}. (Bump-only mode)`);
+    console.log(`Ready to commit and push to release/v${newVersion} branch.`);
+    return;
+  }
+
   console.log(`\n📝 Creating release commit and git tag...`);
   execSync(`git add package.json plugin.json servers/package.json`, {
     stdio: 'inherit',
   });
-  execSync(`git commit -m "chore(release): v${newVersion}"`, { stdio: 'inherit' });
+  execSync(`git commit -m "chore(release): bump version to ${newVersion}"`, { stdio: 'inherit' });
   execSync(`git tag -a "v${newVersion}" -m "Release v${newVersion}"`, { stdio: 'inherit' });
 
   console.log(`⬆️ Pushing commit and tag to origin main...`);

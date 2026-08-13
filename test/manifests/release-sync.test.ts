@@ -80,4 +80,12 @@ describe('Release Version Calculation & Sync', () => {
     expect(plugin.version).toBe('1.1.0');
     expect(servers.version).toBe('1.1.0');
   });
+
+  it('supports custom SemVer increment steps', () => {
+    const res = syncVersions('2.0.0', targets);
+    expect(res.newVersion).toBe('2.0.0');
+
+    const root = JSON.parse(fs.readFileSync(targets.rootPkgPath, 'utf8'));
+    expect(root.version).toBe('2.0.0');
+  });
 });
