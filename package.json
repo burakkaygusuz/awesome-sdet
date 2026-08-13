@@ -1,6 +1,6 @@
 {
   "name": "awesome-sdet",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Enterprise SDET Agent Plugin for AI coding assistants featuring test automation skills and a secure Model Context Protocol (MCP) server.",
   "files": [
