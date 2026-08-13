@@ -29,7 +29,7 @@ git checkout -b feat/your-feature-name
 
 All commits must follow the Conventional Commits specification with an explicit scope:
 
-```
+```bash
 <type>(<scope>): <short summary>
 ```
 
@@ -101,6 +101,7 @@ When `develop` is ready for a release:
    ```
 
 5. **Sync `main` back to `develop`:**
+
    ```bash
    git checkout develop
    git pull origin develop
