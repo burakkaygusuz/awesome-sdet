@@ -195,6 +195,29 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(readData.result?.contents?.[0]?.text).toContain(t.expectText);
       }
     });
+
+    it('resources/read returns JSON-RPC error -32602 when resource is not found across all framework templates', async () => {
+      const invalidUris = [
+        'selenium://not-a-real-domain/typescript',
+        'cypress://not-a-real-domain/typescript',
+        'vibium://not-a-real-domain/typescript',
+        'appium://not-a-real-domain/typescript',
+      ];
+
+      for (const uri of invalidUris) {
+        const readRes = await mcpFetch(url, {
+          jsonrpc: '2.0',
+          id: 13,
+          method: 'resources/read',
+          params: { uri },
+        });
+        const readData = await parseMcpResponse(readRes);
+        expect.soft(readData.error).toBeDefined();
+        expect.soft(readData.error?.code).toBe(-32602);
+        expect.soft(readData.error?.message).toContain('Resource not found');
+        expect.soft(readData.result).toBeUndefined();
+      }
+    });
   });
 
   describe('prompts', () => {

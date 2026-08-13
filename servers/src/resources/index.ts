@@ -1,4 +1,4 @@
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/server';
+import { McpServer, ResourceNotFoundError, ResourceTemplate } from '@modelcontextprotocol/server';
 import { DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE } from '../version.js';
 import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
@@ -38,16 +38,8 @@ export function registerResources(server: McpServer): void {
             },
           ],
         };
-      } catch (error) {
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text: `# Resource Error\n\n${error instanceof Error ? error.message : String(error)}`,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
+      } catch {
+        throw new ResourceNotFoundError(uri.href);
       }
     }
   );
@@ -79,16 +71,8 @@ export function registerResources(server: McpServer): void {
             },
           ],
         };
-      } catch (error) {
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text: `# Resource Error\n\n${error instanceof Error ? error.message : String(error)}`,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
+      } catch {
+        throw new ResourceNotFoundError(uri.href);
       }
     }
   );
@@ -120,16 +104,8 @@ export function registerResources(server: McpServer): void {
             },
           ],
         };
-      } catch (error) {
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text: `# Resource Error\n\n${error instanceof Error ? error.message : String(error)}`,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
+      } catch {
+        throw new ResourceNotFoundError(uri.href);
       }
     }
   );
@@ -161,16 +137,8 @@ export function registerResources(server: McpServer): void {
             },
           ],
         };
-      } catch (error) {
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text: `# Resource Error\n\n${error instanceof Error ? error.message : String(error)}`,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
+      } catch {
+        throw new ResourceNotFoundError(uri.href);
       }
     }
   );
