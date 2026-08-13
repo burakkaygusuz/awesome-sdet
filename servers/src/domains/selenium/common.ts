@@ -1,8 +1,17 @@
-import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { loadCachedReferenceMarkdown, resolveLanguage } from '../shared.js';
+
+export const SELENIUM_SUPPORTED_LANGUAGES = [
+  'java',
+  'python',
+  'typescript',
+  'javascript',
+  'csharp',
+  'ruby',
+] as const;
 
 export const SupportedLanguageSchema = z
-  .enum(['java', 'python', 'typescript', 'javascript', 'csharp', 'ruby'] as const)
+  .enum(SELENIUM_SUPPORTED_LANGUAGES)
   .default('java')
   .describe(
     'Target programming language: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
@@ -10,38 +19,34 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
-const referenceCache = new Map<string, string>();
+export const SeleniumDomainSchema = z
+  .enum([
+    'actions',
+    'bidi',
+    'grid',
+    'listeners',
+    'locators',
+    'observability',
+    'pagefactory',
+    'waits',
+  ] as const)
+  .describe('Supported Selenium documentation domain');
 
-/**
- * Loads a language-specific reference markdown file for an MCP module,
- * caching results in memory and falling back to 'java' if the target language file is unavailable.
- */
+export type SeleniumDomain = z.infer<typeof SeleniumDomainSchema>;
+
 export async function loadReferenceMarkdown(
   importMetaUrl: string,
   language: SupportedLanguage = 'java'
 ): Promise<string> {
-  const cacheKey = `${importMetaUrl}:${language}`;
-  const cached = referenceCache.get(cacheKey);
-  if (cached) return cached;
-
-  const filePath = new URL(`./references/${language}.md`, importMetaUrl);
-  try {
-    const content = await fs.readFile(filePath, 'utf8');
-    referenceCache.set(cacheKey, content);
-    return content;
-  } catch {
-    const defaultPath = new URL(`./references/java.md`, importMetaUrl);
-    const content = await fs.readFile(defaultPath, 'utf8');
-    referenceCache.set(cacheKey, content);
-    return content;
-  }
+  return loadCachedReferenceMarkdown(importMetaUrl, language, 'java');
 }
 
 export async function readSeleniumReferenceDoc(
   domain: string,
   language: string = 'java'
 ): Promise<string> {
-  const normLang = (language.toLowerCase().trim() || 'java') as SupportedLanguage;
-  const baseUrl = new URL(`./${domain}/index.js`, import.meta.url).href;
+  const safeDomain = SeleniumDomainSchema.parse((domain || '').toLowerCase().trim());
+  const normLang = resolveLanguage(language, SELENIUM_SUPPORTED_LANGUAGES, 'java', 'Selenium');
+  const baseUrl = new URL(`./${safeDomain}/index.js`, import.meta.url).href;
   return loadReferenceMarkdown(baseUrl, normLang);
 }
