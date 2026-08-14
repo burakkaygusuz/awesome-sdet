@@ -30,12 +30,17 @@
     "release:patch": "node dist/scripts/release.js patch",
     "release:minor": "node dist/scripts/release.js minor",
     "release:major": "node dist/scripts/release.js major",
+    "commit": "cz",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.3",
     "@types/node": "^26.1.2",
+    "commitizen": "^4.3.2",
+    "cz-git": "^1.13.2",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-markdownlint": "^0.10.1",
@@ -48,6 +53,11 @@
     "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10",
     "zod": "^4.4.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   },
   "type": "module",
   "pnpm": {
