@@ -108,18 +108,18 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
 
 ## 📦 What's Included?
 
-- **32 Test Automation Skills (`skills/`):**
-  - **Cypress (11 skills):** Web E2E, Component testing, Network interception & performance.
-  - **Selenium (11 skills):** WebDriver BiDi, Grid distribution, session management.
-  - **Vibium (5 skills):** AI-native Sense-Think-Act automation.
-  - **Appium (5 skills):** Native iOS & Android testing.
-- **5 SDET Agents (`agents/`):**
-  - Specialized agent definitions for SDET generalist, Cypress, Selenium, Vibium, and Appium.
-- **SDET MCP Server (`mcp.json` / `servers/`):**
-  - Out-of-the-box test plan validation, test code linting, framework matrix recommendations.
-  - Dual transports: On-demand `stdio` subprocess execution and high-performance `streamable-http` endpoint (`http://127.0.0.1:3000/mcp`).
+- **8 Canonical Capability-First Skills (`skills/sdet-*`):**
+  - Universal SDET rules and decision trees following `agentskills.io` standards (`sdet-locators`, `sdet-actions`, `sdet-assertions`, `sdet-network`, `sdet-storage-state`, `sdet-observability`, `sdet-mobile`, and `sdet-authoring`).
+  - Zero token bloat: Level 1 frontmatter, Level 2 lean rulebooks, and Level 3 on-demand polyglot delivery via MCP.
+- **6 SDET Agents (`agents/`):**
+  - Master SDET Orchestrator (`agents/sdet.agent.md`) for cross-framework test strategy, migration, and subagent routing.
+  - 5 Autonomous Domain Specialists for **Playwright**, **Cypress**, **Selenium 4**, **Vibium**, and **Appium**.
+- **Enterprise SDET MCP Server (`mcp.json` / `servers/`):**
+  - 32 MCP tools and dynamic resource templates (`playwright://`, `selenium://`, `cypress://`, `vibium://`, `appium://`) as the Single Source of Truth for polyglot code examples.
+  - Strict **MCP 2026-07-28** conformance: Dual `stdio` and `streamable-http` transports.
+  - Zero-backdoor security defenses: Loopback DNS rebinding prevention, 10MB payload limit (DoS protection), prototype pollution prevention, safe error masking (`-32603`), and path-traversal guards (`resolveSafePath`).
 - **Universal Directives (`AGENTS.md`):**
-  - Shift-left testing, deterministic synchronization, zero-flakiness rules.
+  - Shift-left state & isolation, deterministic synchronization, zero-flakiness rules.
 
 ---
 

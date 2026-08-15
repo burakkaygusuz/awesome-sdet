@@ -4,12 +4,14 @@
 
 ---
 
-## 1. Network Interception (`vibe.route`)
+## 1. Network Interception (`page.route`)
 
 ```python
 from typing import Any
+from vibium import Page
 
-def test_network_mocking(vibe: Any) -> None:
+
+def test_network_mocking(page: Page) -> None:
     def handle_user_api(route: Any) -> None:
         route.fulfill(
             status=200,
@@ -17,10 +19,10 @@ def test_network_mocking(vibe: Any) -> None:
             json={"user": "Python SDET", "role": "admin"},
         )
 
-    vibe.route("**/api/user", handle_user_api)
-    vibe.route("**/*.png", lambda route: route.abort())
+    page.route("**/api/user", handle_user_api)
+    page.route("**/*.png", lambda route: route.abort())
 
-    vibe.go("https://app.example.com")
+    page.go("https://app.example.com")
 ```
 
 ---
@@ -28,9 +30,12 @@ def test_network_mocking(vibe: Any) -> None:
 ## 2. Event Listeners
 
 ```python
-def setup_listeners(vibe: Any) -> None:
-    vibe.on("console", lambda msg: print(f"Console: {msg.text}"))
-    vibe.on("pageerror", lambda err: print(f"Page Error: {err}"))
+from vibium import Page
+
+
+def setup_listeners(page: Page) -> None:
+    page.on("console", lambda msg: print(f"Console: {msg.text}"))
+    page.on("pageerror", lambda err: print(f"Page Error: {err}"))
 ```
 
 ---
@@ -38,15 +43,17 @@ def setup_listeners(vibe: Any) -> None:
 ## 3. Clock Virtualization
 
 ```python
-def test_virtual_clock(vibe: Any) -> None:
-    vibe.clock.install(time="2026-08-01T00:00:00Z")
-    # Fast-forward virtual timer without real sleep delay
-    vibe.clock.fast_forward(30000)
+from vibium import Page
+
+
+def test_virtual_clock(page: Page) -> None:
+    page.clock.install(time="2026-08-01T00:00:00Z")
+    page.clock.fast_forward(30_000)
 ```
 
 ---
 
 ## Best Practices
 
-- **Route Precision**: Use precise glob patterns for `vibe.route` to intercept network traffic without degrading performance.
-- **Clock Virtualization**: Fast-forward timers using `vibe.clock.fast_forward()` rather than inserting `time.sleep()`.
+- **Route Precision**: Use precise glob patterns for `page.route` to intercept network traffic without degrading performance.
+- **Clock Virtualization**: Fast-forward timers using `page.clock.fast_forward()` rather than inserting `time.sleep()`.

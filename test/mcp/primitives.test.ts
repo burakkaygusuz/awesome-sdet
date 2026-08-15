@@ -46,7 +46,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
   });
 
   describe('tools', () => {
-    it('tools/list returns registered tools with readOnlyHint annotations', async () => {
+    it('tools/list returns registered tools with complete safe read-only annotations', async () => {
       const res = await mcpFetch(url, { jsonrpc: '2.0', id: 3, method: 'tools/list' });
 
       expect.soft(res.status).toBe(200);
@@ -59,6 +59,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(typeof tool.name).toBe('string');
         expect.soft(tool.annotations).toBeDefined();
         expect.soft(tool.annotations?.readOnlyHint).toBe(true);
+        expect.soft(tool.annotations?.destructiveHint).toBe(false);
+        expect.soft(tool.annotations?.idempotentHint).toBe(true);
+        expect.soft(tool.annotations?.openWorldHint).toBe(false);
       }
     });
 
@@ -125,6 +128,12 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('tools/call successfully executes documentation tools across all supported frameworks', async () => {
       const crossFrameworkTools = [
+        { name: 'read_pw_locators_docs', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_actions_docs', lang: 'python', expectText: 'Playwright' },
+        { name: 'read_pw_assertions_docs', lang: 'java', expectText: 'Playwright' },
+        { name: 'read_pw_network_docs', lang: 'csharp', expectText: 'Playwright' },
+        { name: 'read_pw_storage_docs', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_observability_docs', lang: 'python', expectText: 'Playwright' },
         { name: 'read_se_actions_docs', lang: 'java', expectText: 'Selenium' },
         { name: 'read_cy_commands_docs', lang: 'typescript', expectText: 'Cypress' },
         { name: 'read_vibium_core_docs', lang: 'python', expectText: 'Vibium' },
@@ -176,6 +185,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('resources/read dynamically fetches resources across all framework templates', async () => {
       const templates = [
+        { uri: 'playwright://locators/typescript', expectText: 'Playwright' },
         { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
         { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
         { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
@@ -196,8 +206,23 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       }
     });
 
+    it('resources/read returns Playwright JavaScript reference', async () => {
+      const readRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 14,
+        method: 'resources/read',
+        params: { uri: 'playwright://locators/javascript' },
+      });
+      const readData = await parseMcpResponse(readRes);
+
+      expect(readData.error).toBeUndefined();
+      expect(readData.result?.contents?.[0]?.uri).toBe('playwright://locators/javascript');
+      expect(readData.result?.contents?.[0]?.text).toContain('Playwright');
+    });
+
     it('resources/read returns JSON-RPC error -32602 when resource is not found across all framework templates', async () => {
       const invalidUris = [
+        'playwright://not-a-real-domain/typescript',
         'selenium://not-a-real-domain/typescript',
         'cypress://not-a-real-domain/typescript',
         'vibium://not-a-real-domain/typescript',
@@ -250,7 +275,40 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const genData = await parseMcpResponse(genRes);
       expect.soft(genData.result?.messages).toBeDefined();
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
-      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/vibium-*');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('resources/read');
+      expect
+        .soft(genData.result?.messages?.[0]?.content?.text)
+        .toContain('vibium://{domain}/{language}');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_vibium_core_docs');
+      expect(genData.result?.messages?.[0]?.content?.text).not.toContain(
+        'skills/sdet-*/references'
+      );
+
+      const pwGenRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 25,
+        method: 'prompts/get',
+        params: {
+          name: 'generate-test',
+          arguments: {
+            framework: 'playwright',
+            language: 'typescript',
+            featureDescription: 'User checkout journey with credit card payment',
+          },
+        },
+      });
+      expect.soft(pwGenRes.status).toBe(200);
+      const pwGenData = await parseMcpResponse(pwGenRes);
+      expect.soft(pwGenData.result?.messages).toBeDefined();
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('playwright');
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
+      expect
+        .soft(pwGenData.result?.messages?.[0]?.content?.text)
+        .toContain('playwright://{domain}/{language}');
+      expect
+        .soft(pwGenData.result?.messages?.[0]?.content?.text)
+        .toContain('read_pw_locators_docs');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -270,6 +328,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(migData.result?.messages?.[0]?.content?.text)
         .toContain('Anti-Pattern Elimination');
+      expect
+        .soft(migData.result?.messages?.[0]?.content?.text)
+        .toContain('cypress://{domain}/{language}');
+      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_cy_commands_docs');
 
       const diagRes = await mcpFetch(url, {
         jsonrpc: '2.0',

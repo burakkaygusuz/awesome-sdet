@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import type { Skill } from './schemas.js';
+import { SkillsManifestSchema, type Skill, type SkillsManifest } from './schemas.js';
 import { validatePluginManifest } from './validators/plugin-validator.js';
 import { validateMcpManifest } from './validators/mcp-validator.js';
 import { collectAllSkills } from './validators/skills-validator.js';
@@ -10,7 +10,6 @@ export async function validate(): Promise<void> {
   const rootDir = process.cwd();
   const skillsDir = path.join(rootDir, 'skills');
 
-  // Validate manifests, agents, and standard skills concurrently
   const [pluginValid, mcpValid, agentResult, skillResult] = await Promise.all([
     validatePluginManifest(rootDir),
     validateMcpManifest(rootDir),
@@ -32,23 +31,30 @@ export async function validate(): Promise<void> {
     skillsByFramework[skill.framework].push(skill);
   }
 
+  const manifestData: SkillsManifest = {
+    schemaVersion: '1.0.0',
+    generatedAt: new Date().toISOString(),
+    totalSkills: skillResult.skills.length,
+    totalAgents: agentResult.agents.length,
+    frameworks: skillResult.frameworks,
+    agents: agentResult.agents,
+    skills: skillsByFramework,
+  };
+
+  const parsedManifest = SkillsManifestSchema.safeParse(manifestData);
+  if (!parsedManifest.success) {
+    console.error(
+      'Error: Generated skills manifest schema validation failed:',
+      parsedManifest.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+    );
+    process.exit(1);
+  }
+
   const distDir = path.join(rootDir, 'dist');
   await fs.mkdir(distDir, { recursive: true });
   await fs.writeFile(
     path.join(distDir, 'skills-manifest.json'),
-    JSON.stringify(
-      {
-        schemaVersion: '1.0.0',
-        generatedAt: new Date().toISOString(),
-        totalSkills: skillResult.skills.length,
-        totalAgents: agentResult.agents.length,
-        frameworks: skillResult.frameworks,
-        agents: agentResult.agents,
-        skills: skillsByFramework,
-      },
-      null,
-      2
-    )
+    JSON.stringify(manifestData, null, 2) + '\n'
   );
 
   console.log(

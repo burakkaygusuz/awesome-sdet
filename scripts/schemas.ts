@@ -39,17 +39,17 @@ export type PluginManifest = z.infer<typeof PluginManifestSchema>;
 export const StdioMcpServerSchema = z
   .object({
     type: z.literal('stdio'),
-    command: z.string(),
+    command: z.string().min(1),
     args: z.array(z.string()).optional(),
     env: z.record(z.string(), z.string()).optional(),
-    cwd: z.string().optional(),
+    cwd: z.string().regex(CWD_REGEX).optional(),
   })
   .strict();
 
 export const StreamableHttpMcpServerSchema = z
   .object({
     type: z.literal('streamable-http'),
-    url: z.string(),
+    url: z.string().min(1),
     headers: z.record(z.string(), z.string()).optional(),
   })
   .strict();
@@ -57,7 +57,7 @@ export const StreamableHttpMcpServerSchema = z
 export const SseMcpServerSchema = z
   .object({
     type: z.literal('sse'),
-    url: z.string(),
+    url: z.string().min(1),
     headers: z.record(z.string(), z.string()).optional(),
   })
   .strict();
@@ -83,13 +83,90 @@ export const McpManifestSchema = z
 
 export type McpManifest = z.infer<typeof McpManifestSchema>;
 
-export interface Skill {
-  name: string;
-  canonicalName: string;
-  framework: string;
-  topic: string;
-  description: string;
-  filePath: string;
-}
+export const CAPABILITY_TOPICS = [
+  'actions',
+  'assertions',
+  'authoring',
+  'locators',
+  'mobile',
+  'network',
+  'observability',
+  'storage-state',
+] as const;
+
+export type CapabilityTopic = (typeof CAPABILITY_TOPICS)[number];
+
+export const CAPABILITY_SKILL_NAMES = [
+  'sdet-actions',
+  'sdet-assertions',
+  'sdet-authoring',
+  'sdet-locators',
+  'sdet-mobile',
+  'sdet-network',
+  'sdet-observability',
+  'sdet-storage-state',
+] as const;
+
+export type CapabilitySkillName = (typeof CAPABILITY_SKILL_NAMES)[number];
 
 export const REQUIRED_FRONTMATTER = ['name', 'description', 'user-invocable', 'license'];
+
+export const SkillFrontmatterMetadataSchema = z
+  .object({
+    capability: z.enum(CAPABILITY_TOPICS).optional(),
+    frameworks: z.string().optional(),
+  })
+  .strict();
+
+export const SkillFrontmatterSchema = z
+  .object({
+    name: z.string().min(1),
+    description: z.string().min(1),
+    'user-invocable': z.union([z.boolean(), z.literal('true'), z.literal('false')]),
+    license: z.string().min(1),
+    metadata: SkillFrontmatterMetadataSchema.optional(),
+  })
+  .strict();
+
+export type SkillFrontmatter = z.infer<typeof SkillFrontmatterSchema>;
+
+/**
+ * Skill Schema: strictly reflects capability-first skills with framework: 'sdet'
+ * and capability topics, enforcing strict property checks.
+ */
+export const SkillSchema = z
+  .object({
+    name: z.string().min(1),
+    canonicalName: z.string().min(1),
+    framework: z.literal('sdet'),
+    topic: z.enum(CAPABILITY_TOPICS),
+    description: z.string().min(1),
+    filePath: z.string().min(1),
+  })
+  .strict();
+
+export type Skill = z.infer<typeof SkillSchema>;
+
+export const AgentInfoSchema = z
+  .object({
+    name: z.string().min(1),
+    description: z.string().min(1),
+    filePath: z.string().min(1),
+  })
+  .strict();
+
+export type AgentInfo = z.infer<typeof AgentInfoSchema>;
+
+export const SkillsManifestSchema = z
+  .object({
+    schemaVersion: z.literal('1.0.0'),
+    generatedAt: z.string(),
+    totalSkills: z.number().int().nonnegative(),
+    totalAgents: z.number().int().nonnegative(),
+    frameworks: z.array(z.string()),
+    agents: z.array(AgentInfoSchema),
+    skills: z.record(z.string(), z.array(SkillSchema)),
+  })
+  .strict();
+
+export type SkillsManifest = z.infer<typeof SkillsManifestSchema>;

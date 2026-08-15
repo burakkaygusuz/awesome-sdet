@@ -4,25 +4,26 @@
 
 ---
 
-## 1. Semantic Locator Strategies (`vibe.find`)
+## 1. Semantic Locator Strategies (`page.find`)
 
 ```python
-from typing import Any
+from vibium import Element, Page
 
-def test_semantic_locators(vibe: Any) -> None:
-    submit_btn = vibe.find({"role": "button", "text": "Sign In"})
+
+def test_semantic_locators(page: Page) -> None:
+    submit_btn: Element = page.find({"role": "button", "text": "Sign In"})
     submit_btn.click()
 
-    email_field = vibe.find("label=Email address")
+    email_field: Element = page.find("label=Email address")
     email_field.fill("sdet@example.com")
 
-    cart_badge = vibe.find("testid=cart-badge")
+    cart_badge: Element = page.find("testid=cart-badge")
     assert cart_badge.is_displayed()
 
-    msg = vibe.find("text=Order Confirmed")
+    msg: Element = page.find("text=Order Confirmed")
     msg.wait_for()
 
-    search = vibe.find("placeholder=Search catalog...")
+    search: Element = page.find("placeholder=Search catalog...")
     search.fill("automation")
 ```
 
@@ -31,12 +32,16 @@ def test_semantic_locators(vibe: Any) -> None:
 ## 2. Pierce Combinators (`>>` and `>>>`)
 
 ```python
-def test_piercing(vibe: Any) -> None:
-    form_btn = vibe.find("form.login-form >> button[type='submit']")
+from vibium import Element, Page
+
+
+def test_piercing(page: Page) -> None:
+    form_btn: Element = page.find("form.login-form >> button[type='submit']")
     form_btn.click()
 
-    # '>>>' pierces nested Web Components across open Shadow Root boundaries
-    shadow_element = vibe.find("custom-widget >>> internal-card >>> button.action")
+    shadow_element: Element = page.find(
+        "custom-widget >>> internal-card >>> button.action"
+    )
     shadow_element.click()
 ```
 
@@ -45,9 +50,12 @@ def test_piercing(vibe: Any) -> None:
 ## 3. Subtree Scoping & Chaining
 
 ```python
-def test_scoping(vibe: Any) -> None:
-    target_row = vibe.find({"role": "row", "text": "Alice"})
-    edit_btn = target_row.find({"role": "button", "text": "Edit"})
+from vibium import Element, Page
+
+
+def test_scoping(page: Page) -> None:
+    target_row: Element = page.find({"role": "row", "text": "Alice"})
+    edit_btn: Element = target_row.find({"role": "button", "text": "Edit"})
     edit_btn.click()
 ```
 

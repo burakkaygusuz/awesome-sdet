@@ -11,8 +11,8 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
+
 def run_traced_session() -> None:
-    # Set OpenTelemetry environment variables before initializing driver
     os.environ["OTEL_TRACES_EXPORTER"] = "otlp"
     os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = "http://jaeger-host:4317"
     os.environ["OTEL_SERVICE_NAME"] = "selenium-python-client"
@@ -20,7 +20,7 @@ def run_traced_session() -> None:
     options = Options()
     driver = webdriver.Remote(
         command_executor="http://grid-hub:4444",
-        options=options
+        options=options,
     )
     try:
         driver.get("https://example.com")
@@ -36,6 +36,7 @@ def run_traced_session() -> None:
 from typing import Any
 import requests
 
+
 def get_grid_status(grid_url: str = "http://grid-hub:4444") -> dict[str, Any]:
     query = """
     query GridState {
@@ -49,9 +50,12 @@ def get_grid_status(grid_url: str = "http://grid-hub:4444") -> dict[str, Any]:
     response = requests.post(
         f"{grid_url}/graphql",
         json={"query": query},
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json"},
+        timeout=10,
     )
-    return response.json()
+    data: dict[str, Any] = response.json()
+    return data
+
 
 if __name__ == "__main__":
     status = get_grid_status()

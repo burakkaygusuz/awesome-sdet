@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { REQUIRED_FRONTMATTER, type Skill } from '../schemas.js';
+import { REQUIRED_FRONTMATTER, SkillSchema, type Skill } from '../schemas.js';
 
 export function parseFrontmatter(
   content: string,
@@ -39,13 +39,13 @@ export async function validateSkillFile(
   filePath: string,
   rootDir: string,
   skillsDir: string
-): Promise<{ skill: Skill | null; hasError: boolean }> {
+): Promise<{ skill: Skill | null; hasError: boolean; declaredFrameworks?: string[] }> {
   const relPath = path.relative(skillsDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
   const { fields, hasError: parseError } = parseFrontmatter(content, relPath);
 
   if (parseError) {
-    return { skill: null, hasError: true };
+    return { skill: null, hasError: true, declaredFrameworks: [] };
   }
 
   let hasError = false;
@@ -64,21 +64,68 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  const framework = skillDirName.includes('-') ? skillDirName.split('-')[0] : 'common';
-  const topic = skillDirName.includes('-')
-    ? skillDirName.substring(framework.length + 1)
-    : skillDirName;
+  const frontmatterEnd = content.indexOf('---', 3);
+  const body = content.substring(frontmatterEnd + 3).trim();
+  const bodyLineCount = body ? body.split('\n').length : 0;
 
-  const skill: Skill = {
+  if (bodyLineCount > 500) {
+    console.error(
+      `Error: ${relPath}: SKILL.md body is ${bodyLineCount} lines; keep it under 500 lines (guide §3.3)`
+    );
+    hasError = true;
+  }
+
+  if (bodyLineCount > 300 && !/^#{1,6}\s+table of contents\s*$/im.test(body)) {
+    console.error(
+      `Error: ${relPath}: SKILL.md body exceeds 300 lines without a Table of Contents heading (guide §3.3)`
+    );
+    hasError = true;
+  }
+
+  const description = fields['description'] || '';
+  const descriptionWords = description.split(/\s+/).filter(Boolean).length;
+  if (descriptionWords > 100) {
+    console.error(
+      `Error: ${relPath}: description is ${descriptionWords} words; keep it at or under 100 words (guide §3.2)`
+    );
+    hasError = true;
+  }
+  if (description.length >= 1024) {
+    console.error(
+      `Error: ${relPath}: description is ${description.length} characters; keep it strictly under the 1024-character specification limit (guide §3.2)`
+    );
+    hasError = true;
+  }
+
+  const framework = skillDirName.startsWith('sdet-') ? 'sdet' : skillDirName.split('-')[0];
+  const topic = skillDirName.startsWith('sdet-') ? skillDirName.substring(5) : skillDirName;
+
+  const frameworksMatch = /frameworks:\s*['"]?([^'"\n\r]+)['"]?/m.exec(content);
+  const declaredFrameworks = frameworksMatch
+    ? frameworksMatch[1].split(',').map((f) => f.trim())
+    : [];
+
+  const rawSkill = {
     name: name || skillDirName,
-    canonicalName: `${framework}/${topic}`,
+    canonicalName: `sdet/${topic}`,
     framework,
     topic,
     description: fields['description'] || '',
     filePath: path.relative(rootDir, filePath),
   };
 
-  return { skill, hasError };
+  const schemaParsed = await SkillSchema.safeParseAsync(rawSkill);
+  if (!schemaParsed.success) {
+    console.error(
+      `Error: ${relPath}: Skill schema validation failed:`,
+      schemaParsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+    );
+    hasError = true;
+  }
+
+  const skill: Skill | null = hasError ? null : (schemaParsed.data as Skill);
+
+  return { skill, hasError, declaredFrameworks };
 }
 
 /**
@@ -100,7 +147,7 @@ export async function collectAllSkills(
         return validateSkillFile(skillFilePath, rootDir, skillsDir);
       } catch {
         console.error(`Error: skills/${dir.name}/SKILL.md does not exist`);
-        return { skill: null, hasError: true };
+        return { skill: null, hasError: true, declaredFrameworks: [] };
       }
     })
   );
@@ -115,7 +162,13 @@ export async function collectAllSkills(
     }
     if (result.skill) {
       skills.push(result.skill);
-      frameworkSet.add(result.skill.framework);
+      if (result.declaredFrameworks && result.declaredFrameworks.length > 0) {
+        for (const fw of result.declaredFrameworks) {
+          frameworkSet.add(fw);
+        }
+      } else {
+        frameworkSet.add(result.skill.framework);
+      }
     }
   }
 

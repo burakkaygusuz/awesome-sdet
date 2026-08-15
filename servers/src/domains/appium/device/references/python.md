@@ -7,36 +7,32 @@
 ## 1. Application Lifecycle & Device Controls
 
 ```python
+from pathlib import Path
+from typing import Any
 from appium.webdriver.webdriver import WebDriver
+
 
 def manage_device_and_app(driver: WebDriver) -> None:
     package_name = "com.example.app"
+    app_path = Path("/path/to/app.apk")
 
-    # 1. App Lifecycle
     if not driver.is_app_installed(package_name):
-        driver.install_app("/path/to/app.apk")
+        driver.install_app(str(app_path))
 
     driver.activate_app(package_name)
-
-    # Background app for 5 seconds
     driver.background_app(5)
 
-    # Check App state
-    state = driver.query_app_state(package_name)
+    state: int = driver.query_app_state(package_name)
     print("Application state:", state)
 
-    # 2. Clipboard Management
     driver.set_clipboard_text("one-time-password-9988")
-    otp = driver.get_clipboard_text()
+    otp: str = driver.get_clipboard_text()
     print("OTP from clipboard:", otp)
 
-    # 3. Orientation & Keyboard
     if driver.is_keyboard_shown():
         driver.hide_keyboard()
 
     driver.orientation = "PORTRAIT"
-
-    # 4. Terminate App
     driver.terminate_app(package_name)
 ```
 

@@ -7,15 +7,19 @@
 ## 1. Android Driver Setup (UiAutomator2Options)
 
 ```python
+from pathlib import Path
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
 
+
 def create_android_driver() -> webdriver.Remote:
+    app_path = Path("/path/to/app-release.apk")
+
     options = UiAutomator2Options()
     options.platform_name = "Android"
     options.automation_name = "UiAutomator2"
     options.device_name = "Pixel_7_API_34"
-    options.app = "/path/to/app-release.apk"
+    options.app = str(app_path)
     options.app_package = "com.example.app"
     options.app_activity = "com.example.app.MainActivity"
     options.no_reset = False
@@ -23,7 +27,7 @@ def create_android_driver() -> webdriver.Remote:
 
     return webdriver.Remote(
         command_executor="http://127.0.0.1:4723",
-        options=options
+        options=options,
     )
 ```
 
@@ -34,6 +38,7 @@ def create_android_driver() -> webdriver.Remote:
 ```python
 from appium import webdriver
 from appium.options.ios import XCUITestOptions
+
 
 def create_ios_driver() -> webdriver.Remote:
     options = XCUITestOptions()
@@ -47,7 +52,7 @@ def create_ios_driver() -> webdriver.Remote:
 
     return webdriver.Remote(
         command_executor="http://127.0.0.1:4723",
-        options=options
+        options=options,
     )
 ```
 

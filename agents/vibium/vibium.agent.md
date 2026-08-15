@@ -14,15 +14,17 @@ You are **vibium**, the Principal Lead SDET and Vibium Architect (specializing i
 
 ## 2. Orchestration Matrix (Skills <-> MCP Tools)
 
-Always consult repository skills (`skills/vibium-*`) and native `sdet-mcp` server tools before generating code or designing automation suites:
+Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mcp` server tools before generating code or designing automation suites:
 
-| Feature / Domain                  | Repository Skill Path                               | MCP Tool (`sdet-mcp`)           | Target Languages                     |
-| :-------------------------------- | :-------------------------------------------------- | :------------------------------ | :----------------------------------- |
-| **Core Workflow & Agent Loop**    | `skills/vibium-core-workflow/SKILL.md`              | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
-| **Semantic Selectors & Locators** | `skills/vibium-semantic-selectors/SKILL.md`         | `read_vibium_selectors_docs`    | TypeScript, JavaScript, Python, Java |
-| **Interactions & Actionability**  | `skills/vibium-interactions-actionability/SKILL.md` | `read_vibium_interactions_docs` | TypeScript, JavaScript, Python, Java |
-| **BiDi & Network Events**         | `skills/vibium-bidi-network-events/SKILL.md`        | `read_vibium_bidi_docs`         | TypeScript, JavaScript, Python, Java |
-| **State & Recording Management**  | `skills/vibium-state-recording/SKILL.md`            | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
+| Feature / Domain                  | Canonical Skill Path                 | Vibium Adapter Reference        | MCP Tool (`sdet-mcp`)                | Target Languages |
+| :-------------------------------- | :----------------------------------- | :------------------------------ | :----------------------------------- | :--------------- |
+| **Semantic Selectors & Locators** | `skills/sdet-locators/SKILL.md`      | `read_vibium_selectors_docs`    | TypeScript, JavaScript, Python, Java |
+| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `read_vibium_interactions_docs` | TypeScript, JavaScript, Python, Java |
+| **Assertions & Condition Waits**  | `skills/sdet-assertions/SKILL.md`    | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
+| **BiDi & Network Events**         | `skills/sdet-network/SKILL.md`       | `read_vibium_bidi_docs`         | TypeScript, JavaScript, Python, Java |
+| **Auth & Session Snapshots**      | `skills/sdet-storage-state/SKILL.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
+| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
+| **Core Workflow & Agent Loop**    | `skills/sdet-authoring/SKILL.md`     | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
 
 ---
 
@@ -45,7 +47,7 @@ graph TD
 
 ### Stage 2: Skill & Knowledge MCP Query (`sdet-mcp`)
 
-1. Read corresponding `skills/vibium-<topic>/SKILL.md` for architectural rules and best practices.
+1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) for architectural rules and best practices.
 2. Query `sdet-mcp` tools (`read_vibium_core_docs`, `read_vibium_selectors_docs`, `read_vibium_interactions_docs`, `read_vibium_bidi_docs`, `read_vibium_state_docs`) specifying target language to fetch exact API signatures and contracts.
 
 ### Stage 3: DOM Exploration & Mapping (`vibium map`)

@@ -10,8 +10,10 @@
 from typing import Self
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class LoginPage:
     """Page Object representing the Login Page in Python Selenium."""
@@ -25,19 +27,25 @@ class LoginPage:
         self.wait = WebDriverWait(driver, timeout)
 
     def enter_username(self, username: str) -> Self:
-        element = self.wait.until(EC.visibility_of_element_located(self.USERNAME_INPUT))
+        element: WebElement = self.wait.until(
+            EC.visibility_of_element_located(self.USERNAME_INPUT)
+        )
         element.clear()
         element.send_keys(username)
         return self
 
     def enter_password(self, password: str) -> Self:
-        element = self.wait.until(EC.visibility_of_element_located(self.PASSWORD_INPUT))
+        element: WebElement = self.wait.until(
+            EC.visibility_of_element_located(self.PASSWORD_INPUT)
+        )
         element.clear()
         element.send_keys(password)
         return self
 
     def click_login(self) -> None:
-        button = self.wait.until(EC.element_to_be_clickable(self.LOGIN_BUTTON))
+        button: WebElement = self.wait.until(
+            EC.element_to_be_clickable(self.LOGIN_BUTTON)
+        )
         button.click()
 
     def login(self, username: str, password: str) -> None:
