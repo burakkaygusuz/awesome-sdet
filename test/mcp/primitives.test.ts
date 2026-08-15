@@ -206,6 +206,20 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       }
     });
 
+    it('resources/read returns Playwright JavaScript reference', async () => {
+      const readRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 14,
+        method: 'resources/read',
+        params: { uri: 'playwright://locators/javascript' },
+      });
+      const readData = await parseMcpResponse(readRes);
+
+      expect(readData.error).toBeUndefined();
+      expect(readData.result?.contents?.[0]?.uri).toBe('playwright://locators/javascript');
+      expect(readData.result?.contents?.[0]?.text).toContain('Playwright');
+    });
+
     it('resources/read returns JSON-RPC error -32602 when resource is not found across all framework templates', async () => {
       const invalidUris = [
         'playwright://not-a-real-domain/typescript',
@@ -262,9 +276,14 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(genData.result?.messages).toBeDefined();
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('resources/read');
       expect
         .soft(genData.result?.messages?.[0]?.content?.text)
-        .toContain('skills/sdet-*/references/vibium.md');
+        .toContain('vibium://{domain}/{language}');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_vibium_core_docs');
+      expect(genData.result?.messages?.[0]?.content?.text).not.toContain(
+        'skills/sdet-*/references'
+      );
 
       const pwGenRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -286,7 +305,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
       expect
         .soft(pwGenData.result?.messages?.[0]?.content?.text)
-        .toContain('skills/sdet-*/references/playwright.md');
+        .toContain('playwright://{domain}/{language}');
+      expect
+        .soft(pwGenData.result?.messages?.[0]?.content?.text)
+        .toContain('read_pw_locators_docs');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -306,6 +328,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(migData.result?.messages?.[0]?.content?.text)
         .toContain('Anti-Pattern Elimination');
+      expect
+        .soft(migData.result?.messages?.[0]?.content?.text)
+        .toContain('cypress://{domain}/{language}');
+      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_cy_commands_docs');
 
       const diagRes = await mcpFetch(url, {
         jsonrpc: '2.0',
