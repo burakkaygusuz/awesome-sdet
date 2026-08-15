@@ -100,7 +100,7 @@ The `plugin.json` file resides at the root of the repository and declares the ge
 - **`$schema`**: MUST point directly to `https://agent-plugins.org/schemas/1.0.0/plugin.schema.json`.
 - **`name`**: Lowercase alphanumeric string between 1 and 64 characters, matching regex `^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$`. Consecutive hyphens (`--`) and dots (`..`) are strictly forbidden.
 - **`version`**: Semantic versioning format `^\d+\.\d+\.\d+$`.
-- **`author`**: MUST be a JSON Object containing `name`, optional `email` (`z.email()`), and optional `url` (`z.url()`). Bare string author names are invalid under Agent Plugins 1.0.0.
+- **`author`**: SHOULD be a JSON Object containing `name`, optional `email` (`z.email()`), and optional `url` (`z.url()`). Bare string author names are tolerated per the Spec §5.4 robustness principle (see §2.3) rather than rejected.
 - **`license`**: Valid SPDX license identifier (e.g. `MIT`, `Apache-2.0`).
 - **`keywords`**: Extensible array of topic strings representing the universal automation ecosystem.
 
@@ -234,7 +234,7 @@ server.registerTool('read_se_locator_docs', {
 
 ### 4.2 Structured Output & `outputSchema`
 
-MCP 2026-07-28 tools can declare an `outputSchema` alongside returning `structuredContent`. Clients supporting structured outputs parse JSON fields directly without markdown regex extraction, falling back to `content[].text` for legacy clients:
+MCP 2026-07-28 tools can declare an `outputSchema` alongside returning `structuredContent` (optional; the sdet-mcp docs tools currently return unstructured markdown via `content` only). Clients supporting structured outputs parse JSON fields directly without markdown regex extraction, falling back to `content[].text` for legacy clients:
 
 ```typescript
 return {
@@ -478,7 +478,7 @@ Plugin & MCP Manifests
 ☐ Canonical schema URLs used directly without local duplicate schemas
 
 Skills Authoring
-☐ Frontmatter contains name, description, user-invocable, license, metadata.framework
+☐ Frontmatter contains name, description, user-invocable, license, metadata.frameworks
 ☐ description ≤ 100 words, quoted ("..."), trigger-accurate
 ☐ SKILL.md body < 500 lines (TOC included if > 300 lines)
 ☐ No forbidden freemium terminology
