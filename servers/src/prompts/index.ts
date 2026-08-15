@@ -2,8 +2,10 @@ import { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 export const SupportedFrameworkSchema = z
-  .enum(['selenium', 'cypress', 'vibium', 'appium'] as const)
-  .describe('Target test automation framework: "selenium", "cypress", "vibium", or "appium"');
+  .enum(['selenium', 'cypress', 'vibium', 'appium', 'playwright'] as const)
+  .describe(
+    'Target test automation framework: "selenium", "cypress", "vibium", "appium", or "playwright"'
+  );
 
 export type SupportedFramework = z.infer<typeof SupportedFrameworkSchema>;
 
@@ -65,10 +67,10 @@ Core Quality Invariants:
         'Translates test suites between automation frameworks while eliminating anti-patterns',
       argsSchema: z.object({
         sourceFramework: SupportedFrameworkSchema.describe(
-          'Source framework (selenium, cypress, vibium, appium)'
+          'Source framework (selenium, cypress, vibium, appium, playwright)'
         ),
         targetFramework: SupportedFrameworkSchema.describe(
-          'Target framework to migrate to (selenium, cypress, vibium, appium)'
+          'Target framework to migrate to (selenium, cypress, vibium, appium, playwright)'
         ),
         sourceCode: z.string().min(5).describe('Source test code to translate'),
       }),
@@ -104,7 +106,7 @@ ${sourceCode}
         'Performs systematic root-cause analysis and provides deterministic fixes for flaky tests',
       argsSchema: z.object({
         framework: SupportedFrameworkSchema.describe(
-          'Testing framework where failure occurred (selenium, cypress, vibium, appium)'
+          'Testing framework where failure occurred (selenium, cypress, vibium, appium, playwright)'
         ),
         failureLog: z.string().min(5).describe('Stack trace, console error, or CI log'),
         testCode: z.string().min(5).describe('Failing test source code'),

@@ -1,4 +1,5 @@
 import { McpServer, type ToolAnnotations } from '@modelcontextprotocol/server';
+import { registerPlaywrightTools } from './domains/playwright/index.js';
 import { registerSeleniumTools } from './domains/selenium/index.js';
 import { registerCypressTools } from './domains/cypress/index.js';
 import { registerVibiumTools } from './domains/vibium/index.js';
@@ -84,6 +85,7 @@ export function createMcpServer(): McpServer {
     }
   );
 
+  registerPlaywrightTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
   registerVibiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);

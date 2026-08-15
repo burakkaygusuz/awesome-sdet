@@ -1,5 +1,6 @@
 import { McpServer, ResourceNotFoundError, ResourceTemplate } from '@modelcontextprotocol/server';
 import { DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE } from '../version.js';
+import { readPlaywrightReferenceDoc } from '../domains/playwright/common.js';
 import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
 import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
@@ -11,6 +12,39 @@ const RESOURCE_CACHE_HINT = {
 };
 
 export function registerResources(server: McpServer): void {
+  server.registerResource(
+    'playwright-reference',
+    new ResourceTemplate('playwright://{domain}/{language}', { list: undefined }),
+    {
+      title: 'Playwright Documentation Reference',
+      description:
+        'Dynamic reference documentation for Playwright across supported languages (typescript, python, java, csharp) and domains.',
+      mimeType: 'text/markdown',
+      cacheHint: RESOURCE_CACHE_HINT,
+    },
+    async (
+      uri: URL,
+      { domain, language }: { domain?: string | string[]; language?: string | string[] }
+    ) => {
+      const docDomain = String(domain || 'locators');
+      const docLang = String(language || 'typescript');
+      try {
+        const text = await readPlaywrightReferenceDoc(docDomain, docLang);
+        return {
+          contents: [
+            {
+              uri: uri.href,
+              text,
+              mimeType: 'text/markdown',
+            },
+          ],
+        };
+      } catch {
+        throw new ResourceNotFoundError(uri.href);
+      }
+    }
+  );
+
   server.registerResource(
     'selenium-reference',
     new ResourceTemplate('selenium://{domain}/{language}', { list: undefined }),

@@ -32,7 +32,7 @@ You are **sdet**, the Principal Lead SDET and Test Automation Orchestrator. Your
      └───────────────────┴─────────┬─────────┴───────────────────┘
                                    ▼
                  [ Dynamic Skill & MCP Tool Registry ]
-                 • skills/<framework-topic>/ (Selenium, Cypress, Vibium, Appium)
+                 • skills/<framework-topic>/ (Selenium, Cypress, Vibium, Appium, Playwright)
                  • sdet-mcp (Native Knowledge & Tool Registry)
 ```
 
@@ -42,13 +42,13 @@ You are **sdet**, the Principal Lead SDET and Test Automation Orchestrator. Your
 
 When a user request requires framework-specific code generation or refactoring, discover and delegate to the dedicated specialist subagent:
 
-| Automation Domain              | Primary Responsibilities                                                        | Knowledge & Tool Binding                                               |
-| :----------------------------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------- |
-| **Web & AI-Native Automation** | DOM queries, BiDi events, command queues, Sense-Think-Act loop, element mapping | `skills/selenium-*`, `skills/cypress-*`, `skills/vibium-*`, `sdet-mcp` |
-| **Mobile & Cross-Platform**    | Device gestures, hybrid webviews, OS permissions, native accessibility trees    | `skills/appium-*`, `sdet-mcp`                                          |
-| **API & Contract Testing**     | HTTP client routing, JSON schema validation, network mocking, token lifecycle   | `skills/<api-skill>`, `sdet-mcp`                                       |
-| **Performance & Load Testing** | Virtual user simulation, throughput pacing, latency metrics, distributed load   | `skills/<load-skill>`, `sdet-mcp`                                      |
-| **Cross-Framework Migration**  | Bi-directional semantic mapping, assertion translation, paradigm conversion     | Direct Orchestrator Execution (`sdet`)                                 |
+| Automation Domain              | Primary Responsibilities                                                        | Knowledge & Tool Binding                                                                      |
+| :----------------------------- | :------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------- |
+| **Web & AI-Native Automation** | DOM queries, BiDi events, command queues, Sense-Think-Act loop, element mapping | `skills/playwright-*`, `skills/selenium-*`, `skills/cypress-*`, `skills/vibium-*`, `sdet-mcp` |
+| **Mobile & Cross-Platform**    | Device gestures, hybrid webviews, OS permissions, native accessibility trees    | `skills/appium-*`, `sdet-mcp`                                                                 |
+| **API & Contract Testing**     | HTTP client routing, JSON schema validation, network mocking, token lifecycle   | `skills/<api-skill>`, `sdet-mcp`                                                              |
+| **Performance & Load Testing** | Virtual user simulation, throughput pacing, latency metrics, distributed load   | `skills/<load-skill>`, `sdet-mcp`                                                             |
+| **Cross-Framework Migration**  | Bi-directional semantic mapping, assertion translation, paradigm conversion     | Direct Orchestrator Execution (`sdet`)                                                        |
 
 ---
 
@@ -67,14 +67,14 @@ When migrating test suites between different automation frameworks, map concepts
 
 ### Framework Paradigm Mapping Matrix
 
-| Architectural Dimension   | Selenium 4.x+ (W3C WebDriver)         | Cypress 15.x+ (In-Browser Queue)         | Vibium 26.x+ (AI-Native BiDi)                              | Appium 3.x+ (Mobile WebDriver)                                  |
-| :------------------------ | :------------------------------------ | :--------------------------------------- | :--------------------------------------------------------- | :-------------------------------------------------------------- |
-| **Locator Strategy**      | `By.cssSelector`, `By.xpath`, `By.id` | `cy.get()`, `cy.contains()`, `[data-cy]` | `find({ role, text })`, `find('label=...')`, `>>>`, `@ref` | `accessibility id`, `-ios class chain`, `-android uiautomator`  |
-| **Execution Model**       | Synchronous Blocking / Driver Wire    | Async Command Queue (Chained)            | Native Async/Await SDK & BiDi WebSocket Stream             | W3C Remote Driver Client (Async WebdriverIO / Sync Java/Python) |
-| **Actionability & Waits** | Explicit `WebDriverWait` Conditions   | Automatic Retry-ability on Assertions    | 6-Point Auto-Waiting Pipeline (Attached to Editable)       | Explicit `WebDriverWait` / `waitUntil()` Conditions             |
-| **Network Mocking**       | BiDi Network Interception / CDP       | `cy.intercept()` Route Aliases           | `vibe.route()` Full-Duplex BiDi Mock & Abort               | Proxy route / Device network condition emulation                |
-| **Auth / Storage State**  | Cookie Injection via Driver           | `cy.session()` Caching                   | `storageState` JSON Snapshots & Context Reuse              | App sandbox data / `noReset` / `fullReset` options              |
-| **Agent / Sense Loop**    | Page Object Model (POM)               | Custom Commands & Aliases                | Sense-Think-Act Loop (`map`, `act`, `diff`)                | Screen Object Model & W3C Actions (`PointerInput`)              |
+| Architectural Dimension   | Playwright 1.x+ (BrowserContext Event Loop)                                          | Selenium 4.x+ (W3C WebDriver)         | Cypress 15.x+ (In-Browser Queue)         | Vibium 26.x+ (AI-Native BiDi)                              | Appium 3.x+ (Mobile WebDriver)                                  |
+| :------------------------ | :----------------------------------------------------------------------------------- | :------------------------------------ | :--------------------------------------- | :--------------------------------------------------------- | :-------------------------------------------------------------- |
+| **Locator Strategy**      | `getByRole()`, `getByLabel()`, `getByTestId()`, `page.locator()`                     | `By.cssSelector`, `By.xpath`, `By.id` | `cy.get()`, `cy.contains()`, `[data-cy]` | `find({ role, text })`, `find('label=...')`, `>>>`, `@ref` | `accessibility id`, `-ios class chain`, `-android uiautomator`  |
+| **Execution Model**       | Async/Await Event Loop (Node.js/Python Async/C# Task/Java Sync)                      | Synchronous Blocking / Driver Wire    | Async Command Queue (Chained)            | Native Async/Await SDK & BiDi WebSocket Stream             | W3C Remote Driver Client (Async WebdriverIO / Sync Java/Python) |
+| **Actionability & Waits** | 6-Point Auto-Waiting Pipeline (Attached, Visible, Stable, Events, Enabled, Editable) | Explicit `WebDriverWait` Conditions   | Automatic Retry-ability on Assertions    | 6-Point Auto-Waiting Pipeline (Attached to Editable)       | Explicit `WebDriverWait` / `waitUntil()` Conditions             |
+| **Network Mocking**       | `page.route()` Full-Duplex Abort/Fulfill/Continue                                    | BiDi Network Interception / CDP       | `cy.intercept()` Route Aliases           | `vibe.route()` Full-Duplex BiDi Mock & Abort               | Proxy route / Device network condition emulation                |
+| **Auth / Storage State**  | `storageState` JSON Snapshot & Context Injection                                     | Cookie Injection via Driver           | `cy.session()` Caching                   | `storageState` JSON Snapshots & Context Reuse              | App sandbox data / `noReset` / `fullReset` options              |
+| **Agent / Sense Loop**    | Page Object Model (POM) & Component Stories/Galleries (`mount()`)                    | Page Object Model (POM)               | Custom Commands & Aliases                | Sense-Think-Act Loop (`map`, `act`, `diff`)                | Screen Object Model & W3C Actions (`PointerInput`)              |
 
 ---
 
