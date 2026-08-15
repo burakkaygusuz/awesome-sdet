@@ -23,7 +23,24 @@ cy.get('.item-list').should(($list) => {
 });
 ```
 
-## 3. Best Practices & Anti-Patterns
+## 3. Scoping & Filtering (`.within`, `.filter`, `.eq`)
+
+```javascript
+cy.get('form.login').within(() => {
+  cy.get('input[name="email"]').should('be.visible'); // scoped to the form
+});
+
+// Filter a subject by selector or predicate
+cy.get('li.todo').filter('.completed').should('have.length', 2);
+cy.get('tr')
+  .filter((idx, el) => Cypress.$(el).data('active') === true)
+  .should('exist');
+
+// Narrow by index
+cy.get('ul.options li').eq(0).click();
+```
+
+## 4. Best Practices & Anti-Patterns
 
 - **Never use `async/await` with Cypress**: Cypress commands enqueue operations into an internal queue; `await` breaks retry-ability and command synchronization.
 - **Use DOM Scoping**: Prefer `cy.get().find()` for component-scoped queries rather than deep global CSS selectors.

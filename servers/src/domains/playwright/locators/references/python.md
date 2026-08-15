@@ -42,7 +42,7 @@ def filter_and_chain(page: Page) -> None:
     row.get_by_role("button", name="Add to Cart").click()
 
     active_user: Locator = page.get_by_role("row").filter(
-        has=page.get_by_role("badge", name="Active")
+        has=page.get_by_role("status", name="Active")
     )
 
     pending_items: Locator = page.get_by_role("row").filter(

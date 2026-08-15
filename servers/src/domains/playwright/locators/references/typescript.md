@@ -43,7 +43,7 @@ export async function filterAndChain(page: Page): Promise<void> {
   await productRow.getByRole('button', { name: 'Add to Cart' }).click();
 
   const activeUserRow: Locator = page.getByRole('row').filter({
-    has: page.getByRole('badge', { name: 'Active' }),
+    has: page.getByRole('status', { name: 'Active' }),
   });
 
   const pendingOrders: Locator = page.getByRole('row').filter({
