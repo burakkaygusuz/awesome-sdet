@@ -64,6 +64,39 @@ export async function validateSkillFile(
     hasError = true;
   }
 
+  const frontmatterEnd = content.indexOf('---', 3);
+  const body = content.substring(frontmatterEnd + 3).trim();
+  const bodyLineCount = body ? body.split('\n').length : 0;
+
+  if (bodyLineCount > 500) {
+    console.error(
+      `Error: ${relPath}: SKILL.md body is ${bodyLineCount} lines; keep it under 500 lines (guide §3.3)`
+    );
+    hasError = true;
+  }
+
+  if (bodyLineCount > 300 && !/^#{1,6}\s+table of contents\s*$/im.test(body)) {
+    console.error(
+      `Error: ${relPath}: SKILL.md body exceeds 300 lines without a Table of Contents heading (guide §3.3)`
+    );
+    hasError = true;
+  }
+
+  const description = fields['description'] || '';
+  const descriptionWords = description.split(/\s+/).filter(Boolean).length;
+  if (descriptionWords > 100) {
+    console.error(
+      `Error: ${relPath}: description is ${descriptionWords} words; keep it at or under 100 words (guide §3.2)`
+    );
+    hasError = true;
+  }
+  if (description.length >= 1024) {
+    console.error(
+      `Error: ${relPath}: description is ${description.length} characters; keep it strictly under the 1024-character specification limit (guide §3.2)`
+    );
+    hasError = true;
+  }
+
   const framework = skillDirName.startsWith('sdet-') ? 'sdet' : skillDirName.split('-')[0];
   const topic = skillDirName.startsWith('sdet-') ? skillDirName.substring(5) : skillDirName;
 
