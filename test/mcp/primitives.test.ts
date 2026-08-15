@@ -46,7 +46,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
   });
 
   describe('tools', () => {
-    it('tools/list returns registered tools with readOnlyHint annotations', async () => {
+    it('tools/list returns registered tools with complete safe read-only annotations', async () => {
       const res = await mcpFetch(url, { jsonrpc: '2.0', id: 3, method: 'tools/list' });
 
       expect.soft(res.status).toBe(200);
@@ -59,6 +59,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(typeof tool.name).toBe('string');
         expect.soft(tool.annotations).toBeDefined();
         expect.soft(tool.annotations?.readOnlyHint).toBe(true);
+        expect.soft(tool.annotations?.destructiveHint).toBe(false);
+        expect.soft(tool.annotations?.idempotentHint).toBe(true);
+        expect.soft(tool.annotations?.openWorldHint).toBe(false);
       }
     });
 
@@ -258,7 +261,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const genData = await parseMcpResponse(genRes);
       expect.soft(genData.result?.messages).toBeDefined();
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
-      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/vibium-*');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
+      expect
+        .soft(genData.result?.messages?.[0]?.content?.text)
+        .toContain('skills/sdet-*/references/vibium.md');
 
       const pwGenRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -277,7 +283,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const pwGenData = await parseMcpResponse(pwGenRes);
       expect.soft(pwGenData.result?.messages).toBeDefined();
       expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('playwright');
-      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/playwright-*');
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
+      expect
+        .soft(pwGenData.result?.messages?.[0]?.content?.text)
+        .toContain('skills/sdet-*/references/playwright.md');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',

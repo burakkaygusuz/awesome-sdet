@@ -42,7 +42,7 @@ export function registerPrompts(server: McpServer): void {
             text: `You are an enterprise SDET Specialist. Generate a production-grade, resilient test suite for ${framework} using ${language}.
 
 Reference Guidelines:
-- Consult repository skills (\`skills/${framework}-*\`) and MCP knowledge tools (\`read_${framework}_*_docs\`).
+- Consult canonical capability skills (\`skills/sdet-*\`), framework adapter references (\`skills/sdet-*/references/${framework}.md\`), and MCP knowledge tools (\`read_${framework}_*_docs\`).
 - Reference canonical invariants at \`sdet://guidelines\` and API references at \`${framework}://{domain}/${language}\`.
 
 Feature Specifications:
@@ -84,7 +84,7 @@ Core Quality Invariants:
             text: `Migrate the following test code from ${sourceFramework} to ${targetFramework}.
 
 Migration Rules:
-1. Target Idioms: Consult \`skills/${targetFramework}-*\` and adopt idiomatic ${targetFramework} patterns.
+1. Target Idioms: Consult canonical capability skills (\`skills/sdet-*\`) and target framework adapter references (\`skills/sdet-*/references/${targetFramework}.md\`), adopting idiomatic ${targetFramework} patterns.
 2. Anti-Pattern Elimination: Refactor any hardcoded sleeps, brittle XPaths, or shared state into ${targetFramework} explicit condition waits and semantic locators.
 3. Assertion Fidelity: Preserve all business logic, assertions, and state verification.
 

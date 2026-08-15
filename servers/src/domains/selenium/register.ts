@@ -1,5 +1,6 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
 import type { safeToolHandler } from '../../server.js';
+import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
 import {
   handleSeleniumWait,
   handlePageFactoryDocs,
@@ -22,7 +23,7 @@ import {
 export function registerSeleniumTools(
   server: McpServer,
   safeHandler: typeof safeToolHandler,
-  annotations: ToolAnnotations
+  annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
     'execute_se_explicit_wait',

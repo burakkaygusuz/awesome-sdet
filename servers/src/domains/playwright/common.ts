@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { loadCachedReferenceMarkdown, resolveLanguage } from '../shared.js';
+import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
 
 export const PLAYWRIGHT_SUPPORTED_LANGUAGES = [
   'typescript',
@@ -18,25 +18,35 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
+export const PLAYWRIGHT_DOMAINS = [
+  'actions',
+  'assertions',
+  'locators',
+  'network',
+  'observability',
+  'storage',
+] as const;
+
 export const PlaywrightDomainSchema = z
-  .enum(['actions', 'assertions', 'locators', 'network', 'observability', 'storage'] as const)
+  .enum(PLAYWRIGHT_DOMAINS)
   .describe('Supported Playwright documentation domain');
 
 export type PlaywrightDomain = z.infer<typeof PlaywrightDomainSchema>;
 
 export async function loadReferenceMarkdown(
   importMetaUrl: string,
-  language: SupportedLanguage = 'typescript'
+  language: string = 'typescript'
 ): Promise<string> {
-  return loadCachedReferenceMarkdown(importMetaUrl, language, 'typescript');
+  const safeLang = sanitizeLanguage(language, PLAYWRIGHT_SUPPORTED_LANGUAGES, 'typescript');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'typescript');
 }
 
 export async function readPlaywrightReferenceDoc(
   domain: string,
   language: string = 'typescript'
 ): Promise<string> {
-  const safeDomain = PlaywrightDomainSchema.parse((domain || '').toLowerCase().trim());
-  const normLang = resolveLanguage(
+  const safeDomain = sanitizeDomain(domain, PLAYWRIGHT_DOMAINS, 'locators', 'Playwright');
+  const normLang = sanitizeLanguage(
     language,
     PLAYWRIGHT_SUPPORTED_LANGUAGES,
     'typescript',

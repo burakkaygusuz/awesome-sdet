@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { calculateNextVersion, syncVersions, type VersionTargets } from '../../scripts/release.js';
+import { PluginManifestSchema } from '../../scripts/schemas.js';
 
 describe('Release Version Calculation & Sync', () => {
   let tempDir: string;
@@ -21,17 +22,34 @@ describe('Release Version Calculation & Sync', () => {
 
     fs.writeFileSync(
       targets.rootPkgPath,
-      JSON.stringify({ name: 'root', version: '1.0.0' }, null, 2),
+      JSON.stringify(
+        {
+          name: 'awesome-sdet',
+          version: '1.0.0',
+          description: 'Enterprise SDET Agent Plugin',
+        },
+        null,
+        2
+      ),
       'utf8'
     );
     fs.writeFileSync(
       targets.pluginJsonPath,
-      JSON.stringify({ name: 'plugin', version: '1.0.0' }, null, 2),
+      JSON.stringify(
+        {
+          $schema: 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json',
+          name: 'awesome-sdet',
+          version: '1.0.0',
+          description: 'Enterprise SDET Agent Plugin',
+        },
+        null,
+        2
+      ),
       'utf8'
     );
     fs.writeFileSync(
       targets.serversPkgPath,
-      JSON.stringify({ name: 'servers', version: '1.0.0' }, null, 2),
+      JSON.stringify({ name: 'sdet-mcp', version: '1.0.0' }, null, 2),
       'utf8'
     );
   });
@@ -87,5 +105,40 @@ describe('Release Version Calculation & Sync', () => {
 
     const root = JSON.parse(fs.readFileSync(targets.rootPkgPath, 'utf8'));
     expect(root.version).toBe('2.0.0');
+  });
+
+  it('ensures synchronized plugin.json strictly satisfies PluginManifestSchema', () => {
+    syncVersions('1.2.0', targets);
+
+    const plugin = JSON.parse(fs.readFileSync(targets.pluginJsonPath, 'utf8'));
+    const parsed = PluginManifestSchema.safeParse(plugin);
+
+    expect(parsed.success).toBe(true);
+    expect(plugin.$schema).toBe('https://agent-plugins.org/schemas/1.0.0/plugin.schema.json');
+    expect(plugin.version).toBe('1.2.0');
+  });
+
+  it('preserves canonical $schema URL and metadata attributes without mutation during sync', () => {
+    syncVersions('3.0.0', targets);
+
+    const plugin = JSON.parse(fs.readFileSync(targets.pluginJsonPath, 'utf8'));
+    expect(plugin.$schema).toBe('https://agent-plugins.org/schemas/1.0.0/plugin.schema.json');
+    expect(plugin.name).toBe('awesome-sdet');
+    expect(plugin.description).toBe('Enterprise SDET Agent Plugin');
+  });
+
+  it('asserts zero version drift across active manifests in repository root and servers', () => {
+    const actualTargets = {
+      rootPkgPath: path.resolve(process.cwd(), 'package.json'),
+      pluginJsonPath: path.resolve(process.cwd(), 'plugin.json'),
+      serversPkgPath: path.resolve(process.cwd(), 'servers/package.json'),
+    };
+
+    const root = JSON.parse(fs.readFileSync(actualTargets.rootPkgPath, 'utf8'));
+    const plugin = JSON.parse(fs.readFileSync(actualTargets.pluginJsonPath, 'utf8'));
+    const servers = JSON.parse(fs.readFileSync(actualTargets.serversPkgPath, 'utf8'));
+
+    expect(plugin.version).toBe(root.version);
+    expect(servers.version).toBe(root.version);
   });
 });

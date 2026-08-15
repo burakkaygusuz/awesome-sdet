@@ -63,6 +63,16 @@ export function handleCorsPreflight(
 
 export const PROTOCOL_VERSION_META_KEY = 'io.modelcontextprotocol/protocolVersion';
 export const CLIENT_CAPABILITIES_META_KEY = 'io.modelcontextprotocol/clientCapabilities';
+export const MAX_BODY_BYTES = 10 * 1024 * 1024; // 10MB
+
+export function safeJsonParse<T = unknown>(text: string): T {
+  return JSON.parse(text, (key, value) => {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      return undefined;
+    }
+    return value;
+  });
+}
 
 export interface EnvelopeValidationResult {
   ok: boolean;
@@ -72,13 +82,19 @@ export interface EnvelopeValidationResult {
 }
 
 export function extractBodyProtocolVersion(payload: Record<string, unknown>): string | undefined {
-  if (!payload || typeof payload !== 'object') return undefined;
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return undefined;
 
-  const params = payload.params as Record<string, unknown> | undefined;
+  const params = Object.hasOwn(payload, 'params')
+    ? (payload.params as Record<string, unknown>)
+    : undefined;
   if (params && typeof params === 'object' && !Array.isArray(params)) {
-    const meta = params._meta as Record<string, unknown> | undefined;
+    const meta = Object.hasOwn(params, '_meta')
+      ? (params._meta as Record<string, unknown>)
+      : undefined;
     if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
-      const v = meta[PROTOCOL_VERSION_META_KEY];
+      const v = Object.hasOwn(meta, PROTOCOL_VERSION_META_KEY)
+        ? meta[PROTOCOL_VERSION_META_KEY]
+        : undefined;
       if (typeof v === 'string' && v.trim().length > 0) return v.trim();
     }
   }
@@ -97,7 +113,9 @@ export function validateRequestEnvelope(
     };
   }
 
-  const params = payload.params as Record<string, unknown> | undefined;
+  const params = Object.hasOwn(payload, 'params')
+    ? (payload.params as Record<string, unknown>)
+    : undefined;
   if (!params || typeof params !== 'object' || Array.isArray(params)) {
     return {
       ok: false,
@@ -106,7 +124,9 @@ export function validateRequestEnvelope(
     };
   }
 
-  const meta = params._meta as Record<string, unknown> | undefined;
+  const meta = Object.hasOwn(params, '_meta')
+    ? (params._meta as Record<string, unknown>)
+    : undefined;
   if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
     return {
       ok: false,
@@ -115,7 +135,9 @@ export function validateRequestEnvelope(
     };
   }
 
-  const protocolVersion = meta[PROTOCOL_VERSION_META_KEY];
+  const protocolVersion = Object.hasOwn(meta, PROTOCOL_VERSION_META_KEY)
+    ? meta[PROTOCOL_VERSION_META_KEY]
+    : undefined;
   if (typeof protocolVersion !== 'string' || protocolVersion.trim().length === 0) {
     return {
       ok: false,
@@ -124,7 +146,9 @@ export function validateRequestEnvelope(
     };
   }
 
-  const clientCapabilities = meta[CLIENT_CAPABILITIES_META_KEY];
+  const clientCapabilities = Object.hasOwn(meta, CLIENT_CAPABILITIES_META_KEY)
+    ? meta[CLIENT_CAPABILITIES_META_KEY]
+    : undefined;
   if (
     clientCapabilities === undefined ||
     typeof clientCapabilities !== 'object' ||
@@ -158,23 +182,67 @@ export async function handleMcpPostRequest(
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
 
+  const contentLength = Number.parseInt(req.headers['content-length'] || '0', 10);
+  if (contentLength > MAX_BODY_BYTES) {
+    res.writeHead(413, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: null,
+        error: {
+          code: -32600,
+          message: 'Payload Too Large: request body exceeds 10MB limit',
+        },
+      })
+    );
+    req.resume();
+    return;
+  }
+
   let body = '';
-  req.on('data', (chunk) => {
+  let receivedBytes = 0;
+  let exceeded = false;
+
+  req.on('data', (chunk: Buffer | string) => {
+    if (exceeded) return;
+    const chunkLength = typeof chunk === 'string' ? Buffer.byteLength(chunk) : chunk.length;
+    receivedBytes += chunkLength;
+
+    if (receivedBytes > MAX_BODY_BYTES) {
+      exceeded = true;
+      if (!res.headersSent) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: null,
+            error: {
+              code: -32600,
+              message: 'Payload Too Large: request body exceeds 10MB limit',
+            },
+          })
+        );
+      }
+      req.resume();
+      return;
+    }
+
     body += chunk;
   });
 
   req.on('end', async () => {
-    try {
-      let jsonPayload: {
-        jsonrpc?: string;
-        id?: unknown;
-        method?: string;
-        params?: Record<string, unknown>;
-      } = {};
+    if (exceeded) return;
+    let jsonPayload: {
+      jsonrpc?: string;
+      id?: unknown;
+      method?: string;
+      params?: Record<string, unknown>;
+    } = {};
 
+    try {
       if (body) {
         try {
-          jsonPayload = JSON.parse(body);
+          jsonPayload = safeJsonParse(body);
         } catch {
           jsonPayload = {};
         }
@@ -192,7 +260,7 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32000,
+              code: -32020,
               message: 'Missing required header: Mcp-Protocol-Version',
             },
           })
@@ -207,15 +275,18 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32000,
+              code: -32022,
               message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
+              data: {
+                supported: Array.from(SUPPORTED_PROTOCOL_VERSIONS),
+                requested: protocolVersionHeader,
+              },
             },
           })
         );
         return;
       }
 
-      // Validate basic JSON-RPC 2.0 structure for messages
       if (jsonPayload.jsonrpc !== undefined && jsonPayload.jsonrpc !== '2.0') {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
@@ -231,9 +302,8 @@ export async function handleMcpPostRequest(
       if (jsonPayload.id !== undefined) {
         const isString = typeof jsonPayload.id === 'string';
         const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
-        const isNull = jsonPayload.id === null;
 
-        if (!isString && !isInteger && !isNull) {
+        if (!isString && !isInteger) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
             JSON.stringify({
@@ -241,7 +311,7 @@ export async function handleMcpPostRequest(
               id: null,
               error: {
                 code: -32600,
-                message: 'Invalid Request: id must be a string, integer, or null',
+                message: 'Invalid Request: id must be a string or integer (null is not allowed)',
               },
             })
           );
@@ -249,7 +319,6 @@ export async function handleMcpPostRequest(
         }
       }
 
-      // Check header consistency
       const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
       if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -288,7 +357,6 @@ export async function handleMcpPostRequest(
         }
       }
 
-      // If this is a request, validate the per-request _meta envelope
       const isRequest = jsonPayload.method !== undefined && jsonPayload.id !== undefined;
       if (isRequest) {
         const envelopeValidation = validateRequestEnvelope(jsonPayload);
@@ -347,9 +415,8 @@ export async function handleMcpPostRequest(
 
         const isString = typeof jsonPayload.id === 'string';
         const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
-        const isNull = jsonPayload.id === null;
 
-        if (!isString && !isInteger && !isNull) {
+        if (!isString && !isInteger) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
             JSON.stringify({
@@ -357,7 +424,7 @@ export async function handleMcpPostRequest(
               id: null,
               error: {
                 code: -32600,
-                message: 'Invalid Request: id must be a string, integer, or null',
+                message: 'Invalid Request: id must be a string or integer (null is not allowed)',
               },
             })
           );
@@ -388,7 +455,6 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      // Route JSON-RPC payload to Streamable HTTP Transport via standard SDK contract
       const transport = new NodeStreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
@@ -403,7 +469,13 @@ export async function handleMcpPostRequest(
         res.end(
           JSON.stringify({
             jsonrpc: '2.0',
-            error: { code: -32603, message: 'Internal Server Error' },
+            id:
+              jsonPayload &&
+              typeof jsonPayload === 'object' &&
+              (typeof jsonPayload.id === 'string' || Number.isInteger(jsonPayload.id))
+                ? jsonPayload.id
+                : null,
+            error: { code: -32603, message: 'Internal error' },
           })
         );
       }
@@ -413,35 +485,48 @@ export async function handleMcpPostRequest(
 
 export function createHttpServer() {
   return http.createServer(async (req, res) => {
-    if (req.url === '/mcp') {
-      if (!isLocalHostAndOrigin(req)) {
-        res.writeHead(403, { 'Content-Type': 'text/plain' });
-        res.end('Forbidden: non-local host/origin');
+    try {
+      if (req.url === '/mcp') {
+        if (!isLocalHostAndOrigin(req)) {
+          res.writeHead(403, { 'Content-Type': 'text/plain' });
+          res.end('Forbidden: non-local host/origin');
+          return;
+        }
+
+        const { originHeader } = extractHostAndOrigin(req);
+
+        if (handleCorsPreflight(req, res, originHeader)) {
+          return;
+        }
+
+        if (req.method === 'POST') {
+          await handleMcpPostRequest(req, res, originHeader);
+          return;
+        }
+
+        res.writeHead(405, {
+          'Content-Type': 'text/plain',
+          Allow: 'POST, OPTIONS',
+        });
+        res.end('Method Not Allowed: MCP 2026-07-28 Streamable HTTP requires POST');
         return;
       }
 
-      const { originHeader } = extractHostAndOrigin(req);
-
-      if (handleCorsPreflight(req, res, originHeader)) {
-        return;
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+    } catch (error) {
+      console.error('[sdet-mcp] Top-level HTTP server error:', error);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: null,
+            error: { code: -32603, message: 'Internal error' },
+          })
+        );
       }
-
-      if (req.method === 'POST') {
-        await handleMcpPostRequest(req, res, originHeader);
-        return;
-      }
-
-      // MCP 2026-07-28 Spec: Streamable HTTP exclusively supports POST (GET stream endpoint removed)
-      res.writeHead(405, {
-        'Content-Type': 'text/plain',
-        Allow: 'POST, OPTIONS',
-      });
-      res.end('Method Not Allowed: MCP 2026-07-28 Streamable HTTP requires POST');
-      return;
     }
-
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
   });
 }
 

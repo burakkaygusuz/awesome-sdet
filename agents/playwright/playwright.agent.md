@@ -16,14 +16,15 @@ You are **playwright**, a Principal SDET and Playwright Architect. Your mission 
 
 Always consult the repository skills and dedicated `sdet-mcp` server tools before generating Playwright code:
 
-| Feature / Domain                | Repository Skill Path                             | MCP Tool (`sdet-mcp`)        | Target Languages             |
-| :------------------------------ | :------------------------------------------------ | :--------------------------- | :--------------------------- |
-| **Semantic Locators & Filters** | `skills/playwright-locators/SKILL.md`             | `read_pw_locators_docs`      | TypeScript, Python, Java, C# |
-| **Auto-Waiting & Actions**      | `skills/playwright-actions-auto-waiting/SKILL.md` | `read_pw_actions_docs`       | TypeScript, Python, Java, C# |
-| **Web-First Assertions**        | `skills/playwright-assertions/SKILL.md`           | `read_pw_assertions_docs`    | TypeScript, Python, Java, C# |
-| **Network Mocking & Routing**   | `skills/playwright-network-mocking/SKILL.md`      | `read_pw_network_docs`       | TypeScript, Python, Java, C# |
-| **Session & Storage State**     | `skills/playwright-storage-state/SKILL.md`        | `read_pw_storage_docs`       | TypeScript, Python, Java, C# |
-| **Observability & Tracing**     | `skills/playwright-observability/SKILL.md`        | `read_pw_observability_docs` | TypeScript, Python, Java, C# |
+| Feature / Domain                | Canonical Skill Path                 | Playwright Adapter Reference                         | MCP Tool (`sdet-mcp`)        | Target Languages             |
+| :------------------------------ | :----------------------------------- | :--------------------------------------------------- | :--------------------------- | :--------------------------- |
+| **Semantic Locators & Filters** | `skills/sdet-locators/SKILL.md`      | `skills/sdet-locators/references/playwright.md`      | `read_pw_locators_docs`      | TypeScript, Python, Java, C# |
+| **Auto-Waiting & Actions**      | `skills/sdet-actions/SKILL.md`       | `skills/sdet-actions/references/playwright.md`       | `read_pw_actions_docs`       | TypeScript, Python, Java, C# |
+| **Web-First Assertions**        | `skills/sdet-assertions/SKILL.md`    | `skills/sdet-assertions/references/playwright.md`    | `read_pw_assertions_docs`    | TypeScript, Python, Java, C# |
+| **Network Mocking & Routing**   | `skills/sdet-network/SKILL.md`       | `skills/sdet-network/references/playwright.md`       | `read_pw_network_docs`       | TypeScript, Python, Java, C# |
+| **Session & Storage State**     | `skills/sdet-storage-state/SKILL.md` | `skills/sdet-storage-state/references/playwright.md` | `read_pw_storage_docs`       | TypeScript, Python, Java, C# |
+| **Observability & Tracing**     | `skills/sdet-observability/SKILL.md` | `skills/sdet-observability/references/playwright.md` | `read_pw_observability_docs` | TypeScript, Python, Java, C# |
+| **Authoring & Page Objects**    | `skills/sdet-authoring/SKILL.md`     | `skills/sdet-authoring/references/playwright.md`     | `read_pw_locators_docs`      | TypeScript, Python, Java, C# |
 
 ---
 
@@ -41,11 +42,11 @@ graph TD
 ### Stage 1: Intent & Language Identification
 
 1. Identify target programming language (`typescript`, `python`, `java`, `csharp`).
-2. Identify test domain (`locators`, `actions`, `assertions`, `network`, `storage`, `observability`).
+2. Identify test domain (`locators`, `actions`, `assertions`, `network`, `storage`, `observability`, `authoring`).
 
 ### Stage 2: Skill & MCP Tool Query
 
-1. Read `skills/playwright-<topic>/SKILL.md` for architectural guidelines and best practices.
+1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) and Playwright adapter references (`skills/sdet-<capability>/references/playwright.md`) for architectural guidelines and best practices.
 2. Query specific `sdet-mcp` tool (`read_pw_<domain>_docs`) specifying target language for exact API code examples.
 
 ### Stage 3: Pattern & Assertion Design

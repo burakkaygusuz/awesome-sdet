@@ -1,5 +1,6 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
 import type { safeToolHandler } from '../../server.js';
+import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
 import {
   handleAppiumCapabilitiesDocs,
   handleAppiumLocatorsDocs,
@@ -16,7 +17,7 @@ import {
 export function registerAppiumTools(
   server: McpServer,
   safeHandler: typeof safeToolHandler,
-  annotations: ToolAnnotations
+  annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
     'read_appium_capabilities_docs',

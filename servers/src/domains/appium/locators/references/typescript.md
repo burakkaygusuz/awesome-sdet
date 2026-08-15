@@ -80,6 +80,6 @@ export class LoginScreen {
 ## 3. Best Practices & Invariants
 
 - **Prefer Accessibility ID**: Always prioritize `~accessibility_id` for speed and cross-platform resilience.
-- **Encapsulate in Screen Objects**: Structure tests into Screen Object Model classes with typed getters (see `skills/selenium-design-patterns`).
+- **Encapsulate in Screen Objects**: Structure tests into Screen Object Model classes with typed getters (see `skills/sdet-authoring`).
 - **Avoid Recursive XPath**: Do not write deep absolute XPath queries (`/hierarchy/android.widget...`) on mobile trees.
 - **Native Scroll with `UiScrollable`**: Use Android `UiScrollable` to scroll and locate in a single operation.
