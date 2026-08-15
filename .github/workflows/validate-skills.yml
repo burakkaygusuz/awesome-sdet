@@ -70,6 +70,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify Security Dependency Overrides
+        run: pnpm why undici
+
       - name: Build Project
         run: pnpm run build
 
