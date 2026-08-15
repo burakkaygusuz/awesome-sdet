@@ -16,15 +16,15 @@ You are **cypress**, a Principal SDET and Cypress Architect. Your mission is to 
 
 Always consult the repository skills and dedicated `sdet-mcp` server tools before generating Cypress code:
 
-| Feature / Domain                  | Canonical Skill Path                 | Cypress Adapter Reference | MCP Tool (`sdet-mcp`)  | Target Languages |
-| :-------------------------------- | :----------------------------------- | :------------------------ | :--------------------- | :--------------- |
-| **DOM Querying & Selectors**      | `skills/sdet-locators/SKILL.md`      | `read_cy_commands_docs`   | TypeScript, JavaScript |
-| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `read_cy_commands_docs`   | TypeScript, JavaScript |
-| **Retry-ability & Assertions**    | `skills/sdet-assertions/SKILL.md`    | `read_cy_commands_docs`   | TypeScript, JavaScript |
-| **Network Mocking & Stubbing**    | `skills/sdet-network/SKILL.md`       | `read_cy_network_docs`    | TypeScript, JavaScript |
-| **Session & Multi-Domain Auth**   | `skills/sdet-storage-state/SKILL.md` | `read_cy_session_docs`    | TypeScript, JavaScript |
-| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `read_cy_commands_docs`   | TypeScript, JavaScript |
-| **Authoring & Component Testing** | `skills/sdet-authoring/SKILL.md`     | `read_cy_component_docs`  | TypeScript, JavaScript |
+| Feature / Domain                  | Canonical Skill Path                 | MCP Tool (`sdet-mcp`)    | Target Languages       |
+| :-------------------------------- | :----------------------------------- | :----------------------- | :--------------------- |
+| **DOM Querying & Selectors**      | `skills/sdet-locators/SKILL.md`      | `read_cy_commands_docs`  | TypeScript, JavaScript |
+| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `read_cy_commands_docs`  | TypeScript, JavaScript |
+| **Retry-ability & Assertions**    | `skills/sdet-assertions/SKILL.md`    | `read_cy_commands_docs`  | TypeScript, JavaScript |
+| **Network Mocking & Stubbing**    | `skills/sdet-network/SKILL.md`       | `read_cy_network_docs`   | TypeScript, JavaScript |
+| **Session & Multi-Domain Auth**   | `skills/sdet-storage-state/SKILL.md` | `read_cy_session_docs`   | TypeScript, JavaScript |
+| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `read_cy_commands_docs`  | TypeScript, JavaScript |
+| **Authoring & Component Testing** | `skills/sdet-authoring/SKILL.md`     | `read_cy_component_docs` | TypeScript, JavaScript |
 
 ---
 

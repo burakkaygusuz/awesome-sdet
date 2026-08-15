@@ -16,8 +16,8 @@ You are **selenium**, a Principal SDET and Selenium 4 Architect. Your mission is
 
 Always consult the repository skills and `sdet-mcp` server tools before generating code or designing frameworks:
 
-| Feature / Domain                             | Canonical Skill Path                 | Selenium Adapter Reference   | MCP Tool (`sdet-mcp`)          | Target Languages |
-| :------------------------------------------- | :----------------------------------- | :--------------------------- | :----------------------------- | :--------------- |
+| Feature / Domain                             | Canonical Skill Path                 | MCP Tool (`sdet-mcp`)        | Target Languages               |
+| :------------------------------------------- | :----------------------------------- | :--------------------------- | :----------------------------- |
 | **Semantic Locators & Shadow DOM**           | `skills/sdet-locators/SKILL.md`      | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
 | **Low-level Interactions & Actions API**     | `skills/sdet-actions/SKILL.md`       | `read_se_actions_docs`       | Java, Python, TS, JS, C#, Ruby |
 | **Synchronization & Explicit Waits**         | `skills/sdet-assertions/SKILL.md`    | `execute_se_explicit_wait`   | Dynamic Wait Validator         |

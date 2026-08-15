@@ -16,12 +16,12 @@ You are **appium**, the Principal Lead SDET and Mobile Test Automation Architect
 
 Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mcp` server tools before generating mobile test automation code:
 
-| Feature / Domain                          | Canonical Skill Path             | Appium Adapter Reference        | MCP Tool (`sdet-mcp`)                    | Target Languages |
-| :---------------------------------------- | :------------------------------- | :------------------------------ | :--------------------------------------- | :--------------- |
+| Feature / Domain                          | Canonical Skill Path             | MCP Tool (`sdet-mcp`)           | Target Languages                         |
+| :---------------------------------------- | :------------------------------- | :------------------------------ | :--------------------------------------- |
 | **Mobile Locator Strategies**             | `skills/sdet-locators/SKILL.md`  | `read_appium_locators_docs`     | TypeScript, JavaScript, Python, Java, C# |
 | **Touch Gestures & W3C Actions**          | `skills/sdet-actions/SKILL.md`   | `read_appium_gestures_docs`     | TypeScript, JavaScript, Python, Java, C# |
 | **Device Lifecycle & App Capabilities**   | `skills/sdet-mobile/SKILL.md`    | `read_appium_capabilities_docs` | TypeScript, JavaScript, Python, Java, C# |
-| **Screen Object Models & Test Authoring** | `skills/sdet-authoring/SKILL.md` | `read_appium_device_docs`       | TypeScript, JavaScript, Python, Java, C# |
+| **Screen Object Models & Test Authoring** | `skills/sdet-authoring/SKILL.md` | `read_appium_locators_docs`     | TypeScript, JavaScript, Python, Java, C# |
 
 > **Cross-Framework Interoperability:** When automating Hybrid WebViews (`WEBVIEW`), consult `skills/sdet-locators` and `skills/sdet-assertions` (along with `read_se_locator_docs` / `selenium://locators/{language}`) for DOM locator strategies and explicit wait assertions.
 
@@ -54,7 +54,7 @@ graph TD
 1. Model W3C-compliant capabilities using dedicated Options classes (`UiAutomator2Options`, `XCUITestOptions`, `AppiumOptions`).
 2. Structure tests using the **Screen Object Model (SOM)** and **Page Component Objects** (`skills/sdet-authoring/SKILL.md`):
    - Encapsulate screen locators and gesture helpers inside Screen classes; keep assertions in test cases.
-   - For Java test suites, leverage `AppiumFieldDecorator` (`@AndroidFindBy`, `@iOSXCUITFindBy`) powered by Selenium `PageFactory` (`read_se_pagefactory_docs`).
+   - For Java test suites, leverage `AppiumFieldDecorator` (`@AndroidFindBy`, `@iOSXCUITFindBy`) powered by Selenium `PageFactory` (`read_se_pagefactory_docs`). Note: Selenium maintainers treat `PageFactory` as de facto deprecated (SeleniumHQ/selenium#15522); prefer constructor injection for new suites.
    - Use the **Mobile Action Bot** pattern to encapsulate complex multi-touch W3C action sequences away from Screen Objects.
    - Implement **Fluent Interface** chaining for multi-screen navigation flows.
 
