@@ -11,6 +11,18 @@ export const ALLOWED_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 export const SUPPORTED_PROTOCOL_VERSIONS = new Set([PROTOCOL_VERSION_2026_07_28]);
 
+const MCP_NAME_METHODS = new Set(['tools/call', 'resources/read', 'prompts/get']);
+const SUPPORTED_MCP_METHODS = new Set([
+  'server/discover',
+  'tools/list',
+  'tools/call',
+  'resources/list',
+  'resources/templates/list',
+  'resources/read',
+  'prompts/list',
+  'prompts/get',
+]);
+
 export const mcpServer = createMcpServer();
 
 export interface HostAndOriginInfo {
@@ -39,7 +51,7 @@ export function extractHostAndOrigin(req: http.IncomingMessage): HostAndOriginIn
 export function isLocalHostAndOrigin(req: http.IncomingMessage): boolean {
   const { hostName, originHeader, originName } = extractHostAndOrigin(req);
   if (!ALLOWED_HOSTS.has(hostName)) return false;
-  if (originHeader && originName && !ALLOWED_HOSTS.has(originName)) return false;
+  if (originHeader && (!originName || !ALLOWED_HOSTS.has(originName))) return false;
   return true;
 }
 
@@ -320,7 +332,22 @@ export async function handleMcpPostRequest(
       }
 
       const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
-      if (mcpMethodHeader && jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
+      if (!mcpMethodHeader) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: {
+              code: -32020,
+              message: 'Missing required header: Mcp-Method',
+            },
+          })
+        );
+        return;
+      }
+
+      if (jsonPayload.method && mcpMethodHeader !== jsonPayload.method) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(
           JSON.stringify({
@@ -336,7 +363,34 @@ export async function handleMcpPostRequest(
       }
 
       const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
+      if (!SUPPORTED_MCP_METHODS.has(effectiveMethod)) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: { code: -32601, message: 'Method not found' },
+          })
+        );
+        return;
+      }
+
       const mcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
+      if (MCP_NAME_METHODS.has(effectiveMethod) && !mcpNameHeader) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: jsonPayload.id ?? null,
+            error: {
+              code: -32020,
+              message: 'Missing required header: Mcp-Name',
+            },
+          })
+        );
+        return;
+      }
+
       if (mcpNameHeader) {
         const paramTarget = (
           (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined

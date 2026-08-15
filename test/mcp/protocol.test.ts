@@ -101,7 +101,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
   });
 
   describe('Mcp-Method header', () => {
-    it('allows standard requests without Mcp-Method header', async () => {
+    it('rejects standard requests without Mcp-Method header with HTTP 400 and -32020', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: MCP_HEADERS,
@@ -118,10 +118,10 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
         }),
       });
 
-      expect.soft(res.status).toBe(200);
+      expect.soft(res.status).toBe(400);
       const data = await parseMcpResponse(res);
-      expect.soft(data.id).toBe(89);
-      expect.soft(Array.isArray(data.result?.tools)).toBe(true);
+      expect.soft(data.error?.code).toBe(-32020);
+      expect.soft(data.error?.message).toContain('Missing required header: Mcp-Method');
     });
 
     it('rejects Mcp-Method / body method mismatch with HTTP 400 and -32020', async () => {
@@ -149,10 +149,10 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
   });
 
   describe('Mcp-Name header', () => {
-    it('allows tools/call requests without Mcp-Name header', async () => {
+    it('rejects tools/call requests without Mcp-Name header with HTTP 400 and -32020', async () => {
       const res = await fetch(url, {
         method: 'POST',
-        headers: MCP_HEADERS,
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/call' },
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: 92,
@@ -168,10 +168,10 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
         }),
       });
 
-      expect.soft(res.status).toBe(200);
+      expect.soft(res.status).toBe(400);
       const data = await parseMcpResponse(res);
-      expect.soft(data.id).toBe(92);
-      expect.soft(Array.isArray(data.result?.content)).toBe(true);
+      expect.soft(data.error?.code).toBe(-32020);
+      expect.soft(data.error?.message).toContain('Missing required header: Mcp-Name');
     });
 
     it('rejects Mcp-Name / body name mismatch with HTTP 400 and -32020', async () => {
@@ -233,6 +233,44 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
         req.end(JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'tools/list' }));
       });
       expect.soft(statusCode).toBe(403);
+    });
+
+    it('rejects malformed Origin header with HTTP 403', async () => {
+      const statusCode = await new Promise<number>((resolve, reject) => {
+        const req = http.request(
+          url,
+          { method: 'POST', headers: { ...MCP_HEADERS, Origin: 'not-a-url' } },
+          (res) => resolve(res.statusCode || 0)
+        );
+        req.on('error', reject);
+        req.end(JSON.stringify({ jsonrpc: '2.0', id: 100, method: 'tools/list' }));
+      });
+      expect.soft(statusCode).toBe(403);
+    });
+  });
+
+  describe('JSON-RPC method dispatch', () => {
+    it('returns HTTP 404 and -32601 for unknown methods', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'unknown/method' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 503,
+          method: 'unknown/method',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(404);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32601);
+      expect.soft(data.error?.message).toBe('Method not found');
     });
   });
 

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/server';
 import { registerPlaywrightTools } from './domains/playwright/index.js';
 import { registerSeleniumTools } from './domains/selenium/index.js';
@@ -45,11 +46,21 @@ export function safeToolHandler<T>(
         ...result,
       };
     } catch (error) {
+      const errorId = randomUUID();
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(
+        JSON.stringify({
+          event: 'tool_execution_error',
+          correlationId: errorId,
+          message: errorMessage,
+        })
+      );
+
       return {
         content: [
           {
             type: 'text' as const,
-            text: `Tool Execution Error: ${error instanceof Error ? error.message : String(error)}`,
+            text: `Tool execution failed. Reference: ${errorId}`,
           },
         ],
         isError: true,
