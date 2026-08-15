@@ -108,13 +108,14 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
 
 ## 📦 What's Included?
 
-- **32 Test Automation Skills (`skills/`):**
+- **38 Test Automation Skills (`skills/`):**
+  - **Playwright (6 skills):** Semantic locators, auto-waiting pipeline, web-first assertions, network interception, storageState caching, and full execution tracing.
   - **Cypress (11 skills):** Web E2E, Component testing, Network interception & performance.
   - **Selenium (11 skills):** WebDriver BiDi, Grid distribution, session management.
   - **Vibium (5 skills):** AI-native Sense-Think-Act automation.
   - **Appium (5 skills):** Native iOS & Android testing.
-- **5 SDET Agents (`agents/`):**
-  - Specialized agent definitions for SDET generalist, Cypress, Selenium, Vibium, and Appium.
+- **6 SDET Agents (`agents/`):**
+  - Specialized agent definitions for SDET generalist, Playwright, Cypress, Selenium, Vibium, and Appium.
 - **SDET MCP Server (`mcp.json` / `servers/`):**
   - Out-of-the-box test plan validation, test code linting, framework matrix recommendations.
   - Dual transports: On-demand `stdio` subprocess execution and high-performance `streamable-http` endpoint (`http://127.0.0.1:3000/mcp`).

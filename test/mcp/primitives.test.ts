@@ -125,6 +125,12 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('tools/call successfully executes documentation tools across all supported frameworks', async () => {
       const crossFrameworkTools = [
+        { name: 'read_pw_locators_docs', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_actions_docs', lang: 'python', expectText: 'Playwright' },
+        { name: 'read_pw_assertions_docs', lang: 'java', expectText: 'Playwright' },
+        { name: 'read_pw_network_docs', lang: 'csharp', expectText: 'Playwright' },
+        { name: 'read_pw_storage_docs', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_observability_docs', lang: 'python', expectText: 'Playwright' },
         { name: 'read_se_actions_docs', lang: 'java', expectText: 'Selenium' },
         { name: 'read_cy_commands_docs', lang: 'typescript', expectText: 'Cypress' },
         { name: 'read_vibium_core_docs', lang: 'python', expectText: 'Vibium' },
@@ -176,6 +182,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('resources/read dynamically fetches resources across all framework templates', async () => {
       const templates = [
+        { uri: 'playwright://locators/typescript', expectText: 'Playwright' },
         { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
         { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
         { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
@@ -198,6 +205,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('resources/read returns JSON-RPC error -32602 when resource is not found across all framework templates', async () => {
       const invalidUris = [
+        'playwright://not-a-real-domain/typescript',
         'selenium://not-a-real-domain/typescript',
         'cypress://not-a-real-domain/typescript',
         'vibium://not-a-real-domain/typescript',
@@ -251,6 +259,25 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(genData.result?.messages).toBeDefined();
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/vibium-*');
+
+      const pwGenRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 25,
+        method: 'prompts/get',
+        params: {
+          name: 'generate-test',
+          arguments: {
+            framework: 'playwright',
+            language: 'typescript',
+            featureDescription: 'User checkout journey with credit card payment',
+          },
+        },
+      });
+      expect.soft(pwGenRes.status).toBe(200);
+      const pwGenData = await parseMcpResponse(pwGenRes);
+      expect.soft(pwGenData.result?.messages).toBeDefined();
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('playwright');
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/playwright-*');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
