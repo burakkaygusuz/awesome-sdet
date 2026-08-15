@@ -1,6 +1,6 @@
 import http from 'node:http';
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createHttpServer } from '../../servers/src/index.js';
 import { closeServer, listenServer, MCP_HEADERS, mcpFetch, parseMcpResponse } from '../helpers.js';
@@ -542,6 +542,120 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       });
 
       expect.soft(res.status).toBe(406);
+    });
+  });
+
+  describe('Payload size limit (MAX_BODY_BYTES)', () => {
+    it('rejects payload exceeding 10MB limit with HTTP 413', async () => {
+      const largePadding = 'x'.repeat(10 * 1024 * 1024 + 1024);
+      const largeBody = JSON.stringify({
+        jsonrpc: '2.0',
+        id: 999,
+        method: 'tools/list',
+        params: {
+          padding: largePadding,
+          _meta: {
+            'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+            'io.modelcontextprotocol/clientCapabilities': {},
+          },
+        },
+      });
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/list',
+        },
+        body: largeBody,
+      });
+
+      expect.soft(res.status).toBe(413);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.message).toContain('Payload Too Large');
+    });
+  });
+
+  describe('Prototype pollution prevention', () => {
+    it('safely handles prototype pollution attempts (__proto__, constructor) without server crash or pollution', async () => {
+      const pollutedBody = JSON.stringify({
+        jsonrpc: '2.0',
+        id: 777,
+        method: 'tools/list',
+        params: {
+          _meta: {
+            'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+            'io.modelcontextprotocol/clientCapabilities': {},
+          },
+        },
+      }).replace(
+        '{"jsonrpc"',
+        '{"__proto__":{"polluted":"yes_root"},"constructor":{"prototype":{"polluted_constructor":"yes"}},"jsonrpc"'
+      );
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/list',
+        },
+        body: pollutedBody,
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe(777);
+      expect.soft(Array.isArray(data.result?.tools)).toBe(true);
+
+      expect.soft((Object.prototype as Record<string, unknown>).polluted).toBeUndefined();
+      expect
+        .soft((Object.prototype as Record<string, unknown>).polluted_constructor)
+        .toBeUndefined();
+      expect.soft(({} as Record<string, unknown>).polluted).toBeUndefined();
+    });
+  });
+
+  describe('Internal error masking & stack trace protection', () => {
+    it('returns generic error message without stack trace leakage on unhandled exceptions', async () => {
+      const { mcpServer } = await import('../../servers/src/index.js');
+      const spy = vi
+        .spyOn(mcpServer, 'connect')
+        .mockRejectedValueOnce(
+          new Error(
+            'SENSITIVE_INTERNAL_DATABASE_FAILURE: secret credentials at /var/data/db.sqlite:42'
+          )
+        );
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/list',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 888,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      spy.mockRestore();
+
+      expect.soft(res.status).toBe(500);
+      const rawText = await res.text();
+      expect.soft(rawText).not.toContain('SENSITIVE_INTERNAL_DATABASE_FAILURE');
+      expect.soft(rawText).not.toContain('/var/data/db.sqlite');
+
+      const data = JSON.parse(rawText);
+      expect.soft(data.jsonrpc).toBe('2.0');
+      expect.soft(data.error?.code).toBe(-32603);
+      expect.soft(data.error?.message).toBe('Internal error');
     });
   });
 });
