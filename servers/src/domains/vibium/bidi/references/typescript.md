@@ -83,7 +83,7 @@ export async function virtualizeClock(vibe: Vibe): Promise<void> {
   // Fast-forward virtual timer by 10 minutes without real sleep delays
   await vibe.clock.fastForward(10 * 60 * 1000);
 
-  const expiredMsg = await vibe.find('text=Offer Expired');
+  const expiredMsg = await vibe.find({ text: 'Offer Expired' });
   await expiredMsg.waitFor();
 }
 ```

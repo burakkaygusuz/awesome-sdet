@@ -19,10 +19,10 @@ export async function captureAndReuseAuthState(): Promise<void> {
     const authPage: Vibe = await bro.page();
     await authPage.go('https://app.example.com/login');
 
-    const userInput = await authPage.find('label=Username');
+    const userInput = await authPage.find({ label: 'Username' });
     await userInput.fill('enterprise-admin');
 
-    const passInput = await authPage.find('label=Password');
+    const passInput = await authPage.find({ label: 'Password' });
     await passInput.fill('SecureP@ssword123');
 
     const loginBtn = await authPage.find({ role: 'button', text: 'Sign In' });

@@ -25,8 +25,8 @@ Before dispatching an action, Vibium ensures the target element meets all releva
 import { type Vibe, type Element } from 'vibium';
 
 export async function demonstrateInteractions(vibe: Vibe): Promise<void> {
-  const username: Element = await vibe.find('label=Username');
-  const password: Element = await vibe.find('label=Password');
+  const username: Element = await vibe.find({ label: 'Username' });
+  const password: Element = await vibe.find({ label: 'Password' });
   const loginBtn: Element = await vibe.find({ role: 'button', text: 'Log In' });
 
   // fill(): Fast atomic replacement with input/change events; type(): sequential physical keystrokes
@@ -35,24 +35,24 @@ export async function demonstrateInteractions(vibe: Vibe): Promise<void> {
 
   await loginBtn.click();
 
-  const searchInput: Element = await vibe.find('placeholder=Search');
+  const searchInput: Element = await vibe.find({ placeholder: 'Search' });
   await searchInput.press('Control+A');
   await searchInput.press('Backspace');
   await searchInput.press('Enter');
 
   // Idempotent checkbox state toggles
-  const termsCheckbox: Element = await vibe.find('label=I agree to Terms');
+  const termsCheckbox: Element = await vibe.find({ label: 'I agree to Terms' });
   await termsCheckbox.check();
   await termsCheckbox.uncheck();
 
-  const infoIcon: Element = await vibe.find('testid=help-tooltip-trigger');
+  const infoIcon: Element = await vibe.find({ testid: 'help-tooltip-trigger' });
   await infoIcon.hover();
   await infoIcon.highlight();
   const box = await infoIcon.bounds();
   console.log('Element bounding box:', box);
 
-  const sourceItem: Element = await vibe.find('testid=draggable-item-1');
-  const targetZone: Element = await vibe.find('testid=drop-target-zone');
+  const sourceItem: Element = await vibe.find({ testid: 'draggable-item-1' });
+  const targetZone: Element = await vibe.find({ testid: 'drop-target-zone' });
   await sourceItem.dragTo(targetZone);
 }
 ```

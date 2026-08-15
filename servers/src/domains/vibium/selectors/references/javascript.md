@@ -11,12 +11,12 @@ async function demonstrateSemanticLocators(vibe) {
   const submitBtn = await vibe.find({ role: 'button', text: 'Sign In' });
   await submitBtn.click();
 
-  const emailInput = await vibe.find('label=Email');
+  const emailInput = await vibe.find({ label: 'Email' });
   await emailInput.fill('user@example.com');
 
-  const submitCard = await vibe.find('testid=submit-card');
+  const submitCard = await vibe.find({ testid: 'submit-card' });
 
-  const successText = await vibe.find('text=Account created');
+  const successText = await vibe.find({ text: 'Account created' });
   await successText.waitFor();
 }
 ```
@@ -27,10 +27,10 @@ async function demonstrateSemanticLocators(vibe) {
 
 ```javascript
 async function pierceShadowRoots(vibe) {
-  const formSubmit = await vibe.find('form.auth-form >> button[type="submit"]');
-  await formSubmit.click();
+  const editButton = await vibe.find('user-card >> button.edit');
+  await editButton.click();
 
-  // '>>>' pierces nested Web Components across open Shadow Root boundaries
+  const shadowBtn = await vibe.find(
   const shadowBtn = await vibe.find('custom-header >>> account-menu >>> button#logout');
   await shadowBtn.click();
 }

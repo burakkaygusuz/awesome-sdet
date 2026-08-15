@@ -16,7 +16,7 @@ async function manageStorageState() {
     const authPage = await bro.page();
     await authPage.go('https://app.example.com/login');
 
-    const userInput = await authPage.find('label=User');
+    const userInput = await authPage.find({ label: 'User' });
     await userInput.fill('admin');
 
     const loginBtn = await authPage.find({ role: 'button', text: 'Login' });

@@ -15,16 +15,16 @@ export async function demonstrateSemanticLocators(vibe: Vibe): Promise<void> {
   const submitBtn: Element = await vibe.find({ role: 'button', text: 'Sign In' });
   await submitBtn.click();
 
-  const usernameInput: Element = await vibe.find('label=Email address');
+  const usernameInput: Element = await vibe.find({ label: 'Email address' });
   await usernameInput.fill('sdet@example.com');
 
-  const cartBadge: Element = await vibe.find('testid=cart-item-count');
+  const cartBadge: Element = await vibe.find({ testid: 'cart-item-count' });
   console.log('Cart count text:', await cartBadge.text());
 
-  const confirmationMsg: Element = await vibe.find('text=Order confirmed successfully');
+  const confirmationMsg: Element = await vibe.find({ text: 'Order confirmed successfully' });
   await confirmationMsg.waitFor();
 
-  const searchField: Element = await vibe.find('placeholder=Search catalog...');
+  const searchField: Element = await vibe.find({ placeholder: 'Search catalog...' });
   await searchField.fill('BiDi testing');
 }
 ```
@@ -35,10 +35,10 @@ export async function demonstrateSemanticLocators(vibe: Vibe): Promise<void> {
 
 Vibium includes explicit combinators for chaining and piercing Shadow DOM boundaries:
 
-| Combinator | Behavior                                                                                     | Example                                            |
-| :--------- | :------------------------------------------------------------------------------------------- | :------------------------------------------------- |
-| **`>>`**   | **Descendant / Scoping Chaining** — Scopes query within parent context or 1 shadow boundary. | `vibe.find('section#checkout >> button.pay-now')`  |
-| **`>>>`**  | **Deep Shadow DOM Piercing** — Pierces across open Shadow Root boundaries recursively.       | `vibe.find('user-avatar >>> shadow-icon >>> svg')` |
+| Combinator | Behavior                                                                               | Example                                            |
+| :--------- | :------------------------------------------------------------------------------------- | :------------------------------------------------- |
+| **`>>`**   | **Single Shadow Boundary Piercing** — Crosses the host element's own Shadow Root.      | `vibe.find('user-card >> p')`                      |
+| **`>>>`**  | **Deep Shadow DOM Piercing** — Pierces across open Shadow Root boundaries recursively. | `vibe.find('user-avatar >>> shadow-icon >>> svg')` |
 
 ### Shadow DOM Piercing Example
 
@@ -46,14 +46,14 @@ Vibium includes explicit combinators for chaining and piercing Shadow DOM bounda
 import { type Vibe, type Element } from 'vibium';
 
 export async function pierceShadowRoots(vibe: Vibe): Promise<void> {
-  // '>>>' pierces nested Web Components across open Shadow Root boundaries
+  const editButton: Element = await vibe.find('user-card >> button.edit');
+  await editButton.click();
+
+  const nestedButton: Element = await vibe.find( at any depth
   const nestedButton: Element = await vibe.find(
     'app-header >>> user-profile-card >>> #edit-profile-btn'
   );
   await nestedButton.click();
-
-  const modalConfirm: Element = await vibe.find('dialog.modal-confirm >> button.confirm');
-  await modalConfirm.click();
 }
 ```
 
@@ -77,8 +77,8 @@ export async function scopedLocators(vibe: Vibe): Promise<void> {
 
 ## 4. Best Practices & Priority Hierarchy
 
-1. 🥇 **`find({ role, text })` / `find('label=...')`**: User-facing accessibility contracts.
-2. 🥈 **`find('testid=...')`**: Dedicated QA contract (`data-testid`).
-3. 🥉 **`find('text=...')` / `find('placeholder=...')`**: Content matching.
+1. 🥇 **`find({ role, text })` / `find({ label })`**: User-facing accessibility contracts.
+2. 🥈 **`find({ testid })`**: Dedicated QA contract (`data-testid`).
+3. 🥉 **`find({ text })` / `find({ placeholder })`**: Content matching.
 4. 🏅 **`>>>` Piercing**: Complex shadow root boundaries in Web Components.
 5. ❌ **Avoid raw XPath or brittle CSS paths** (`div > div:nth-child(3) > span`).
