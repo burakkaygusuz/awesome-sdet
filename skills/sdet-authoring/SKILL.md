@@ -65,6 +65,6 @@ To fetch complete, language-specific code implementations without context pollut
 
 - **Playwright**: `read_pw_locators_docs`, `read_pw_actions_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `playwright://locators/{language}`, `playwright://actions/{language}`
 - **Cypress**: `read_cy_component_docs`, `read_cy_commands_docs`, `read_cy_task_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://component/{language}`, `cypress://commands/{language}`, `cypress://task/{language}`
-- **Selenium**: `read_se_pagefactory_docs`, `read_se_locators_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
+- **Selenium**: `read_se_pagefactory_docs`, `read_se_locator_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
 - **Vibium**: `read_vibium_core_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
 - **Appium**: `read_appium_capabilities_docs`, `read_appium_locators_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://locators/{language}`

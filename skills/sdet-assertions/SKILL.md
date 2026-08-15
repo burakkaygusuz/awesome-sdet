@@ -62,5 +62,5 @@ To fetch complete, language-specific code implementations without context pollut
 
 - **Playwright**: `read_pw_assertions_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
 - **Cypress**: `read_cy_commands_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium**: `read_se_waits_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://waits/{language}`
+- **Selenium**: `execute_se_explicit_wait` (executable dynamic wait validator; explicit-wait patterns ship in the tool response)
 - **Vibium**: `read_vibium_core_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`

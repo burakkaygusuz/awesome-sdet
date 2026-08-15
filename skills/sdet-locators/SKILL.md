@@ -66,6 +66,6 @@ To fetch complete, language-specific code implementations without context pollut
 
 - **Playwright**: `read_pw_locators_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://locators/{language}`
 - **Cypress**: `read_cy_commands_docs`, `read_cy_shadow_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://commands/{language}`, `cypress://shadow/{language}`
-- **Selenium**: `read_se_locators_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
+- **Selenium**: `read_se_locator_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
 - **Vibium**: `read_vibium_selectors_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://selectors/{language}`
 - **Appium**: `read_appium_locators_docs` (Parameters: `strategy: "accessibility_id" | "ios_class_chain" | "ios_predicate_string" | "android_uiautomator" | "id" | "xpath"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://locators/{language}`

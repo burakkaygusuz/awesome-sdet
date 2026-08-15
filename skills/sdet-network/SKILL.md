@@ -62,6 +62,6 @@ By controlling network responses, SDET suites simulate hard-to-reproduce edge ca
 To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
 
 - **Playwright**: `read_pw_network_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
-- **Cypress**: `read_cy_network_docs`, `read_cy_stubs_docs`, `read_cy_fixtures_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
+- **Cypress**: `read_cy_network_docs`, `read_cy_stubs_spies_docs`, `read_cy_fixtures_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
 - **Selenium**: `read_se_bidi_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
 - **Vibium**: `read_vibium_bidi_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`
