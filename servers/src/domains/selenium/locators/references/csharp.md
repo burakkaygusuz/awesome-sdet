@@ -35,3 +35,18 @@ namespace Com.Example.Locators
     }
 }
 ```
+
+## Shadow DOM Piercing
+
+Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+
+```csharp
+IWebElement shadowHost = driver.FindElement(By.CssSelector("my-card"));
+ISearchContext shadowRoot = shadowHost.GetShadowRoot();
+IWebElement inner = shadowRoot.FindElement(By.CssSelector("p"));
+ISearchContext nestedRoot = shadowRoot.FindElement(By.CssSelector("child-widget")).GetShadowRoot();
+```
+
+## Link Text Strategies
+
+Anchor-only strategies: `By.LinkText("Sign in")` / `By.PartialLinkText("Sign")`.

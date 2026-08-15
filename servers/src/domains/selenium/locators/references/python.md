@@ -41,3 +41,18 @@ class LocatorExamples:
 
 - **Tuple Unpacking**: Define locators as `(By.<STRATEGY>, "selector")` tuples and unpack them with `*` when calling `find_element`.
 - **Relative Locators**: Prefer spatial relative locators (`below`, `above`, `left_of`, `right_of`, `near`) for dynamic forms where IDs change.
+
+## Shadow DOM Piercing
+
+Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+
+```python
+shadow_host = driver.find_element(By.CSS_SELECTOR, "my-card")
+shadow_root = shadow_host.shadow_root
+inner = shadow_root.find_element(By.CSS_SELECTOR, "p")
+nested_root = shadow_root.find_element(By.CSS_SELECTOR, "child-widget").shadow_root
+```
+
+## Link Text Strategies
+
+Anchor-only strategies: `By.LINK_TEXT` / `By.PARTIAL_LINK_TEXT`.

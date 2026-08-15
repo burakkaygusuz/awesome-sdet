@@ -27,3 +27,18 @@ class LocatorExamples {
 
 module.exports = { LocatorExamples };
 ```
+
+## Shadow DOM Piercing
+
+Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+
+```javascript
+const shadowHost = await driver.findElement(By.css('my-card'));
+const shadowRoot = await shadowHost.getShadowRoot();
+const inner = await shadowRoot.findElement(By.css('p'));
+const nestedRoot = (await shadowRoot.findElement(By.css('child-widget'))).getShadowRoot();
+```
+
+## Link Text Strategies
+
+Anchor-only strategies: `By.linkText('Sign in')` / `By.partialLinkText('Sign')`.
