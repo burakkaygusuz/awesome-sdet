@@ -104,3 +104,7 @@ public class LoginScreen {
 - **Use `AppiumBy` Methods**: Use static helper methods (`AppiumBy.accessibilityId`, `AppiumBy.iOSClassChain`, `AppiumBy.androidUIAutomator`).
 - **Encapsulate with Screen Objects**: Use `AppiumFieldDecorator` and `PageFactory.initElements` for cross-platform Screen Object encapsulation (see `selenium://pagefactory/java`).
 - **Avoid Fragile XPaths**: Never use full-tree absolute XPaths which cause significant slowdowns on mobile device drivers.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `AppiumBy.image("path/to/element.png")` (requires the Appium images plugin).

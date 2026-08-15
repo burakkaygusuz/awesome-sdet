@@ -58,3 +58,7 @@ namespace AwesomeSdet.Appium
 
 - **Use `MobileBy`**: Use `MobileBy.AccessibilityId` and `MobileBy.IosClassChain` for mobile-native strategies.
 - **Scroll Into View**: Use `MobileBy.AndroidUIAutomator` with `UiScrollable` to reliably target offscreen items.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `MobileBy.Image("path/to/element.png")` (requires the Appium images plugin).

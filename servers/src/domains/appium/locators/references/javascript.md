@@ -44,3 +44,7 @@ async function findAndInteract(driver) {
 
 - **Prefix-Based Selectors**: WebdriverIO interprets `~` as Accessibility ID and `android=` as UiAutomator.
 - **Avoid Absolute XPaths**: Always replace fragile XML XPaths with Class Chains or Predicates.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `AppiumBy.image('path/to/element.png')`, or the `-image` prefix in WebdriverIO selectors (requires the Appium images plugin).

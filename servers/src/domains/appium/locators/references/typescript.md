@@ -83,3 +83,7 @@ export class LoginScreen {
 - **Encapsulate in Screen Objects**: Structure tests into Screen Object Model classes with typed getters (see `skills/sdet-authoring`).
 - **Avoid Recursive XPath**: Do not write deep absolute XPath queries (`/hierarchy/android.widget...`) on mobile trees.
 - **Native Scroll with `UiScrollable`**: Use Android `UiScrollable` to scroll and locate in a single operation.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `AppiumBy.image('path/to/element.png')`, or the `-image` prefix in WebdriverIO selectors (requires the Appium images plugin).
