@@ -52,7 +52,7 @@ The **sdet-mobile** capability standardizes mobile testing architecture in Appiu
 | Mobile Domain / Feature | Appium 2.x W3C Standard                                                | Multi-Platform Strategy                                 |
 | :---------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------ |
 | **Driver Capabilities** | `UiAutomator2Options` (Android), `XCUITestOptions` (iOS)               | Vendor-prefixed (`appium:automationName`, `appium:app`) |
-| **Context Switching**   | `driver.getContextHandles()`, `driver.context('WEBVIEW_...')`          | Safe `try...finally` return to `NATIVE_APP`             |
+| **Context Switching**   | `driver.getContexts()`, switch to `WEBVIEW_<id>`                       | Safe `try...finally` return to `NATIVE_APP`             |
 | **Touch & Gestures**    | W3C `PointerInput` / `ActionChains` (tap, scroll, swipe, drag)         | Standard normalized pixel coordinates                   |
 | **Device Lifecycle**    | `driver.installApp()`, `driver.terminateApp()`, `driver.activateApp()` | Idempotent teardown hooks                               |
 

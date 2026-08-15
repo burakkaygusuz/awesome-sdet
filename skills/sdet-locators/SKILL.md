@@ -52,13 +52,13 @@ Semantic locators identify UI elements exactly as users and assistive technologi
 
 ## 4. Universal Framework Paradigm Mapping
 
-| Automation Framework | Canonical Primary Strategy                          | Scoping & Filtering                             | Piercing & Traversal                              |
-| :------------------- | :-------------------------------------------------- | :---------------------------------------------- | :------------------------------------------------ |
-| **Playwright**       | `page.getByRole()`, `getByLabel()`, `getByTestId()` | `.filter({ hasText, has })`, `.or()`, `.and()`  | Automatic Shadow DOM piercing                     |
-| **Cypress**          | `cy.get('[data-cy=...]')`, `cy.contains()`          | `.within(() => ...)`, `.filter()`               | `.shadow().find(...)`                             |
-| **Selenium 4**       | `driver.findElement(By.cssSelector(...))`           | W3C Relative Locators (`with().above().near()`) | `element.getShadowRoot().findElement(...)`        |
-| **Vibium**           | `browser.find({ role: '...' })`, `label`, `testid`  | Subtree chaining and state filtering            | Shadow piercing combinators (`>>`, `>>>`)         |
-| **Appium**           | `driver.findElement(AppiumBy.accessibilityId(...))` | iOS Class Chains, Android `UiScrollable`        | Native context switching (`WEBVIEW`/`NATIVE_APP`) |
+| Automation Framework | Canonical Primary Strategy                              | Scoping & Filtering                             | Piercing & Traversal                              |
+| :------------------- | :------------------------------------------------------ | :---------------------------------------------- | :------------------------------------------------ |
+| **Playwright**       | `page.getByRole()`, `getByLabel()`, `getByTestId()`     | `.filter({ hasText, has })`, `.or()`, `.and()`  | Automatic Shadow DOM piercing                     |
+| **Cypress**          | `cy.get('[data-testid=...]')`, `cy.contains()`          | `.within(() => ...)`, `.filter()`               | `.shadow().find(...)`                             |
+| **Selenium 4**       | `driver.findElement(By.cssSelector(...))`               | W3C Relative Locators (`with().above().near()`) | `element.getShadowRoot().findElement(...)`        |
+| **Vibium**           | `vibe.find({ role: '...' })`, `{ label }`, `{ testid }` | Subtree chaining (`el.find(...)`)               | `>>` (one boundary), `>>>` (any depth)            |
+| **Appium**           | `driver.findElement(AppiumBy.accessibilityId(...))`     | iOS Class Chains, Android `UiScrollable`        | Native context switching (`WEBVIEW`/`NATIVE_APP`) |
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
