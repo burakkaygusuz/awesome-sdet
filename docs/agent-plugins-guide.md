@@ -46,6 +46,7 @@ The repository is architected as an **evergreen, multi-framework SDET platform**
 │   ├── src/
 │   │   ├── index.ts                # Dual transport runtime (zero-config stdio & streamable-http with DoS/Rebinding guards)
 │   │   ├── server.ts               # McpServer singleton registering Tools, Resources, and Prompts
+│   │   ├── http/                   # Streamable HTTP wire layer (JSON-RPC parsing, request guards, transport security)
 │   │   ├── resources/              # URI documentation resources (<protocol>://{domain}/{language})
 │   │   ├── prompts/                # Standard SDET workflow prompts (generate-test, migrate-test)
 │   │   └── domains/                # Pluggable framework domains (playwright, selenium, cypress, vibium, appium)
