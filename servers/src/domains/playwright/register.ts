@@ -26,7 +26,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Locators & Selectors',
       description:
-        'Returns Playwright user-facing locator strategies (getByRole, getByText, getByTestId), filtering, and chaining reference.',
+        'Returns Playwright locator strategies (getByRole, getByText, getByTestId), filtering, and chaining reference.',
       inputSchema: PlaywrightLocatorsDocsSchema,
       annotations,
     },
@@ -38,7 +38,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Actions & Auto-Waiting',
       description:
-        'Returns Playwright actionability checks, auto-waiting, click, fill, type, selectOption, dragTo, and file upload reference.',
+        'Returns Playwright auto-waiting actions: click, fill, selectOption, dragTo, and file upload reference.',
       inputSchema: PlaywrightActionsDocsSchema,
       annotations,
     },
@@ -50,7 +50,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Web-First Assertions',
       description:
-        'Returns Playwright auto-retrying web-first assertions (expect(locator).toBeVisible(), toHaveText(), toHaveValue(), toPass()) reference.',
+        'Returns Playwright web-first assertions (toBeVisible, toHaveText, toHaveValue, toPass) reference.',
       inputSchema: PlaywrightAssertionsDocsSchema,
       annotations,
     },
@@ -62,7 +62,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Network Mocking & API Testing',
       description:
-        'Returns Playwright request interception (page.route(), route.fulfill(), route.abort()), HAR replay, and APIRequestContext reference.',
+        'Returns Playwright route interception (page.route, fulfill, abort), HAR replay, and APIRequestContext reference.',
       inputSchema: PlaywrightNetworkDocsSchema,
       annotations,
     },
@@ -74,7 +74,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Storage State & Authentication',
       description:
-        'Returns Playwright authentication state persistence (storageState.json), multi-role fixtures, and browser context isolation reference.',
+        'Returns Playwright storageState persistence, multi-role fixtures, and context isolation reference.',
       inputSchema: PlaywrightStorageDocsSchema,
       annotations,
     },
@@ -86,7 +86,7 @@ export function registerPlaywrightTools(
     {
       title: 'Playwright Observability & Tracing',
       description:
-        'Returns Playwright tracing (context.tracing.start/stop), trace viewer artifacts, video recording, screenshots, and visual regression (toHaveScreenshot()) reference.',
+        'Returns Playwright tracing, trace viewer artifacts, video, screenshots, and toHaveScreenshot() reference.',
       inputSchema: PlaywrightObservabilityDocsSchema,
       annotations,
     },

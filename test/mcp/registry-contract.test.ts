@@ -37,4 +37,20 @@ describe('framework registry contract', () => {
       }
     }
   });
+
+  it('keeps every tool description within the 120-character dispatch budget (guide §4.1)', async () => {
+    const response = await mcpFetch(url, {
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/list',
+    });
+    const data = await parseMcpResponse(response);
+    const tools = data.result?.tools ?? [];
+
+    const offenders = tools
+      .filter((tool) => (tool.description ?? '').length > 120)
+      .map((tool) => `${tool.name}: ${(tool.description ?? '').length} chars`);
+
+    expect(offenders).toEqual([]);
+  });
 });

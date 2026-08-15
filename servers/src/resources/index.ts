@@ -152,7 +152,7 @@ export function registerResources(server: McpServer): void {
     new ResourceTemplate(appium.resourceUri, { list: undefined }),
     {
       title: 'Appium Documentation Reference',
-      description: `Dynamic reference documentation for Appium 2.0 mobile automation across supported languages (${appium.languages.join(', ')}) and domains (${appium.domains.join(', ')}).`,
+      description: `Dynamic reference documentation for Appium 3.x mobile automation across supported languages (${appium.languages.join(', ')}) and domains (${appium.domains.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },

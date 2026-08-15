@@ -77,6 +77,13 @@ export const PROTOCOL_VERSION_META_KEY = 'io.modelcontextprotocol/protocolVersio
 export const CLIENT_CAPABILITIES_META_KEY = 'io.modelcontextprotocol/clientCapabilities';
 export const MAX_BODY_BYTES = 10 * 1024 * 1024; // 10MB
 
+const BASE64_SENTINEL = /^=\?base64\?([A-Za-z0-9+/=]+)\?=$/;
+
+export function decodeHeaderValue(raw: string): string {
+  const match = BASE64_SENTINEL.exec(raw);
+  return match ? Buffer.from(match[1], 'base64').toString('utf8') : raw;
+}
+
 export function safeJsonParse<T = unknown>(text: string): T {
   return JSON.parse(text, (key, value) => {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
@@ -185,11 +192,13 @@ export async function handleMcpPostRequest(
   res: http.ServerResponse,
   originHeader?: string
 ): Promise<void> {
-  res.setHeader('Access-Control-Allow-Origin', originHeader || '*');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, Mcp-Method, Mcp-Name, Mcp-Protocol-Version'
-  );
+  if (originHeader) {
+    res.setHeader('Access-Control-Allow-Origin', originHeader);
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization, Mcp-Method, Mcp-Name, Mcp-Protocol-Version'
+    );
+  }
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
@@ -375,7 +384,8 @@ export async function handleMcpPostRequest(
         return;
       }
 
-      const mcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
+      const rawMcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
+      const mcpNameHeader = rawMcpNameHeader ? decodeHeaderValue(rawMcpNameHeader) : undefined;
       if (MCP_NAME_METHODS.has(effectiveMethod) && !mcpNameHeader) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(

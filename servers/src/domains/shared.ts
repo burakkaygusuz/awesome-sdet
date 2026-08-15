@@ -136,15 +136,6 @@ export function sanitizeDomain<const T extends readonly string[]>(
   throw new Error(`${prefix} '${rawDomain}'. ${listLabel} ${allowed.join(', ')}.`);
 }
 
-export function resolveLanguage<const T extends readonly string[]>(
-  rawLanguage: string | undefined | null,
-  supported: T,
-  defaultLanguage: T[number],
-  frameworkName: string
-): T[number] {
-  return sanitizeLanguage(rawLanguage, supported, defaultLanguage, frameworkName);
-}
-
 const referenceCache = new Map<string, string>();
 
 /**

@@ -78,7 +78,7 @@ export function registerSeleniumTools(
     {
       title: 'Selenium Actions API Docs',
       description:
-        'Returns Actions API reference and code examples for low-level user interactions (mouse, keyboard, wheel) for a given language.',
+        'Returns Selenium Actions API reference for low-level mouse, keyboard, and wheel interactions per language.',
       inputSchema: ActionsDocsSchema,
       annotations,
     },
@@ -102,7 +102,7 @@ export function registerSeleniumTools(
     {
       title: 'Selenium Grid & RemoteWebDriver Docs',
       description:
-        'Returns RemoteWebDriver API reference, Grid 4 capabilities, remote file download, custom TOML stereotypes, and cloud grid configuration for a given language.',
+        'Returns RemoteWebDriver API, Grid 4 capabilities, TOML stereotypes, and cloud grid configuration reference.',
       inputSchema: GridDocsSchema,
       annotations,
     },

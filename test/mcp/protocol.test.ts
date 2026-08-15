@@ -305,6 +305,13 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(res.headers.get('x-frame-options')).toBe('DENY');
       expect.soft(res.headers.get('referrer-policy')).toBe('no-referrer');
     });
+
+    it('omits Access-Control-Allow-Origin for Origin-less (non-browser) POST requests', async () => {
+      const res = await mcpFetch(url, { jsonrpc: '2.0', id: 97, method: 'tools/list' });
+
+      expect.soft(res.status).toBe(200);
+      expect.soft(res.headers.has('access-control-allow-origin')).toBe(false);
+    });
   });
 
   describe('server/discover protocol & notification compliance', () => {
