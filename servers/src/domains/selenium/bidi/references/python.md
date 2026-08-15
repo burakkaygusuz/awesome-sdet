@@ -12,6 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.log import LogInspector
 
+
 class BidiExamples:
 
     async def demonstrate_bidi(self) -> None:
@@ -20,6 +21,7 @@ class BidiExamples:
 
         driver = webdriver.Chrome(options=options)
         try:
+
             async def on_log_entry(entry: Any) -> None:
                 print(f"Log: {entry.text}")
 

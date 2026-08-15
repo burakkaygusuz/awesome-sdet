@@ -7,10 +7,15 @@
 ## Code Examples
 
 ```python
-from selenium.webdriver.common.listener import AbstractEventListener
-from selenium.webdriver.support.event_firing_webdriver import EventFiringDecorator
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.abstract_event_listener import (
+    AbstractEventListener,
+)
+from selenium.webdriver.support.event_firing_webdriver import (
+    EventFiringDecorator,
+)
+
 
 class CustomListener(AbstractEventListener):
 
@@ -20,11 +25,13 @@ class CustomListener(AbstractEventListener):
     def on_exception(self, exception: Exception, driver: WebDriver) -> None:
         print(f"Exception caught: {exception}")
 
+
 class ListenerExamples:
 
     def demonstrate_listener(self, original_driver: WebDriver) -> WebDriver:
-        # Wrap driver using Selenium 4 EventFiringDecorator
-        event_driver = EventFiringDecorator(CustomListener()).decorate(original_driver)
+        event_driver: WebDriver = EventFiringDecorator(
+            CustomListener()
+        ).decorate(original_driver)
         event_driver.get("https://example.com")
         return event_driver
 ```

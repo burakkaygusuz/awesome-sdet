@@ -8,27 +8,29 @@
 
 ```python
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.relative_locator import locate_with
+
 
 class LocatorExamples:
 
-    # Tuple locators (Python Best Practice)
     USERNAME_INPUT: tuple[str, str] = (By.ID, "username")
-    SUBMIT_BUTTON: tuple[str, str] = (By.CSS_SELECTOR, "button.btn-success[type='submit']")
+    SUBMIT_BUTTON: tuple[str, str] = (
+        By.CSS_SELECTOR,
+        "button.btn-success[type='submit']",
+    )
     EMAIL_INPUT: tuple[str, str] = (By.NAME, "email")
     ROW_BUTTON: tuple[str, str] = (By.XPATH, "//tr[td[text()='Active']]//button")
 
     def demonstrate_locators(self, driver: WebDriver) -> None:
-        # 1. Unpacking Tuple Locators
-        username = driver.find_element(*self.USERNAME_INPUT)
-        submit_btn = driver.find_element(*self.SUBMIT_BUTTON)
+        username: WebElement = driver.find_element(*self.USERNAME_INPUT)
+        submit_btn: WebElement = driver.find_element(*self.SUBMIT_BUTTON)
 
-        # 2. Selenium 4 Relative Locators (Spatial)
-        password_input = driver.find_element(
+        password_input: WebElement = driver.find_element(
             locate_with(By.TAG_NAME, "input").below(username)
         )
-        cancel_button = driver.find_element(
+        cancel_button: WebElement = driver.find_element(
             locate_with(By.TAG_NAME, "button").left_of(submit_btn)
         )
 ```

@@ -7,14 +7,16 @@
 ## 1. Storage State Snapshots
 
 ```python
-from typing import Any
-from vibium import browser
+from pathlib import Path
+from vibium import Browser, Page, browser
+
 
 def test_auth_storage_state() -> None:
-    # Capture authenticated state snapshot
-    bro = browser.start(headless=True)
+    auth_path = Path("auth_state.json")
+
+    bro: Browser = browser.start(headless=True)
     try:
-        page = bro.page()
+        page: Page = bro.page()
         page.go("https://app.example.com/login")
 
         username = page.find("label=Username")
@@ -23,14 +25,13 @@ def test_auth_storage_state() -> None:
         login_btn = page.find({"role": "button", "text": "Log in"})
         login_btn.click()
 
-        bro.storage_state(path="auth_state.json")
+        bro.storage_state(path=str(auth_path))
     finally:
         bro.stop()
 
-    # Reuse storageState to bypass repeated UI logins
-    auth_bro = browser.start(headless=True, storage_state="auth_state.json")
+    auth_bro: Browser = browser.start(headless=True, storage_state=str(auth_path))
     try:
-        auth_page = auth_bro.page()
+        auth_page: Page = auth_bro.page()
         auth_page.go("https://app.example.com/dashboard")
     finally:
         auth_bro.stop()
@@ -41,9 +42,12 @@ def test_auth_storage_state() -> None:
 ## 2. Multi-Tab Handling
 
 ```python
-def test_tabs(bro: Any) -> None:
-    main_page = bro.page()
-    new_page = bro.new_page()
+from vibium import Browser, Page
+
+
+def test_tabs(bro: Browser) -> None:
+    main_page: Page = bro.page()
+    new_page: Page = bro.new_page()
     new_page.go("https://app.example.com/docs")
 
     print("Open tab count:", len(bro.pages()))

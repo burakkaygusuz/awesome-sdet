@@ -9,21 +9,26 @@
 ```python
 from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 def switch_to_webview(driver: WebDriver) -> None:
-    contexts = driver.contexts
+    contexts: list[str] = driver.contexts
     print("Available contexts:", contexts)
 
-    webview_context = next((c for c in contexts if "WEBVIEW" in c), None)
+    webview_context: str | None = next(
+        (c for c in contexts if "WEBVIEW" in c), None
+    )
     if webview_context:
         driver.switch_to.context(webview_context)
         print("Active context:", driver.current_context)
 
-        # Standard Selenium By and WebDriverWait inside webview
         wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.pay-now")))
+        element: WebElement = wait.until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.pay-now"))
+        )
         element.click()
 
         driver.switch_to.context("NATIVE_APP")

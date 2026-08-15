@@ -8,31 +8,30 @@
 
 ```python
 from typing import Any
+from vibium import Element, Page
 
-def test_interactions(vibe: Any) -> None:
-    btn = vibe.find({"role": "button", "text": "Log In"})
+
+def test_interactions(page: Page) -> None:
+    btn: Element = page.find({"role": "button", "text": "Log In"})
     btn.click()
 
-    # fill(): atomic value replacement; type(): sequential keystrokes
-    username = vibe.find("label=Username")
+    username: Element = page.find("label=Username")
     username.fill("admin")
     username.type("_dev")
-
     username.press("Enter")
 
-    # Idempotent checkbox state toggles
-    terms = vibe.find("label=Agree")
+    terms: Element = page.find("label=Agree")
     terms.check()
     terms.uncheck()
 
-    menu = vibe.find("testid=profile-menu")
+    menu: Element = page.find("testid=profile-menu")
     menu.hover()
     menu.highlight()
-    box = menu.bounds()
+    box: dict[str, Any] = menu.bounds()
     print("Bounding box:", box)
 
-    source = vibe.find("testid=task-1")
-    target = vibe.find("testid=column-done")
+    source: Element = page.find("testid=task-1")
+    target: Element = page.find("testid=column-done")
     source.drag_to(target)
 ```
 
