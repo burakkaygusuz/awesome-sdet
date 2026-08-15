@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const CYPRESS_SUPPORTED_LANGUAGES = ['javascript', 'typescript'] as const;
+export const CYPRESS_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.cypress.languages;
 
 export const SupportedLanguageSchema = z
   .enum(CYPRESS_SUPPORTED_LANGUAGES)
@@ -9,18 +10,8 @@ export const SupportedLanguageSchema = z
   .describe('Target programming language: "javascript" or "typescript". Defaults to "typescript".');
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
-export type CypressSupportedLanguage = SupportedLanguage;
 
-export const CYPRESS_DOMAINS = [
-  'commands',
-  'component',
-  'fixtures',
-  'network',
-  'session',
-  'shadow',
-  'stubs',
-  'task',
-] as const;
+export const CYPRESS_DOMAINS = FRAMEWORK_REGISTRY.cypress.domains;
 
 export const CypressDomainSchema = z
   .enum(CYPRESS_DOMAINS)
@@ -33,7 +24,7 @@ export async function loadReferenceMarkdown(
   language: string = 'typescript'
 ): Promise<string> {
   const safeLang = sanitizeLanguage(language, CYPRESS_SUPPORTED_LANGUAGES, 'typescript');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'typescript');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
 }
 
 export async function readCypressReferenceDoc(

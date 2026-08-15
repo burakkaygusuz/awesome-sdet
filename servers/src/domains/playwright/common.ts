@@ -1,13 +1,8 @@
 import { z } from 'zod';
 import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const PLAYWRIGHT_SUPPORTED_LANGUAGES = [
-  'typescript',
-  'javascript',
-  'python',
-  'java',
-  'csharp',
-] as const;
+export const PLAYWRIGHT_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.playwright.languages;
 
 export const SupportedLanguageSchema = z
   .enum(PLAYWRIGHT_SUPPORTED_LANGUAGES)
@@ -18,14 +13,7 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
-export const PLAYWRIGHT_DOMAINS = [
-  'actions',
-  'assertions',
-  'locators',
-  'network',
-  'observability',
-  'storage',
-] as const;
+export const PLAYWRIGHT_DOMAINS = FRAMEWORK_REGISTRY.playwright.domains;
 
 export const PlaywrightDomainSchema = z
   .enum(PLAYWRIGHT_DOMAINS)
@@ -38,7 +26,7 @@ export async function loadReferenceMarkdown(
   language: string = 'typescript'
 ): Promise<string> {
   const safeLang = sanitizeLanguage(language, PLAYWRIGHT_SUPPORTED_LANGUAGES, 'typescript');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'typescript');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
 }
 
 export async function readPlaywrightReferenceDoc(

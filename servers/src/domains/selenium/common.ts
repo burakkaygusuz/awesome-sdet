@@ -1,14 +1,8 @@
 import { z } from 'zod';
 import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const SELENIUM_SUPPORTED_LANGUAGES = [
-  'java',
-  'python',
-  'typescript',
-  'javascript',
-  'csharp',
-  'ruby',
-] as const;
+export const SELENIUM_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.selenium.languages;
 
 export const SupportedLanguageSchema = z
   .enum(SELENIUM_SUPPORTED_LANGUAGES)
@@ -19,16 +13,7 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
-export const SELENIUM_DOMAINS = [
-  'actions',
-  'bidi',
-  'grid',
-  'listeners',
-  'locators',
-  'observability',
-  'pagefactory',
-  'waits',
-] as const;
+export const SELENIUM_DOMAINS = FRAMEWORK_REGISTRY.selenium.domains;
 
 export const SeleniumDomainSchema = z
   .enum(SELENIUM_DOMAINS)
@@ -41,7 +26,7 @@ export async function loadReferenceMarkdown(
   language: string = 'java'
 ): Promise<string> {
   const safeLang = sanitizeLanguage(language, SELENIUM_SUPPORTED_LANGUAGES, 'java');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'java');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
 }
 
 export async function readSeleniumReferenceDoc(

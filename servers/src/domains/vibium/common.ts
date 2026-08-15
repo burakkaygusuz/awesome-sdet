@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const VIBIUM_SUPPORTED_LANGUAGES = ['typescript', 'javascript', 'python', 'java'] as const;
+export const VIBIUM_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.vibium.languages;
 
 export const SupportedLanguageSchema = z
   .enum(VIBIUM_SUPPORTED_LANGUAGES)
@@ -12,7 +13,7 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
-export const VIBIUM_DOMAINS = ['bidi', 'core', 'interactions', 'selectors', 'state'] as const;
+export const VIBIUM_DOMAINS = FRAMEWORK_REGISTRY.vibium.domains;
 
 export const VibiumDomainSchema = z
   .enum(VIBIUM_DOMAINS)
@@ -25,7 +26,7 @@ export async function loadReferenceMarkdown(
   language: string = 'typescript'
 ): Promise<string> {
   const safeLang = sanitizeLanguage(language, VIBIUM_SUPPORTED_LANGUAGES, 'typescript');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'typescript');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
 }
 
 export async function readVibiumReferenceDoc(

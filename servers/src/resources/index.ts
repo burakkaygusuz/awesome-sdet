@@ -5,6 +5,7 @@ import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
 import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
 import { readAppiumReferenceDoc } from '../domains/appium/common.js';
+import { FRAMEWORK_REGISTRY } from '../registry.js';
 
 const RESOURCE_CACHE_HINT = {
   ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
@@ -12,13 +13,18 @@ const RESOURCE_CACHE_HINT = {
 };
 
 export function registerResources(server: McpServer): void {
+  const playwright = FRAMEWORK_REGISTRY.playwright;
+  const selenium = FRAMEWORK_REGISTRY.selenium;
+  const cypress = FRAMEWORK_REGISTRY.cypress;
+  const vibium = FRAMEWORK_REGISTRY.vibium;
+  const appium = FRAMEWORK_REGISTRY.appium;
+
   server.registerResource(
     'playwright-reference',
-    new ResourceTemplate('playwright://{domain}/{language}', { list: undefined }),
+    new ResourceTemplate(playwright.resourceUri, { list: undefined }),
     {
       title: 'Playwright Documentation Reference',
-      description:
-        'Dynamic reference documentation for Playwright across supported languages (typescript, python, java, csharp) and domains.',
+      description: `Dynamic reference documentation for Playwright across supported languages (${playwright.languages.join(', ')}) and domains (${playwright.domains.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },
@@ -47,11 +53,10 @@ export function registerResources(server: McpServer): void {
 
   server.registerResource(
     'selenium-reference',
-    new ResourceTemplate('selenium://{domain}/{language}', { list: undefined }),
+    new ResourceTemplate(selenium.resourceUri, { list: undefined }),
     {
       title: 'Selenium Documentation Reference',
-      description:
-        'Dynamic reference documentation for Selenium 4 across supported languages and domains.',
+      description: `Dynamic reference documentation for Selenium 4 across supported languages (${selenium.languages.join(', ')}) and domains (${selenium.domains.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },
@@ -80,11 +85,10 @@ export function registerResources(server: McpServer): void {
 
   server.registerResource(
     'cypress-reference',
-    new ResourceTemplate('cypress://{domain}/{language}', { list: undefined }),
+    new ResourceTemplate(cypress.resourceUri, { list: undefined }),
     {
       title: 'Cypress Documentation Reference',
-      description:
-        'Dynamic reference documentation for Cypress across supported domains (commands, component, fixtures, network, session, shadow, stubs, task) and languages (javascript, typescript).',
+      description: `Dynamic reference documentation for Cypress across supported domains (${cypress.domains.join(', ')}) and languages (${cypress.languages.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },
@@ -113,11 +117,10 @@ export function registerResources(server: McpServer): void {
 
   server.registerResource(
     'vibium-reference',
-    new ResourceTemplate('vibium://{domain}/{language}', { list: undefined }),
+    new ResourceTemplate(vibium.resourceUri, { list: undefined }),
     {
       title: 'Vibium Documentation Reference',
-      description:
-        'Dynamic reference documentation for Vibium across supported languages and domains.',
+      description: `Dynamic reference documentation for Vibium across supported languages (${vibium.languages.join(', ')}) and domains (${vibium.domains.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },
@@ -146,11 +149,10 @@ export function registerResources(server: McpServer): void {
 
   server.registerResource(
     'appium-reference',
-    new ResourceTemplate('appium://{domain}/{language}', { list: undefined }),
+    new ResourceTemplate(appium.resourceUri, { list: undefined }),
     {
       title: 'Appium Documentation Reference',
-      description:
-        'Dynamic reference documentation for Appium 2.0 mobile automation across supported languages and domains.',
+      description: `Dynamic reference documentation for Appium 2.0 mobile automation across supported languages (${appium.languages.join(', ')}) and domains (${appium.domains.join(', ')}).`,
       mimeType: 'text/markdown',
       cacheHint: RESOURCE_CACHE_HINT,
     },

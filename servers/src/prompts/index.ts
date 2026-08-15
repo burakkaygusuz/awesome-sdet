@@ -1,21 +1,33 @@
 import { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
-export const SupportedFrameworkSchema = z
-  .enum(['selenium', 'cypress', 'vibium', 'appium', 'playwright'] as const)
-  .describe(
-    'Target test automation framework: "selenium", "cypress", "vibium", "appium", or "playwright"'
-  );
+import {
+  FRAMEWORK_IDS,
+  FRAMEWORK_REGISTRY,
+  SUPPORTED_LANGUAGES,
+  type SupportedFramework,
+} from '../registry.js';
 
-export type SupportedFramework = z.infer<typeof SupportedFrameworkSchema>;
+export { type SupportedFramework, type SupportedLanguage } from '../registry.js';
+
+const frameworkList = FRAMEWORK_IDS.join(', ');
+const languageList = SUPPORTED_LANGUAGES.join(', ');
+
+export const SupportedFrameworkSchema = z
+  .enum(FRAMEWORK_IDS)
+  .describe(`Target test automation framework: ${frameworkList}`);
 
 export const SupportedLanguageSchema = z
-  .enum(['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'] as const)
-  .describe(
-    'Programming language: "typescript", "javascript", "python", "java", "csharp", or "ruby"'
-  );
+  .enum(SUPPORTED_LANGUAGES)
+  .describe(`Programming language: ${languageList}`);
 
-export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
+function frameworkReferenceGuidance(framework: SupportedFramework): string {
+  const definition = FRAMEWORK_REGISTRY[framework];
+  const exampleTool = definition.toolNames[0];
+
+  return `- Consult canonical capability skills (\`skills/sdet-*\`) and dynamic MCP resources via \`resources/read\`.
+- Read framework references from \`${definition.resourceUri}\` and use \`tools/list\` to select the registered \`${definition.toolPrefix}_*\` tools (for example \`${exampleTool}\`).`;
+}
 
 export function registerPrompts(server: McpServer): void {
   server.registerPrompt(
@@ -33,17 +45,20 @@ export function registerPrompts(server: McpServer): void {
           .describe('Detailed description of the user journey, assertions, and test expectations'),
       }),
     },
-    ({ framework, language, featureDescription }) => ({
-      messages: [
-        {
-          role: 'user',
-          content: {
-            type: 'text',
-            text: `You are an enterprise SDET Specialist. Generate a production-grade, resilient test suite for ${framework} using ${language}.
+    ({ framework, language, featureDescription }) => {
+      const referenceGuidance = frameworkReferenceGuidance(framework);
+
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `You are an enterprise SDET Specialist. Generate a production-grade, resilient test suite for ${framework} using ${language}.
 
 Reference Guidelines:
-- Consult canonical capability skills (\`skills/sdet-*\`), framework adapter references (\`skills/sdet-*/references/${framework}.md\`), and MCP knowledge tools (\`read_${framework}_*_docs\`).
-- Reference canonical invariants at \`sdet://guidelines\` and API references at \`${framework}://{domain}/${language}\`.
+${referenceGuidance}
+- Reference canonical invariants at \`sdet://guidelines\` and API references at \`${FRAMEWORK_REGISTRY[framework].resourceUri}\`.
 
 Feature Specifications:
 ${featureDescription}
@@ -53,10 +68,11 @@ Core Quality Invariants:
 2. Dynamic Synchronization: Rely strictly on dynamic condition polling — NEVER use hardcoded arbitrary sleep intervals.
 3. Modular Architecture: Structure reusable interactions using Page Object Models or Action patterns.
 4. Concurrency & Isolation: Ensure thread-safety, statelessness, and clean session/storage isolation.`,
+            },
           },
-        },
-      ],
-    })
+        ],
+      };
+    }
   );
 
   server.registerPrompt(
@@ -75,16 +91,20 @@ Core Quality Invariants:
         sourceCode: z.string().min(5).describe('Source test code to translate'),
       }),
     },
-    ({ sourceFramework, targetFramework, sourceCode }) => ({
-      messages: [
-        {
-          role: 'user',
-          content: {
-            type: 'text',
-            text: `Migrate the following test code from ${sourceFramework} to ${targetFramework}.
+    ({ sourceFramework, targetFramework, sourceCode }) => {
+      const targetGuidance = frameworkReferenceGuidance(targetFramework);
+
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `Migrate the following test code from ${sourceFramework} to ${targetFramework}.
 
 Migration Rules:
-1. Target Idioms: Consult canonical capability skills (\`skills/sdet-*\`) and target framework adapter references (\`skills/sdet-*/references/${targetFramework}.md\`), adopting idiomatic ${targetFramework} patterns.
+1. Target Idioms: Consult canonical capability skills (\`skills/sdet-*\`) and dynamic MCP references for ${targetFramework}.
+${targetGuidance}
 2. Anti-Pattern Elimination: Refactor any hardcoded sleeps, brittle XPaths, or shared state into ${targetFramework} explicit condition waits and semantic locators.
 3. Assertion Fidelity: Preserve all business logic, assertions, and state verification.
 
@@ -92,10 +112,11 @@ Source Test Code (${sourceFramework}):
 \`\`\`
 ${sourceCode}
 \`\`\``,
+            },
           },
-        },
-      ],
-    })
+        ],
+      };
+    }
   );
 
   server.registerPrompt(
@@ -106,7 +127,7 @@ ${sourceCode}
         'Performs systematic root-cause analysis and provides deterministic fixes for flaky tests',
       argsSchema: z.object({
         framework: SupportedFrameworkSchema.describe(
-          'Testing framework where failure occurred (selenium, cypress, vibium, appium, playwright)'
+          `Testing framework where failure occurred (${frameworkList})`
         ),
         failureLog: z.string().min(5).describe('Stack trace, console error, or CI log'),
         testCode: z.string().min(5).describe('Failing test source code'),

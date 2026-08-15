@@ -148,13 +148,12 @@ export function resolveLanguage<const T extends readonly string[]>(
 const referenceCache = new Map<string, string>();
 
 /**
- * Loads a language-specific reference markdown file for an MCP module,
- * caching results in memory and falling back to defaultLanguage if the target language file is unavailable.
+ * Loads the requested language-specific reference markdown file for an MCP module
+ * and caches the result in memory.
  */
 export async function loadCachedReferenceMarkdown(
   baseUrlOrMetaUrl: string,
-  language: string,
-  defaultLanguage: string
+  language: string
 ): Promise<string> {
   const cacheKey = `${baseUrlOrMetaUrl}:${language}`;
   const cached = referenceCache.get(cacheKey);
@@ -165,14 +164,7 @@ export async function loadCachedReferenceMarkdown(
     : path.resolve(baseUrlOrMetaUrl, 'references');
 
   const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
-  try {
-    const content = await fs.readFile(filePath, 'utf8');
-    referenceCache.set(cacheKey, content);
-    return content;
-  } catch {
-    const defaultPath = resolveSafePath(baseReferencesDir, `${defaultLanguage}.md`);
-    const content = await fs.readFile(defaultPath, 'utf8');
-    referenceCache.set(cacheKey, content);
-    return content;
-  }
+  const content = await fs.readFile(filePath, 'utf8');
+  referenceCache.set(cacheKey, content);
+  return content;
 }

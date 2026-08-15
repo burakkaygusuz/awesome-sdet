@@ -1,13 +1,8 @@
 import { z } from 'zod';
 import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const APPIUM_SUPPORTED_LANGUAGES = [
-  'typescript',
-  'javascript',
-  'python',
-  'java',
-  'csharp',
-] as const;
+export const APPIUM_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.appium.languages;
 
 export const SupportedLanguageSchema = z
   .enum(APPIUM_SUPPORTED_LANGUAGES)
@@ -18,13 +13,7 @@ export const SupportedLanguageSchema = z
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
-export const APPIUM_DOMAINS = [
-  'capabilities',
-  'context',
-  'device',
-  'gestures',
-  'locators',
-] as const;
+export const APPIUM_DOMAINS = FRAMEWORK_REGISTRY.appium.domains;
 
 export const AppiumDomainSchema = z
   .enum(APPIUM_DOMAINS)
@@ -37,7 +26,7 @@ export async function loadReferenceMarkdown(
   language: string = 'typescript'
 ): Promise<string> {
   const safeLang = sanitizeLanguage(language, APPIUM_SUPPORTED_LANGUAGES, 'typescript');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang, 'typescript');
+  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
 }
 
 export async function readAppiumReferenceDoc(
