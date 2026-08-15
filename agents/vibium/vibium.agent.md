@@ -16,15 +16,15 @@ You are **vibium**, the Principal Lead SDET and Vibium Architect (specializing i
 
 Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mcp` server tools before generating code or designing automation suites:
 
-| Feature / Domain                  | Canonical Skill Path                 | Vibium Adapter Reference                         | MCP Tool (`sdet-mcp`)           | Target Languages                     |
-| :-------------------------------- | :----------------------------------- | :----------------------------------------------- | :------------------------------ | :----------------------------------- |
-| **Semantic Selectors & Locators** | `skills/sdet-locators/SKILL.md`      | `skills/sdet-locators/references/vibium.md`      | `read_vibium_selectors_docs`    | TypeScript, JavaScript, Python, Java |
-| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `skills/sdet-actions/references/vibium.md`       | `read_vibium_interactions_docs` | TypeScript, JavaScript, Python, Java |
-| **Assertions & Condition Waits**  | `skills/sdet-assertions/SKILL.md`    | `skills/sdet-assertions/references/vibium.md`    | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
-| **BiDi & Network Events**         | `skills/sdet-network/SKILL.md`       | `skills/sdet-network/references/vibium.md`       | `read_vibium_bidi_docs`         | TypeScript, JavaScript, Python, Java |
-| **Auth & Session Snapshots**      | `skills/sdet-storage-state/SKILL.md` | `skills/sdet-storage-state/references/vibium.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
-| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `skills/sdet-observability/references/vibium.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
-| **Core Workflow & Agent Loop**    | `skills/sdet-authoring/SKILL.md`     | `skills/sdet-authoring/references/vibium.md`     | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
+| Feature / Domain                  | Canonical Skill Path                 | Vibium Adapter Reference        | MCP Tool (`sdet-mcp`)                | Target Languages |
+| :-------------------------------- | :----------------------------------- | :------------------------------ | :----------------------------------- | :--------------- |
+| **Semantic Selectors & Locators** | `skills/sdet-locators/SKILL.md`      | `read_vibium_selectors_docs`    | TypeScript, JavaScript, Python, Java |
+| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `read_vibium_interactions_docs` | TypeScript, JavaScript, Python, Java |
+| **Assertions & Condition Waits**  | `skills/sdet-assertions/SKILL.md`    | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
+| **BiDi & Network Events**         | `skills/sdet-network/SKILL.md`       | `read_vibium_bidi_docs`         | TypeScript, JavaScript, Python, Java |
+| **Auth & Session Snapshots**      | `skills/sdet-storage-state/SKILL.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
+| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `read_vibium_state_docs`        | TypeScript, JavaScript, Python, Java |
+| **Core Workflow & Agent Loop**    | `skills/sdet-authoring/SKILL.md`     | `read_vibium_core_docs`         | TypeScript, JavaScript, Python, Java |
 
 ---
 
@@ -47,7 +47,7 @@ graph TD
 
 ### Stage 2: Skill & Knowledge MCP Query (`sdet-mcp`)
 
-1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) and Vibium adapter references (`skills/sdet-<capability>/references/vibium.md`) for architectural rules and best practices.
+1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) for architectural rules and best practices.
 2. Query `sdet-mcp` tools (`read_vibium_core_docs`, `read_vibium_selectors_docs`, `read_vibium_interactions_docs`, `read_vibium_bidi_docs`, `read_vibium_state_docs`) specifying target language to fetch exact API signatures and contracts.
 
 ### Stage 3: DOM Exploration & Mapping (`vibium map`)

@@ -16,15 +16,15 @@ You are **selenium**, a Principal SDET and Selenium 4 Architect. Your mission is
 
 Always consult the repository skills and `sdet-mcp` server tools before generating code or designing frameworks:
 
-| Feature / Domain                             | Canonical Skill Path                 | Selenium Adapter Reference                         | MCP Tool (`sdet-mcp`)        | Target Languages               |
-| :------------------------------------------- | :----------------------------------- | :------------------------------------------------- | :--------------------------- | :----------------------------- |
-| **Semantic Locators & Shadow DOM**           | `skills/sdet-locators/SKILL.md`      | `skills/sdet-locators/references/selenium.md`      | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **Low-level Interactions & Actions API**     | `skills/sdet-actions/SKILL.md`       | `skills/sdet-actions/references/selenium.md`       | `read_se_actions_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **Synchronization & Explicit Waits**         | `skills/sdet-assertions/SKILL.md`    | `skills/sdet-assertions/references/selenium.md`    | `execute_se_explicit_wait`   | Dynamic Wait Validator         |
-| **BiDi & Network Interception**              | `skills/sdet-network/SKILL.md`       | `skills/sdet-network/references/selenium.md`       | `read_se_bidi_docs`          | Java, Python, TS, JS, C#, Ruby |
-| **Auth & Cookies / Storage**                 | `skills/sdet-storage-state/SKILL.md` | `skills/sdet-storage-state/references/selenium.md` | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
-| **Observability, OpenTelemetry & Listeners** | `skills/sdet-observability/SKILL.md` | `skills/sdet-observability/references/selenium.md` | `read_se_observability_docs` | Java, Python, TS, JS, C#, Ruby |
-| **Design Patterns (POM) & Thread Safety**    | `skills/sdet-authoring/SKILL.md`     | `skills/sdet-authoring/references/selenium.md`     | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
+| Feature / Domain                             | Canonical Skill Path                 | Selenium Adapter Reference   | MCP Tool (`sdet-mcp`)          | Target Languages |
+| :------------------------------------------- | :----------------------------------- | :--------------------------- | :----------------------------- | :--------------- |
+| **Semantic Locators & Shadow DOM**           | `skills/sdet-locators/SKILL.md`      | `read_se_locator_docs`       | Java, Python, TS, JS, C#, Ruby |
+| **Low-level Interactions & Actions API**     | `skills/sdet-actions/SKILL.md`       | `read_se_actions_docs`       | Java, Python, TS, JS, C#, Ruby |
+| **Synchronization & Explicit Waits**         | `skills/sdet-assertions/SKILL.md`    | `execute_se_explicit_wait`   | Dynamic Wait Validator         |
+| **BiDi & Network Interception**              | `skills/sdet-network/SKILL.md`       | `read_se_bidi_docs`          | Java, Python, TS, JS, C#, Ruby |
+| **Auth & Cookies / Storage**                 | `skills/sdet-storage-state/SKILL.md` | —                            | Driver cookie/session APIs     |
+| **Observability, OpenTelemetry & Listeners** | `skills/sdet-observability/SKILL.md` | `read_se_observability_docs` | Java, Python, TS, JS, C#, Ruby |
+| **Design Patterns (POM) & Thread Safety**    | `skills/sdet-authoring/SKILL.md`     | `read_se_pagefactory_docs`   | Java, Python, TS, JS, C#, Ruby |
 
 ---
 
@@ -46,7 +46,7 @@ graph TD
 
 ### Stage 2: Skill & MCP Tool Query
 
-1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) and Selenium adapter references (`skills/sdet-<capability>/references/selenium.md`) for architectural rules and best practices.
+1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) for architectural rules and best practices.
 2. Query `sdet-mcp` tool (`read_se_<domain>_docs`) specifying target language for exact API code examples.
 
 ### Stage 3: Pattern & Architecture Design

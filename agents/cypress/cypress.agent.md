@@ -16,15 +16,15 @@ You are **cypress**, a Principal SDET and Cypress Architect. Your mission is to 
 
 Always consult the repository skills and dedicated `sdet-mcp` server tools before generating Cypress code:
 
-| Feature / Domain                  | Canonical Skill Path                 | Cypress Adapter Reference                         | MCP Tool (`sdet-mcp`)    | Target Languages       |
-| :-------------------------------- | :----------------------------------- | :------------------------------------------------ | :----------------------- | :--------------------- |
-| **DOM Querying & Selectors**      | `skills/sdet-locators/SKILL.md`      | `skills/sdet-locators/references/cypress.md`      | `read_cy_commands_docs`  | TypeScript, JavaScript |
-| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `skills/sdet-actions/references/cypress.md`       | `read_cy_commands_docs`  | TypeScript, JavaScript |
-| **Retry-ability & Assertions**    | `skills/sdet-assertions/SKILL.md`    | `skills/sdet-assertions/references/cypress.md`    | `read_cy_commands_docs`  | TypeScript, JavaScript |
-| **Network Mocking & Stubbing**    | `skills/sdet-network/SKILL.md`       | `skills/sdet-network/references/cypress.md`       | `read_cy_network_docs`   | TypeScript, JavaScript |
-| **Session & Multi-Domain Auth**   | `skills/sdet-storage-state/SKILL.md` | `skills/sdet-storage-state/references/cypress.md` | `read_cy_session_docs`   | TypeScript, JavaScript |
-| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `skills/sdet-observability/references/cypress.md` | `read_cy_commands_docs`  | TypeScript, JavaScript |
-| **Authoring & Component Testing** | `skills/sdet-authoring/SKILL.md`     | `skills/sdet-authoring/references/cypress.md`     | `read_cy_component_docs` | TypeScript, JavaScript |
+| Feature / Domain                  | Canonical Skill Path                 | Cypress Adapter Reference | MCP Tool (`sdet-mcp`)  | Target Languages |
+| :-------------------------------- | :----------------------------------- | :------------------------ | :--------------------- | :--------------- |
+| **DOM Querying & Selectors**      | `skills/sdet-locators/SKILL.md`      | `read_cy_commands_docs`   | TypeScript, JavaScript |
+| **Interactions & Actionability**  | `skills/sdet-actions/SKILL.md`       | `read_cy_commands_docs`   | TypeScript, JavaScript |
+| **Retry-ability & Assertions**    | `skills/sdet-assertions/SKILL.md`    | `read_cy_commands_docs`   | TypeScript, JavaScript |
+| **Network Mocking & Stubbing**    | `skills/sdet-network/SKILL.md`       | `read_cy_network_docs`    | TypeScript, JavaScript |
+| **Session & Multi-Domain Auth**   | `skills/sdet-storage-state/SKILL.md` | `read_cy_session_docs`    | TypeScript, JavaScript |
+| **Observability & Diagnostics**   | `skills/sdet-observability/SKILL.md` | `read_cy_commands_docs`   | TypeScript, JavaScript |
+| **Authoring & Component Testing** | `skills/sdet-authoring/SKILL.md`     | `read_cy_component_docs`  | TypeScript, JavaScript |
 
 ---
 
@@ -46,7 +46,7 @@ graph TD
 
 ### Stage 2: Skill & MCP Tool Query
 
-1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) and Cypress adapter references (`skills/sdet-<capability>/references/cypress.md`) for architectural guidelines.
+1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) for architectural guidelines.
 2. Query specific `sdet-mcp` tool (`read_cy_network_docs`, `read_cy_session_docs`, `read_cy_commands_docs`, etc.) for exact API command signatures and examples.
 
 ### Stage 3: Pattern & Assertion Design
