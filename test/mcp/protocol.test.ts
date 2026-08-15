@@ -19,7 +19,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
   });
 
   describe('Mcp-Protocol-Version header', () => {
-    it('rejects missing Mcp-Protocol-Version with HTTP 400 and -32000', async () => {
+    it('rejects missing Mcp-Protocol-Version with HTTP 400 and -32020', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,11 +28,11 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
 
       expect.soft(res.status).toBe(400);
       const data = await parseMcpResponse(res);
-      expect.soft(data.error?.code).toBe(-32000);
+      expect.soft(data.error?.code).toBe(-32020);
       expect.soft(data.error?.message).toContain('Missing required header: Mcp-Protocol-Version');
     });
 
-    it('rejects request having body _meta protocolVersion but missing Mcp-Protocol-Version header with HTTP 400 and -32000', async () => {
+    it('rejects request having body _meta protocolVersion but missing Mcp-Protocol-Version header with HTTP 400 and -32020', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,11 +51,11 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
 
       expect.soft(res.status).toBe(400);
       const data = await parseMcpResponse(res);
-      expect.soft(data.error?.code).toBe(-32000);
+      expect.soft(data.error?.code).toBe(-32020);
       expect.soft(data.error?.message).toContain('Missing required header: Mcp-Protocol-Version');
     });
 
-    it('rejects unsupported protocol version with HTTP 400 and -32000', async () => {
+    it('rejects unsupported protocol version with HTTP 400 and -32022', async () => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { ...MCP_HEADERS, 'Mcp-Protocol-Version': '2023-01-01' },
@@ -64,8 +64,12 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
 
       expect.soft(res.status).toBe(400);
       const data = await parseMcpResponse(res);
-      expect.soft(data.error?.code).toBe(-32000);
+      expect.soft(data.error?.code).toBe(-32022);
       expect.soft(data.error?.message).toContain('Unsupported protocol version');
+      expect.soft(data.error?.data).toEqual({
+        supported: ['2026-07-28'],
+        requested: '2023-01-01',
+      });
     });
 
     it('rejects header vs body _meta protocol version mismatch with HTTP 400 and -32020', async () => {
@@ -304,6 +308,42 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       expect.soft(data.error?.message).toContain('Invalid Request');
     });
 
+    it('rejects id: null on server/discover with HTTP 400 and -32600', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'server/discover' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: null, method: 'server/discover' }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32600);
+      expect.soft(data.error?.message).toContain('id must be a string or integer');
+    });
+
+    it('rejects request with id: null on standard method with HTTP 400 and -32600', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...MCP_HEADERS, 'Mcp-Method': 'tools/list' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: null,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(400);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.error?.code).toBe(-32600);
+      expect.soft(data.error?.message).toContain('id must be a string or integer');
+    });
+
     it('returns 200 with matching id and resultType complete for valid server/discover request', async () => {
       const res = await fetch(url, {
         method: 'POST',
@@ -450,6 +490,58 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const data = await parseMcpResponse(res);
       expect.soft(data.id).toBe(206);
       expect.soft(Array.isArray(data.result?.tools)).toBe(true);
+    });
+  });
+
+  describe('Accept header content negotiation', () => {
+    it('accepts Streamable HTTP default application/json, text/event-stream with HTTP 200', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          Accept: 'application/json, text/event-stream',
+          'Mcp-Method': 'tools/list',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 501,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe(501);
+    });
+
+    it('rejects unsupported Accept header with HTTP 406 Not Acceptable', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          Accept: 'image/png',
+          'Mcp-Method': 'tools/list',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 502,
+          method: 'tools/list',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(406);
     });
   });
 });

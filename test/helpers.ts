@@ -79,7 +79,7 @@ export interface JsonRpcResponse {
     cacheScope?: string;
     isError?: boolean;
   };
-  error?: { code: number; message: string };
+  error?: { code: number; message: string; data?: unknown };
 }
 
 export async function parseMcpResponse(res: Response): Promise<JsonRpcResponse> {

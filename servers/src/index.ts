@@ -192,7 +192,7 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32000,
+              code: -32020,
               message: 'Missing required header: Mcp-Protocol-Version',
             },
           })
@@ -207,8 +207,12 @@ export async function handleMcpPostRequest(
             jsonrpc: '2.0',
             id: jsonPayload.id ?? null,
             error: {
-              code: -32000,
+              code: -32022,
               message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
+              data: {
+                supported: Array.from(SUPPORTED_PROTOCOL_VERSIONS),
+                requested: protocolVersionHeader,
+              },
             },
           })
         );
@@ -231,9 +235,8 @@ export async function handleMcpPostRequest(
       if (jsonPayload.id !== undefined) {
         const isString = typeof jsonPayload.id === 'string';
         const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
-        const isNull = jsonPayload.id === null;
 
-        if (!isString && !isInteger && !isNull) {
+        if (!isString && !isInteger) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
             JSON.stringify({
@@ -241,7 +244,7 @@ export async function handleMcpPostRequest(
               id: null,
               error: {
                 code: -32600,
-                message: 'Invalid Request: id must be a string, integer, or null',
+                message: 'Invalid Request: id must be a string or integer (null is not allowed)',
               },
             })
           );
@@ -347,9 +350,8 @@ export async function handleMcpPostRequest(
 
         const isString = typeof jsonPayload.id === 'string';
         const isInteger = typeof jsonPayload.id === 'number' && Number.isInteger(jsonPayload.id);
-        const isNull = jsonPayload.id === null;
 
-        if (!isString && !isInteger && !isNull) {
+        if (!isString && !isInteger) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(
             JSON.stringify({
@@ -357,7 +359,7 @@ export async function handleMcpPostRequest(
               id: null,
               error: {
                 code: -32600,
-                message: 'Invalid Request: id must be a string, integer, or null',
+                message: 'Invalid Request: id must be a string or integer (null is not allowed)',
               },
             })
           );
