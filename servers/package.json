@@ -4,6 +4,9 @@
   "description": "Modular, test-framework-based MCP server following official modelcontextprotocol/servers architecture",
   "type": "module",
   "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "tsc && node -e \"fs.cpSync('src', 'dist', { recursive: true, filter: (f) => !f.endsWith('.ts') })\"",
     "test": "pnpm --dir .. test -- test/mcp",
@@ -15,7 +18,7 @@
     "@modelcontextprotocol/fastify": "^2.0.0",
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
-    "fastify": "^5.11.3",
+    "fastify": "^5.12.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
