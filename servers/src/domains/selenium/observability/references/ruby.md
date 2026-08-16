@@ -54,4 +54,4 @@ end
 
 - **String Header Keys**: Always use String keys (`'Content-Type' => 'application/json'`) in `Net::HTTP` headers instead of Symbol keys.
 - **Automated HTTP Teardown**: Use high-level `Net::HTTP.post(uri, body, headers)` to automatically manage HTTP TCP socket opening and teardown.
-- **URI Initialization**: Prefer `URI("http://...")` over deprecated `URI.parse`.
+- **URI Initialization**: Use the Kernel shorthand `URI("http://...")` — it delegates directly to `URI.parse`, which returns the scheme-specific subclass (`URI::HTTP`, `URI::HTTPS`) for known schemes.
