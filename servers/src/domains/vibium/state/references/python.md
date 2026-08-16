@@ -22,7 +22,7 @@ def test_auth_storage_state() -> None:
         username = page.find("label=Username")
         username.fill("python_tester")
 
-        login_btn = page.find({"role": "button", "text": "Log in"})
+        login_btn = page.find(role="button", text="Log in")
         login_btn.click()
 
         bro.storage_state(path=str(auth_path))

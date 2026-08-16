@@ -12,7 +12,7 @@ from vibium import Element, Page
 
 
 def test_interactions(page: Page) -> None:
-    btn: Element = page.find({"role": "button", "text": "Log In"})
+    btn: Element = page.find(role="button", text="Log In")
     btn.click()
 
     username: Element = page.find("label=Username")

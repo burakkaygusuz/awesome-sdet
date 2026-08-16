@@ -13,19 +13,19 @@ from vibium import browser
 def test_semantic_locators() -> None:
     bro = browser.start()
     vibe = bro.page()
-    submit_btn = vibe.find({"role": "button", "text": "Sign In"})
+    submit_btn = vibe.find(role="button", text="Sign In")
     submit_btn.click()
 
-    email_field = vibe.find({"label": "Email address"})
+    email_field = vibe.find(label="Email address")
     email_field.fill("sdet@example.com")
 
-    cart_badge = vibe.find({"testid": "cart-badge"})
+    cart_badge = vibe.find(testid="cart-badge")
     assert cart_badge.is_displayed()
 
-    msg = vibe.find({"text": "Order Confirmed"})
+    msg = vibe.find(text="Order Confirmed")
     msg.wait_for()
 
-    search = vibe.find({"placeholder": "Search catalog..."})
+    search = vibe.find(placeholder="Search catalog...")
     search.fill("automation")
 ```
 
@@ -44,7 +44,6 @@ def test_piercing() -> None:
     edit_button = vibe.find("user-card >> button.edit")
     edit_button.click()
 
-    shadow_element = vibe.find(
     shadow_element = vibe.find("custom-widget >>> internal-card >>> button.action")
     shadow_element.click()
 ```
@@ -60,8 +59,8 @@ from vibium import browser
 def test_scoping() -> None:
     bro = browser.start()
     vibe = bro.page()
-    target_row = vibe.find({"role": "row", "text": "Alice"})
-    edit_btn = target_row.find({"role": "button", "text": "Edit"})
+    target_row = vibe.find(role="row", text="Alice")
+    edit_btn = target_row.find(role="button", text="Edit")
     edit_btn.click()
 ```
 

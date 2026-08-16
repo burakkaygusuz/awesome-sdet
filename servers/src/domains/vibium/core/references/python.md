@@ -17,9 +17,7 @@ def run_vibium_sync() -> None:
         page.go("https://app.example.com")
         print("Page Title:", page.evaluate("() => document.title"))
 
-        submit_btn: Element = page.find(
-            {"role": "button", "text": "Get Started"}
-        )
+        submit_btn: Element = page.find(role="button", text="Get Started")
         submit_btn.click()
     finally:
         bro.stop()
@@ -49,17 +47,14 @@ async def run_vibium_async() -> None:
         page: AsyncPage = await bro.page()
         await page.go("https://app.example.com/login")
 
-        email_input: AsyncElement = await page.find(
-            {"role": "textbox", "text": "Email"}
-        )
+        email_input: AsyncElement = await page.find(role="textbox", text="Email")
         await email_input.fill("sdet@example.com")
 
-        submit_btn: AsyncElement = await page.find(
-            {"role": "button", "text": "Sign In"}
-        )
+        submit_btn: AsyncElement = await page.find(role="button", text="Sign In")
         await submit_btn.click()
 
-        await page.check("verify user lands on dashboard")
+        # find() waits for the element; ElementNotFoundError fails the flow if absent
+        await page.find(role="heading", text="Dashboard")
     finally:
         await bro.stop()
 
