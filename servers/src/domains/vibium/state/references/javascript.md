@@ -1,60 +1,121 @@
 # Vibium State & Recording Management — JavaScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) provides authentication state snapshots (`storageState`), session tracing, recording chunking/grouping, and multi-tab context isolation.
+> Official Vibium 26.5+ JavaScript authentication state snapshots (`storageState`), session cookies, local storage serialization, session tracing, and multi-tab context isolation.
 
 ---
 
-## 1. Storage State Snapshots
+## 1. Storage State & Auth Snapshots
 
 ```javascript
 const { browser } = require('vibium');
 
 async function manageStorageState() {
-  // Capture authenticated state snapshot
-  const bro = await browser.start({ headless: true });
+  const vibe = await browser.launch({ headless: true });
   try {
-    const authPage = await bro.page();
-    await authPage.go('https://app.example.com/login');
+    await vibe.go('https://app.example.com/login');
 
-    const userInput = await authPage.find({ label: 'User' });
+    const userInput = await vibe.find({ label: 'Username' });
     await userInput.fill('admin');
 
-    const loginBtn = await authPage.find({ role: 'button', text: 'Login' });
+    const passInput = await vibe.find({ label: 'Password' });
+    await passInput.fill('SecureP@ssword123');
+
+    const loginBtn = await vibe.find({ role: 'button', text: 'Sign In' });
     await loginBtn.click();
 
-    await bro.storageState({ path: 'auth.json' });
+    await vibe.storageState({ path: '.auth/admin-state.json' });
   } finally {
-    await bro.stop();
+    await vibe.quit();
   }
 
-  // Reuse storageState to bypass repeated UI logins
-  const testBro = await browser.start({ headless: true, storageState: 'auth.json' });
+  const testVibe = await browser.launch({
+    headless: true,
+    storageState: '.auth/admin-state.json',
+  });
   try {
-    const testPage = await testBro.page();
-    await testPage.go('https://app.example.com/dashboard');
+    await testVibe.go('https://app.example.com/dashboard');
   } finally {
-    await testBro.stop();
+    await testVibe.quit();
   }
 }
-
-module.exports = { manageStorageState };
 ```
 
 ---
 
-## 2. Multi-Tab Handling
+## 2. Multi-Tab & Page Management
 
 ```javascript
-async function handleTabs(bro) {
-  const mainTab = await bro.page();
-  const helpTab = await bro.newPage();
+async function handleTabs(mainVibe) {
+  const newTab = await mainVibe.newPage();
+  await newTab.go('https://app.example.com/docs');
 
-  await helpTab.go('https://app.example.com/help');
-  console.log('Open tabs:', (await bro.pages()).length);
+  const pages = await mainVibe.pages();
 
-  await mainTab.bringToFront();
-  await helpTab.close();
+  await mainVibe.bringToFront();
+  await newTab.close();
+}
+```
+
+---
+
+## 3. Session Cookies & Local Storage Serialization
+
+```javascript
+async function manageCookiesAndStorage(vibe) {
+  await vibe.setCookies([
+    {
+      name: 'session_token',
+      value: 'jwt_secure_token_xyz',
+      domain: '.example.com',
+      path: '/',
+      httpOnly: true,
+      secure: true,
+    },
+  ]);
+
+  const cookies = await vibe.cookies('https://app.example.com');
+
+  await vibe.evaluate(() => {
+    localStorage.setItem('theme', 'dark');
+    localStorage.setItem('feature_flags', JSON.stringify({ beta_dashboard: true }));
+  });
+
+  await vibe.clearCookies();
 }
 
-module.exports = { manageStorageState, handleTabs };
+module.exports = {
+  manageStorageState,
+  handleTabs,
+  manageCookiesAndStorage,
+};
 ```
+
+---
+
+## 4. Session Tracing & Recording (CLI v26.5.31)
+
+```bash
+# Start full video and BiDi event recording
+vibium record start --video --output ./reports/session.zip
+
+# Grouping subcommands (v26.5.31)
+vibium record start-group --name "login-flow"
+vibium go https://app.example.com/login
+vibium record stop-group
+
+# Chunking subcommands (v26.5.31)
+vibium record start-chunk --name "checkout-step-1"
+vibium click @e5
+vibium record stop-chunk
+
+# Finalize recording
+vibium record stop
+```
+
+---
+
+## 5. Best Practices
+
+- **Never share storage state across concurrent workers**: Give each parallel worker thread its own isolated storage state file.
+- **Use chunked recordings for long journeys**: Leverage `start-chunk` and `stop-chunk` to split large test runs into distinct debuggable archives.
+- **Always close browser on teardown**: Auto-flush recordings and finalize storage snapshots inside `try / finally` blocks.
