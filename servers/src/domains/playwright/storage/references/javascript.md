@@ -1,13 +1,16 @@
 # Playwright Storage State & Authentication — JavaScript Reference
 
-> Playwright speeds up isolated tests by reusing saved authentication state with `storageState` and by creating a fresh `BrowserContext` for each test.
+> Official Playwright 1.62+ JavaScript authentication setup project pattern, multi-role fixtures, and storage state isolation.
+
+---
 
 ## 1. Authentication Setup Project Pattern
 
 Authenticate once during setup, save the session state, and inject it into dependent projects:
 
+### A. Setup Spec (`tests/auth.setup.js`)
+
 ```javascript
-// auth.setup.js
 import { test as setup, expect } from '@playwright/test';
 
 const authFile = 'playwright/.auth/user.json';
@@ -17,12 +20,15 @@ setup('authenticate user', async ({ page }) => {
   await page.getByLabel('Username').fill('standard_user');
   await page.getByLabel('Password').fill('secret_pass');
   await page.getByRole('button', { name: 'Sign in' }).click();
+
+  await page.waitForURL('**/dashboard');
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
   await page.context().storageState({ path: authFile });
 });
 ```
 
-### Configure in `playwright.config.js`
+### B. Configuration (`playwright.config.js`)
 
 ```javascript
 import { defineConfig, devices } from '@playwright/test';
@@ -38,6 +44,8 @@ export default defineConfig({
   ],
 });
 ```
+
+---
 
 ## 2. Multi-Role Authentication Fixtures
 
@@ -57,6 +65,8 @@ export const test = base.extend({
 
 export { expect };
 ```
+
+---
 
 ## 3. Cookie and Context Manipulation
 
@@ -81,8 +91,10 @@ test('inspect and manipulate isolated cookies', async ({ context }) => {
 });
 ```
 
+---
+
 ## 4. Context Isolation Invariants
 
-- Each test receives an isolated context with independent cookies, cache, and local storage.
-- Seed authentication state instead of repeating UI login in every scenario.
-- Close manually created contexts in a `finally` block; standard fixtures clean up automatically.
+- **Isolated Browser Contexts**: Each test receives an isolated context with independent cookies, cache, and local storage.
+- **Bypass UI Logins**: Seed authentication state instead of repeating UI login in every scenario.
+- **Teardown Safety**: Close manually created contexts in a `finally` block; standard fixtures clean up automatically.

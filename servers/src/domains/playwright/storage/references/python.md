@@ -1,6 +1,6 @@
 # Playwright Storage State & Authentication — Python Reference
 
-> Playwright Python persists session state using `storage_state` and provides Pytest fixtures for multi-role contexts.
+> Official Playwright 1.62+ Python session persistence using storage_state and Pytest multi-role context fixtures.
 
 ---
 
