@@ -135,6 +135,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         { name: 'read_pw_storage_docs', lang: 'typescript', expectText: 'Playwright' },
         { name: 'read_pw_observability_docs', lang: 'python', expectText: 'Playwright' },
         { name: 'read_se_actions_docs', lang: 'java', expectText: 'Selenium' },
+        { name: 'read_se_bidi_docs', lang: 'python', expectText: 'Selenium' },
         { name: 'read_cy_commands_docs', lang: 'typescript', expectText: 'Cypress' },
         { name: 'read_vibium_core_docs', lang: 'python', expectText: 'Vibium' },
         { name: 'read_vibium_selectors_docs', lang: 'typescript', expectText: 'Vibium' },
@@ -187,6 +188,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const templates = [
         { uri: 'playwright://locators/typescript', expectText: 'Playwright' },
         { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
+        { uri: 'selenium://bidi/python', expectText: 'Selenium' },
         { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
         { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
         { uri: 'appium://capabilities/typescript', expectText: 'Appium' },
