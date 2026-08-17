@@ -1,6 +1,6 @@
 # Playwright Actions & Auto-Waiting — Python Reference
 
-> Playwright Python actions automatically wait for elements to be visible, stable, enabled, and ready before performing interactions.
+> Official Playwright 1.62+ Python auto-waiting actions, keyboard/mouse input, and file uploads.
 
 ---
 
@@ -75,7 +75,6 @@ def advanced_actions(page: Page) -> None:
         [fixtures_dir / "doc1.pdf", fixtures_dir / "doc2.pdf"]
     )
 
-    # In-memory buffer upload
     file_input.set_input_files(
         FilePayload(
             name="report.csv",

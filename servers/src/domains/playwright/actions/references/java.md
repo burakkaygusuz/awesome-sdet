@@ -1,6 +1,6 @@
 # Playwright Actions & Auto-Waiting — Java Reference
 
-> Playwright Java API provides strong types and built-in auto-waiting actionability checks for deterministic automation.
+> Official Playwright 1.62+ Java auto-waiting interactions, keyboard/mouse events, drag-and-drop, and file uploads.
 
 ---
 
@@ -16,7 +16,6 @@ Playwright Java waits for elements to be attached, visible, stable, enabled, and
 package com.example.playwright;
 
 import java.util.Arrays;
-import java.util.List;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;

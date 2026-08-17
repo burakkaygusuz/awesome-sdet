@@ -1,6 +1,6 @@
 # Playwright Actions & Auto-Waiting — TypeScript Reference
 
-> Playwright performs thorough actionability checks before performing any action (e.g. click, fill), eliminating the need for manual sleeps or arbitrary wait loops.
+> Official Playwright 1.62+ TypeScript auto-waiting actions, keyboard/mouse input, and file uploads.
 
 ---
 
@@ -72,7 +72,6 @@ export async function advancedActions(page: Page): Promise<void> {
   await fileInput.setInputFiles(['fixtures/doc1.pdf', 'fixtures/doc2.pdf']);
   await fileInput.setInputFiles([]);
 
-  // In-memory buffer file upload
   await fileInput.setInputFiles({
     name: 'report.csv',
     mimeType: 'text/csv',

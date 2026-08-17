@@ -1,6 +1,6 @@
 # Playwright Actions & Auto-Waiting — C# Reference
 
-> Microsoft.Playwright C# actions automatically await DOM readiness, visibility, and element stability.
+> Official Playwright 1.62+ C# (.NET) auto-waiting actions, keyboard/mouse input, and file uploads.
 
 ---
 

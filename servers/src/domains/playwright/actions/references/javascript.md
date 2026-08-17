@@ -1,10 +1,14 @@
 # Playwright Actions & Auto-Waiting — JavaScript Reference
 
-> Playwright performs actionability checks before each action, so tests can synchronize on the UI instead of using arbitrary sleeps.
+> Official Playwright 1.62+ JavaScript auto-waiting actions, keyboard/mouse input, and file uploads.
+
+---
 
 ## 1. Actionability Guarantees
 
 Before an action runs, Playwright waits for the target to be visible, stable, enabled, and able to receive events when those checks apply. Prefer the built-in action waiters over `waitForTimeout`.
+
+---
 
 ## 2. Common User Interactions
 
@@ -23,6 +27,8 @@ test('use standard user interactions', async ({ page }) => {
 });
 ```
 
+---
+
 ## 3. Drag and Keyboard Actions
 
 ```javascript
@@ -40,6 +46,8 @@ test('use keyboard navigation', async ({ page }) => {
   await page.keyboard.press('Enter');
 });
 ```
+
+---
 
 ## 4. Best Practices
 
