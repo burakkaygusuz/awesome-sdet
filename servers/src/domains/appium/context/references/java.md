@@ -1,6 +1,6 @@
-# Appium Hybrid Context Switching — Java API Reference (Appium 3.x+)
+# Appium Hybrid Context Switching — Java API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Java Client (`SupportsContextSwitching`) hybrid context navigation and WebView DOM automation.
+> Official Appium 2.x Java Client (`io.appium:java-client` v9.x+) `SupportsContextSwitching` hybrid context navigation and WebView DOM automation.
 
 ---
 
@@ -28,18 +28,18 @@ public class AppiumContextManager {
             for (String contextName : contextNames) {
                 if (contextName.contains("WEBVIEW")) {
                     contextDriver.context(contextName);
-                    System.out.println("Active context: " + contextDriver.getContext());
-
-                    // Standard Selenium By and WebDriverWait inside webview
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                    WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#submit-order")));
-                    submitBtn.click();
+                    try {
+                        System.out.println("Active context: " + contextDriver.getContext());
+                        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                        WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#submit-order")));
+                        submitBtn.click();
+                    } finally {
+                        contextDriver.context("NATIVE_APP");
+                        System.out.println("Returned to native context: " + contextDriver.getContext());
+                    }
                     break;
                 }
             }
-
-            contextDriver.context("NATIVE_APP");
-            System.out.println("Returned to native context: " + contextDriver.getContext());
         }
     }
 }

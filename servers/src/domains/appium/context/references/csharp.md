@@ -1,6 +1,6 @@
-# Appium Hybrid Context Switching — C# API Reference (Appium 3.x+)
+# Appium Hybrid Context Switching — C# API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ .NET Client (`IContextAware`) hybrid context navigation and WebView DOM automation.
+> Official Appium 2.x .NET Client (`IContextAware`) hybrid context navigation and WebView DOM automation.
 
 ---
 
@@ -29,18 +29,21 @@ namespace AwesomeSdet.Appium
                     if (context.Contains("WEBVIEW"))
                     {
                         contextAwareDriver.Context = context;
-                        Console.WriteLine($"Switched to: {contextAwareDriver.Context}");
-
-                        // Standard Selenium By and WebDriverWait inside webview
-                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-                        var submitBtn = wait.Until(d => d.FindElement(By.CssSelector("button.action-submit")));
-                        submitBtn.Click();
+                        try
+                        {
+                            Console.WriteLine($"Switched to: {contextAwareDriver.Context}");
+                            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                            var submitBtn = wait.Until(d => d.FindElement(By.CssSelector("button.action-submit")));
+                            submitBtn.Click();
+                        }
+                        finally
+                        {
+                            contextAwareDriver.Context = "NATIVE_APP";
+                            Console.WriteLine($"Active Context: {contextAwareDriver.Context}");
+                        }
                         break;
                     }
                 }
-
-                contextAwareDriver.Context = "NATIVE_APP";
-                Console.WriteLine($"Active Context: {contextAwareDriver.Context}");
             }
         }
     }

@@ -9,7 +9,7 @@ export const AppiumContextDocsSchema = z
 
 export type AppiumContextDocsArgs = z.infer<typeof AppiumContextDocsSchema>;
 
-const FULL_HEADER = `# API Reference — Appium Hybrid Context Switching (Appium 3.6.0+)`;
+const FULL_HEADER = `# API Reference — Appium Hybrid Context Switching (Appium 2.x+)`;
 
 export async function handleAppiumContextDocs(args: AppiumContextDocsArgs) {
   const targetLanguage: SupportedLanguage = args.language;

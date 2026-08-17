@@ -1,6 +1,6 @@
-# Appium Hybrid Context Switching — JavaScript API Reference (Appium 3.x+)
+# Appium Hybrid Context Switching — JavaScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO JavaScript hybrid application automation and WebView context switching.
+> Official Appium 2.x WebdriverIO JavaScript hybrid application automation and WebView context switching.
 
 ---
 
@@ -20,10 +20,12 @@ async function switchBetweenContexts(driver) {
   const targetWebview = contexts.find((c) => typeof c === 'string' && c.startsWith('WEBVIEW'));
 
   await driver.switchContext(targetWebview);
-  const input = await driver.$('input[name="search"]');
-  await input.setValue('Hybrid Automation');
-
-  await driver.switchContext('NATIVE_APP');
+  try {
+    const input = await driver.$('input[name="search"]');
+    await input.setValue('Hybrid Automation');
+  } finally {
+    await driver.switchContext('NATIVE_APP');
+  }
 }
 ```
 

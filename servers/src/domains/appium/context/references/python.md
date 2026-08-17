@@ -1,6 +1,6 @@
-# Appium Hybrid Context Switching — Python API Reference (Appium 3.x+)
+# Appium Hybrid Context Switching — Python API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Python Client context inspection and WebView switching.
+> Official Appium 2.x Python Client context inspection and WebView switching.
 
 ---
 
@@ -23,16 +23,17 @@ def switch_to_webview(driver: WebDriver) -> None:
     )
     if webview_context:
         driver.switch_to.context(webview_context)
-        print("Active context:", driver.current_context)
+        try:
+            print("Active context:", driver.current_context)
 
-        wait = WebDriverWait(driver, 10)
-        element: WebElement = wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.pay-now"))
-        )
-        element.click()
-
-        driver.switch_to.context("NATIVE_APP")
-        print("Switched back to:", driver.current_context)
+            wait = WebDriverWait(driver, 10)
+            element: WebElement = wait.until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.pay-now"))
+            )
+            element.click()
+        finally:
+            driver.switch_to.context("NATIVE_APP")
+            print("Switched back to:", driver.current_context)
     else:
         raise RuntimeError("No WebView context available")
 ```

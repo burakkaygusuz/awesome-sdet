@@ -1,6 +1,6 @@
-# Appium Hybrid Context Switching — TypeScript API Reference (Appium 3.x+)
+# Appium Hybrid Context Switching — TypeScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO TypeScript hybrid application automation and WebView context switching.
+> Official Appium 2.x WebdriverIO TypeScript hybrid application automation and WebView context switching.
 
 ---
 
@@ -19,14 +19,14 @@ export async function handleHybridContext(driver: WebdriverIO.Browser): Promise<
 
   if (webviewContext) {
     await driver.switchContext(webviewContext);
-    console.log('Switched to WebView:', webviewContext);
-
-    // Standard DOM locators apply inside WebView (equivalent to Selenium Web)
-    const webButton = await driver.$('button#checkout-btn');
-    await webButton.click();
-
-    await driver.switchContext('NATIVE_APP');
-    console.log('Returned to NATIVE_APP context');
+    try {
+      console.log('Switched to WebView:', webviewContext);
+      const webButton = await driver.$('button#checkout-btn');
+      await webButton.click();
+    } finally {
+      await driver.switchContext('NATIVE_APP');
+      console.log('Returned to NATIVE_APP context');
+    }
   }
 }
 ```
