@@ -1,13 +1,12 @@
 # Playwright Web-First Assertions — C# Reference
 
-> Microsoft.Playwright C# `Expect(locator)` provides asynchronous, auto-polling assertions.
+> Official Playwright 1.62+ C# (.NET) auto-retrying web-first assertions (Expect) and asynchronous state verification.
 
 ---
 
 ## 1. Locator State Assertions
 
 ```csharp
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using static Microsoft.Playwright.Assertions;

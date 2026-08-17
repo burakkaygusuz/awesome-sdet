@@ -1,6 +1,6 @@
 # Playwright Web-First Assertions — Java Reference
 
-> Playwright Java `PlaywrightAssertions.assertThat` performs auto-retrying assertions against locators and pages.
+> Official Playwright 1.62+ Java auto-retrying web-first assertions (PlaywrightAssertions.assertThat) and attribute verification.
 
 ---
 
@@ -11,7 +11,6 @@ package com.example.playwright;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
-import java.util.regex.Pattern;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
