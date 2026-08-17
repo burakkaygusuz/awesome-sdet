@@ -1,12 +1,13 @@
 # Playwright Network Mocking & API Testing — C# Reference
 
-> Microsoft.Playwright C# provides asynchronous network routing (`page.RouteAsync`) and headless API testing with `IAPIRequestContext`.
+> Official Playwright 1.62+ C# (.NET) network interception (RouteAsync), HAR mocking, and IAPIRequestContext.
 
 ---
 
 ## 1. Network Interception & Mocking (`page.RouteAsync`)
 
 ```csharp
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
@@ -34,6 +35,16 @@ public class NetworkMockingExamples
         });
 
         await page.RouteAsync("**/*analytics*/**", async (route) => await route.AbortAsync());
+
+        await page.RouteAsync("**/api/v1/secure/**", async (route) =>
+        {
+            var headers = new Dictionary<string, string>(await route.Request.AllHeadersAsync())
+            {
+                ["X-Mock-Authorization"] = "Bearer test-token-123"
+            };
+            await route.ContinueAsync(new() { Headers = headers });
+        });
+
         await page.UnrouteAsync("**/api/v1/user/profile");
     }
 }
