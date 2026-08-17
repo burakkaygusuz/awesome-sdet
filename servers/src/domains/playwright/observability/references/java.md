@@ -1,6 +1,6 @@
 # Playwright Observability, Tracing & Visual Testing — Java Reference
 
-> Playwright Java supports execution tracing via `Tracing.start()` and visual regression assertions.
+> Official Playwright 1.62+ Java execution tracing, screenshot capture, element masking, and error event monitoring.
 
 ---
 
@@ -36,18 +36,15 @@ public class TracingExamples {
 
 ---
 
-## 2. Screenshots & Visual Verification
+## 2. Screenshots & Element Masking
 
 ```java
 package com.example.playwright;
-
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 import java.nio.file.Paths;
 import java.util.List;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.assertions.PageAssertions;
 
 public class VisualExamples {
     public static void captureAndAssert(Page page) {
@@ -58,8 +55,8 @@ public class VisualExamples {
             .setFullPage(true));
 
         Locator clock = page.getByTestId("live-clock");
-        assertThat(page).hasScreenshot("dashboard.png", new PageAssertions.HasScreenshotOptions()
-            .setMaxDiffPixelRatio(0.02)
+        page.screenshot(new Page.ScreenshotOptions()
+            .setPath(Paths.get("screenshots/dashboard-masked.png"))
             .setMask(List.of(clock)));
     }
 }
