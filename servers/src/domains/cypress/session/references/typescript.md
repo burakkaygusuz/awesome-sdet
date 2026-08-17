@@ -1,16 +1,21 @@
 # Cypress Session & Multi-Origin Testing — TypeScript API Reference (Cypress 15.x+)
 
+> Official Cypress 15+ TypeScript session caching (cy.session) and multi-domain workflow (cy.origin) automation.
+
+---
+
 ## 1. Fast Auth Session Caching with Validation (`cy.session`)
 
 ```typescript
 cy.session(
   'user-session',
   () => {
-    cy.request('POST', '/api/login', { username: 'testuser', password: 'password123' }).then(
-      (res) => {
-        cy.setCookie('session_id', res.body.token);
-      }
-    );
+    cy.request<{ token: string }>('POST', '/api/login', {
+      username: 'testuser',
+      password: 'password123',
+    }).then((res) => {
+      cy.setCookie('session_id', res.body.token);
+    });
   },
   {
     validate() {
@@ -21,6 +26,8 @@ cy.session(
   }
 );
 ```
+
+---
 
 ## 2. Multi-Origin Domain Testing (`cy.origin`)
 
@@ -35,6 +42,8 @@ cy.origin('https://auth.thirdparty.com', { args: { userEmail } }, ({ userEmail }
   cy.get('#submit').click();
 });
 ```
+
+---
 
 ## 3. Best Practices & Anti-Patterns
 

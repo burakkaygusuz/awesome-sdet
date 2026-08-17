@@ -1,11 +1,16 @@
 # Cypress Shadow DOM Traversal — JavaScript API Reference (Cypress 15.x+)
 
+> Official Cypress 15+ JavaScript Shadow DOM traversal (.shadow()) and automatic piercing (includeShadowDom).
+
+---
+
 ## 1. Explicit Shadow Root Traversal (`.shadow()`)
 
 ```javascript
-// Traverses into the shadow root of a custom web component host element
 cy.get('custom-web-component').shadow().find('.internal-action-button').click();
 ```
+
+---
 
 ## 2. Automatic Shadow DOM Ingestion (`includeShadowDom`)
 
@@ -26,6 +31,8 @@ module.exports = defineConfig({
   },
 });
 ```
+
+---
 
 ## 3. Best Practices & Anti-Patterns
 

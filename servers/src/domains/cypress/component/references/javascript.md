@@ -1,9 +1,13 @@
 # Cypress Component Testing & Framework Mount — JavaScript API Reference (Cypress 15.x+)
 
+> Official Cypress 15+ JavaScript Component Testing mount APIs, framework adapters, and custom definitions.
+
+---
+
 ## 1. Multi-Framework Component Mounting (`mount`)
 
 ```javascript
-// React Component Mounting (cypress/react)
+import React from 'react';
 import { mount } from 'cypress/react';
 import Button from './Button';
 
@@ -19,10 +23,11 @@ describe('<Button />', () => {
 });
 ```
 
+---
+
 ## 2. Vue 3 & Angular Mounting
 
 ```javascript
-// Vue 3 Component Mounting (cypress/vue)
 import { mount } from 'cypress/vue';
 import UserProfile from './UserProfile.vue';
 
@@ -36,18 +41,29 @@ describe('<UserProfile />', () => {
 });
 ```
 
+---
+
 ## 3. Custom Framework Definition (`defineFrameworkDefinition`)
 
 ```javascript
-import { defineFrameworkDefinition } from 'cypress';
+const { defineFrameworkDefinition } = require('cypress');
 
-export default defineFrameworkDefinition({
-  type: 'custom-framework',
+module.exports = defineFrameworkDefinition({
+  type: '@org/cypress-ct-custom',
   name: 'Custom Framework',
   supportedBundlers: ['vite', 'webpack'],
   detectors: [{ type: 'dependency', name: 'custom-framework' }],
+  dependencies: () => [
+    {
+      type: 'custom-framework',
+      name: 'Custom Framework',
+      package: 'custom-framework',
+    },
+  ],
 });
 ```
+
+---
 
 ## 4. Best Practices & Anti-Patterns
 

@@ -1,6 +1,8 @@
 # Cypress Component Testing & Framework Mount — TypeScript API Reference (Cypress 15.x+)
 
-Cypress supports Component Testing across major frontend frameworks (React, Vue, Angular, Svelte) and provides a public API for building custom framework definitions (Solid.js, Lit, Qwik).
+> Official Cypress 15+ TypeScript Component Testing mount APIs across React, Vue, Angular, Svelte, and custom framework definitions.
+
+---
 
 ## 1. React (`cypress/react`)
 
