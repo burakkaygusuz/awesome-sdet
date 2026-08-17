@@ -11,11 +11,8 @@
 
 require 'selenium-webdriver'
 
-# 1. RemoteWebDriver Setup with Capabilities
 options = Selenium::WebDriver::Options.chrome
 options.add_option('se:downloadsEnabled', true)
-
-# 2. Node Stereotype Capabilities
 options.add_option('nodename:applicationName', 'node_1')
 
 driver = Selenium::WebDriver.for(:remote, url: 'http://localhost:4444', options: options)
