@@ -1,16 +1,22 @@
 # Cypress Stubs, Spies & Clock Control — TypeScript API Reference (Cypress 15.x+)
 
+> Official Cypress 15+ TypeScript function spies (cy.spy), method stubs (cy.stub), and timer clocks (cy.clock, cy.tick).
+
+---
+
 ## 1. Function Stubbing (`cy.stub`)
 
 ```typescript
 cy.visit('/', {
-  onBeforeLoad(win) {
+  onBeforeLoad(win: Cypress.AUTWindow) {
     cy.stub(win, 'prompt').returns('custom input').as('winPrompt');
   },
 });
 
 cy.get('@winPrompt').should('be.calledWith', 'Enter your name');
 ```
+
+---
 
 ## 2. Function Spying (`cy.spy`)
 
@@ -25,16 +31,23 @@ user.notify('Hello');
 cy.get('@notifySpy').should('have.been.calledWith', 'Hello');
 ```
 
+---
+
 ## 3. System Clock & Timer Control (`cy.clock`, `cy.tick`)
 
 ```typescript
-// Freeze clock and advance time deterministically without real delays
 cy.clock();
 cy.visit('/dashboard');
 
-// Fast-forward virtual timer to trigger setTimeout/setInterval
 cy.tick(5000);
 cy.get('#session-timeout-banner').should('be.visible');
 
-cy.clock().then((clock) => clock.restore());
+cy.clock().invoke('restore');
 ```
+
+---
+
+## 4. Best Practices & Anti-Patterns
+
+- **Deterministic Timers**: Advance application timers using `cy.clock()` and `cy.tick(ms)` instead of real `cy.wait(ms)` delays.
+- **Automatic Cleanup**: Spies, stubs, and clocks are automatically restored between tests by Cypress.
