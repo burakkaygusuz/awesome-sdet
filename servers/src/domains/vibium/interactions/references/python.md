@@ -1,43 +1,63 @@
 # Vibium Interactions & Actionability — Python API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) automatically performs comprehensive actionability checks before executing any interaction, preventing race conditions and test flakiness.
+> Official Vibium 26.5+ Python auto-waiting interaction primitives, actionability checks, and pointer mechanics.
 
 ---
 
-## 1. Interaction Primitives
+## 1. Actionability Guarantees
+
+Before dispatching an action, Vibium ensures the target element meets all relevant criteria:
+
+| Check               | Description                                                        | Click | Fill / Type | Select | Hover | Check / Uncheck | Drag_To |
+| :------------------ | :----------------------------------------------------------------- | :---: | :---------: | :----: | :---: | :-------------: | :-----: |
+| **Attached**        | Element is connected to the active DOM tree.                       |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
+| **Visible**         | Element has non-zero geometry and is not hidden (`display: none`). |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
+| **Stable**          | Element is not actively animating or transitioning.                |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
+| **Receives Events** | Element is top-most at coordinates and not obscured.               |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
+| **Enabled**         | Element is not marked `disabled` or `aria-disabled`.               |  ✅   |     ✅      |   ✅   |   —   |       ✅        |   ✅    |
+| **Editable**        | Element is not marked `readonly` or immutable.                     |   —   |     ✅      |   ✅   |   —   |        —        |    —    |
+
+---
+
+## 2. Interaction Methods
 
 ```python
 from typing import Any
-from vibium import Element, Page
+from vibium import Element, Vibe
 
 
-def test_interactions(page: Page) -> None:
-    btn: Element = page.find(role="button", text="Log In")
+def test_interactions(vibe: Vibe) -> None:
+    btn: Element = vibe.find(role="button", text="Log In")
     btn.click()
 
-    username: Element = page.find("label=Username")
+    username: Element = vibe.find(label="Username")
     username.fill("admin")
     username.type("_dev")
     username.press("Enter")
+    username.value()
 
-    terms: Element = page.find("label=Agree")
+    country_select: Element = vibe.find(role="combobox", text="Country")
+    country_select.select("US")
+
+    terms: Element = vibe.find(label="Agree to Terms")
     terms.check()
     terms.uncheck()
 
-    menu: Element = page.find("testid=profile-menu")
+    menu: Element = vibe.find(testid="profile-menu")
     menu.hover()
     menu.highlight()
     box: dict[str, Any] = menu.bounds()
-    print("Bounding box:", box)
+    menu.text()
 
-    source: Element = page.find("testid=task-1")
-    target: Element = page.find("testid=column-done")
+    source: Element = vibe.find(testid="task-1")
+    target: Element = vibe.find(testid="column-done")
     source.drag_to(target)
 ```
 
 ---
 
-## Best Practices
+## 3. Best Practices & Action Invariants
 
 - **Use `fill()` for Form Inputs**: `fill()` atomically sets field values and triggers change events; use `type()` only for real-time keypress validation testing.
-- **Actionability Checks**: Vibium auto-waits for elements to become visible, stable, and enabled before interacting. Avoid manual delays.
+- **Actionability Auto-Waiting**: Vibium auto-waits for elements to become attached, visible, stable, enabled, and non-obscured before interacting. Avoid manual delays (`time.sleep()`).
+- **Autonomous Intent Verification**: Combine `vibe.do("click submit")` and `vibe.check("verify status")` when driving autonomous agent steps.
