@@ -4,6 +4,15 @@
 
 ---
 
+## Enabling BiDi
+
+```csharp
+var options = new ChromeOptions { UseWebSocketUrl = true };
+IWebDriver driver = new ChromeDriver(options);
+```
+
+---
+
 ## Code Examples
 
 ```csharp
@@ -15,25 +24,21 @@ public class BidiExamples
 {
     public async Task DemonstrateBidiAsync()
     {
-        var options = new ChromeOptions
-        {
-            UseWebSocketUrl = true
-        };
+        var options = new ChromeOptions { UseWebSocketUrl = true };
+        using IWebDriver driver = new ChromeDriver(options);
+        await using var bidi = await driver.AsBiDiAsync();
 
-        IWebDriver driver = new ChromeDriver(options);
+        await bidi.Log.OnEntryAddedAsync(entry => Console.WriteLine($"Console: {entry.Text}"));
 
-        var bidi = await driver.AsBiDiAsync();
-
-        bidi.Log.ConsoleEntryAdded += (sender, e) =>
-        {
-            Console.WriteLine($"Console message: {e.Text}");
-        };
+        driver.Navigate().GoToUrl("https://www.selenium.dev/selenium/web/bidi/logEntryAdded.html");
+        driver.FindElement(By.Id("consoleLog")).Click();
     }
 }
 ```
 
 ## Best Practices
 
-- **Enable BiDi Capability**: BiDi must be enabled in `DriverOptions` (`UseWebSocketUrl = true`) before starting the session.
+- **Enable BiDi in options**: Set `UseWebSocketUrl = true` on `DriverOptions` before starting the session.
+- **Use `AsBiDiAsync()`**: Connect to the BiDi WebSocket via the `AsBiDiAsync()` extension method on `IWebDriver`.
 - **Use BiDi over CDP**: Prefer W3C BiDi over CDP for cross-browser support (Chrome, Edge, Firefox).
-- **Clean up listeners**: Unsubscribe C# events (`ConsoleEntryAdded -= ...`) during teardown.
+- **Dispose BiDi session**: Use `await using` on the BiDi connection to release WebSocket resources on teardown.
