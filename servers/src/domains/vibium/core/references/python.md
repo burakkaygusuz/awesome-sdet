@@ -1,26 +1,25 @@
 # Vibium Core & CLI Architecture — Python API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) is an AI-native browser automation framework built on W3C WebDriver BiDi, unifying the Sense-Think-Act agent loop, `@ref` element mapping, and multi-language client libraries.
+> Official Vibium 26.5+ Python browser lifecycle, launch options, and Sense-Think-Act CLI architecture.
 
 ---
 
 ## 1. Synchronous Browser Lifecycle & Setup
 
 ```python
-from vibium import Browser, Element, Page, browser
+from vibium import Element, Vibe, browserSync
 
 
 def run_vibium_sync() -> None:
-    bro: Browser = browser.start(headless=True)
+    vibe: Vibe = browserSync.launch(headless=True)
     try:
-        page: Page = bro.page()
-        page.go("https://app.example.com")
-        print("Page Title:", page.evaluate("() => document.title"))
+        vibe.go("https://app.example.com")
+        vibe.evaluate("() => document.title")
 
-        submit_btn: Element = page.find(role="button", text="Get Started")
+        submit_btn: Element = vibe.find(role="button", text="Get Started")
         submit_btn.click()
     finally:
-        bro.stop()
+        vibe.quit()
 
 
 if __name__ == "__main__":
@@ -33,30 +32,23 @@ if __name__ == "__main__":
 
 ```python
 import asyncio
-from vibium.async_api import (
-    Browser as AsyncBrowser,
-    Element as AsyncElement,
-    Page as AsyncPage,
-    browser as async_browser,
-)
+from vibium import Element, Vibe, browser
 
 
 async def run_vibium_async() -> None:
-    bro: AsyncBrowser = await async_browser.start(headless=True)
+    vibe: Vibe = await browser.launch(headless=True)
     try:
-        page: AsyncPage = await bro.page()
-        await page.go("https://app.example.com/login")
+        await vibe.go("https://app.example.com/login")
 
-        email_input: AsyncElement = await page.find(role="textbox", text="Email")
+        email_input: Element = await vibe.find(role="textbox", text="Email")
         await email_input.fill("sdet@example.com")
 
-        submit_btn: AsyncElement = await page.find(role="button", text="Sign In")
+        submit_btn: Element = await vibe.find(role="button", text="Sign In")
         await submit_btn.click()
 
-        # find() waits for the element; ElementNotFoundError fails the flow if absent
-        await page.find(role="heading", text="Dashboard")
+        await vibe.find(role="heading", text="Dashboard")
     finally:
-        await bro.stop()
+        await vibe.quit()
 
 
 if __name__ == "__main__":
@@ -82,7 +74,8 @@ vibium map --diff
 
 ---
 
-## Best Practices
+## 4. Best Practices
 
-- **Explicit Lifecycle Management**: Always invoke `bro.stop()` or `await bro.stop()` inside `try ... finally` blocks.
-- **Async vs Sync Alignment**: Select `vibium.browser` for synchronous scripts and `vibium.async_api.browser` for asyncio frameworks.
+- **Explicit Lifecycle Management**: Always invoke `vibe.quit()` or `await vibe.quit()` inside `try ... finally` blocks.
+- **Async vs Sync Alignment**: Select `browserSync.launch()` for synchronous scripts and `await browser.launch()` for asyncio frameworks.
+- **Zero Arbitrary Sleeps**: Rely exclusively on Vibium's auto-waiting actionability pipeline.

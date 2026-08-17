@@ -1,31 +1,38 @@
 # Vibium Core & CLI Architecture — TypeScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) is an AI-native browser automation framework built on W3C WebDriver BiDi, unifying the Sense-Think-Act agent loop, `@ref` element mapping, and multi-language client libraries.
+> Official Vibium 26.5+ TypeScript browser lifecycle, launch options, and Sense-Think-Act CLI architecture.
 
 ---
 
 ## 1. Browser Lifecycle & Setup
 
 ```typescript
-import { browser, type Browser, type Vibe, type Element } from 'vibium';
+import { browser, browserSync, type Vibe, type Element } from 'vibium';
 
-export async function runVibiumLifecycle(): Promise<void> {
-  const bro: Browser = await browser.start({
+export async function runVibiumAsyncLifecycle(): Promise<void> {
+  const vibe: Vibe = await browser.launch({
     headless: true,
   });
 
   try {
-    const vibe: Vibe = await bro.page();
     await vibe.go('https://app.example.com');
-
-    const title = await vibe.evaluate('() => document.title');
-    console.log('Page Title:', title);
+    await vibe.evaluate('() => document.title');
 
     const submitBtn: Element = await vibe.find({ role: 'button', text: 'Get Started' });
     await submitBtn.click();
   } finally {
-    // Guaranteed graceful teardown preventing orphaned daemon processes
-    await bro.stop();
+    await vibe.quit();
+  }
+}
+
+export function runVibiumSyncLifecycle(): void {
+  const vibe: Vibe = browserSync.launch({ headless: true });
+  try {
+    vibe.go('https://app.example.com');
+    const submitBtn: Element = vibe.find({ role: 'button', text: 'Get Started' });
+    submitBtn.click();
+  } finally {
+    vibe.quit();
   }
 }
 ```
@@ -42,13 +49,12 @@ Vibium operates on a tri-modal autonomous agent execution loop:
 4. **Diff Check (`diff map`)**: Inspect state mutations using differential snapshot checks (`vibium map --diff`) without re-parsing entire DOM trees.
 
 ```typescript
-import { browser, type Browser, type Vibe } from 'vibium';
+import { browser, type Vibe } from 'vibium';
 
 export async function senseThinkActWorkflow(): Promise<void> {
-  const bro: Browser = await browser.start();
+  const vibe: Vibe = await browser.launch();
 
   try {
-    const vibe: Vibe = await bro.page();
     await vibe.go('https://app.example.com/login');
 
     const emailInput = await vibe.find({ role: 'textbox', text: 'Email' });
@@ -59,7 +65,7 @@ export async function senseThinkActWorkflow(): Promise<void> {
 
     await vibe.check('verify user lands on dashboard');
   } finally {
-    await bro.stop();
+    await vibe.quit();
   }
 }
 ```
@@ -68,10 +74,10 @@ export async function senseThinkActWorkflow(): Promise<void> {
 
 ## 3. CLI vs SDK Modes
 
-| Mode    | Invocation                         | Primary Use Case                                                             |
-| :------ | :--------------------------------- | :--------------------------------------------------------------------------- |
-| **CLI** | `vibium go <url>` / `vibium map`   | Terminal debugging, shell scripts, live agent inspection.                    |
-| **SDK** | `import { browser } from 'vibium'` | Enterprise CI/CD pipelines, type-safe Page Object Models, regression suites. |
+| Mode    | Invocation                                      | Primary Use Case                                                             |
+| :------ | :---------------------------------------------- | :--------------------------------------------------------------------------- |
+| **CLI** | `vibium go <url>` / `vibium map`                | Terminal debugging, shell scripts, live agent inspection.                    |
+| **SDK** | `import { browser, browserSync } from 'vibium'` | Enterprise CI/CD pipelines, type-safe Page Object Models, regression suites. |
 
 ### CLI Commands Reference (Vibium 26.5.31)
 
@@ -101,5 +107,5 @@ vibium screenshot --output ./reports/screen.png
 ## 4. Best Practices
 
 - **Zero Arbitrary Sleeps**: Rely exclusively on Vibium's auto-waiting actionability pipeline.
-- **Always Stop Browser**: Ensure `await bro.stop()` is invoked in `try / finally` blocks to prevent orphaned browser daemon processes.
+- **Always Quit Browser**: Ensure `await vibe.quit()` (or `vibe.quit()`) is invoked in `try / finally` blocks to prevent orphaned browser daemon processes.
 - **Prefer Semantic Selectors**: Locate elements by role and text before falling back to CSS or XPath.
