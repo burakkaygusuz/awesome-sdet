@@ -1,6 +1,6 @@
 # Playwright Locators & Selectors — TypeScript Reference
 
-> Playwright Locators are strict, auto-waiting, and resilient element pointers that query the live DOM at execution time.
+> Official Playwright 1.62+ TypeScript locator strategies, accessibility queries, filtering, and chaining.
 
 ---
 
@@ -49,6 +49,8 @@ export async function filterAndChain(page: Page): Promise<void> {
   const pendingOrders: Locator = page.getByRole('row').filter({
     hasNot: page.getByText('Completed'),
   });
+
+  const visibleSubmitButtons: Locator = page.locator('button:visible');
 
   const modal: Locator = page.getByRole('dialog', { name: 'Edit Profile' });
   await modal.getByRole('textbox', { name: 'Full Name' }).fill('Jane Doe');

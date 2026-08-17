@@ -1,10 +1,12 @@
 # Playwright Locators & Selectors — Java Reference
 
-> Playwright Java API provides type-safe, auto-waiting locators anchored to accessibility roles and resilient locators.
+> Official Playwright 1.62+ Java locator strategies, accessibility queries, filtering, and chaining.
 
 ---
 
 ## 1. Recommended User-Facing Locators
+
+Prefer accessibility semantics and user-facing contracts over brittle CSS or XPath selectors:
 
 ```java
 package com.example.playwright;
@@ -12,25 +14,31 @@ package com.example.playwright;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.SelectOption;
 
 public class LocatorExamples {
     public static void demonstrateLocators(Page page) {
         Locator submitBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit Order"));
-        Locator heading = page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Dashboard").setLevel(1));
+        Locator navHeading = page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Dashboard").setLevel(1));
         Locator termsCheckbox = page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("I agree to Terms"));
         Locator countrySelect = page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Country"));
-
         Locator usernameInput = page.getByLabel("Username or Email");
-        Locator passwordInput = page.getByLabel("Password");
-
-        Locator searchField = page.getByPlaceholder("Search products, categories...");
-
+        Locator searchInput = page.getByPlaceholder("Search products, categories...");
         Locator welcomeText = page.getByText("Welcome back, Admin!");
-        Locator exactText = page.getByText("Active", new Page.GetByTextOptions().setExact(true));
-
-        Locator logo = page.getByAltText("Acme Corporation");
+        Locator companyLogo = page.getByAltText("Acme Corporation");
         Locator closeBtn = page.getByTitle("Close modal");
-        Locator card = page.getByTestId("user-summary-card");
+        Locator dataCard = page.getByTestId("user-summary-card");
+
+        submitBtn.click();
+        navHeading.waitFor();
+        termsCheckbox.check();
+        countrySelect.selectOption(new SelectOption().setValue("US"));
+        usernameInput.fill("jane@example.com");
+        searchInput.fill("mouse");
+        welcomeText.waitFor();
+        companyLogo.waitFor();
+        closeBtn.waitFor();
+        dataCard.waitFor();
     }
 }
 ```
@@ -54,6 +62,11 @@ public class FilterAndChainExamples {
 
         Locator activeRow = page.getByRole(AriaRole.ROW)
             .filter(new Locator.FilterOptions().setHas(page.getByRole(AriaRole.STATUS, new Page.GetByRoleOptions().setName("Active"))));
+
+        Locator pendingItems = page.getByRole(AriaRole.ROW)
+            .filter(new Locator.FilterOptions().setHasNot(page.getByText("Completed")));
+
+        Locator visibleButtons = page.locator("button:visible");
 
         Locator dialog = page.getByRole(AriaRole.DIALOG, new Page.GetByRoleOptions().setName("Edit Profile"));
         dialog.getByRole(AriaRole.TEXTBOX, new Locator.GetByRoleOptions().setName("Full Name")).fill("Jane Doe");

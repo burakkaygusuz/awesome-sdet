@@ -1,6 +1,6 @@
 # Playwright Locators & Selectors — Python Reference
 
-> Playwright Python locators represent an element query on the page, dynamically evaluated and auto-waited upon action execution.
+> Official Playwright 1.62+ Python locator strategies, accessibility queries, filtering, and chaining.
 
 ---
 
@@ -12,21 +12,26 @@ from playwright.sync_api import Locator, Page
 
 def demonstrate_locators(page: Page) -> None:
     submit_btn: Locator = page.get_by_role("button", name="Submit Order")
-    heading: Locator = page.get_by_role("heading", name="Dashboard", level=1)
-    terms_box: Locator = page.get_by_role("checkbox", name="I agree to Terms")
+    nav_heading: Locator = page.get_by_role("heading", name="Dashboard", level=1)
+    terms_checkbox: Locator = page.get_by_role("checkbox", name="I agree to Terms")
     country_select: Locator = page.get_by_role("combobox", name="Country")
-
     username_input: Locator = page.get_by_label("Username or Email")
-    password_input: Locator = page.get_by_label("Password")
-
-    search_field: Locator = page.get_by_placeholder("Search products, categories...")
-
+    search_input: Locator = page.get_by_placeholder("Search products, categories...")
     welcome_text: Locator = page.get_by_text("Welcome back, Admin!")
-    exact_text: Locator = page.get_by_text("Active", exact=True)
-
-    logo: Locator = page.get_by_alt_text("Acme Corporation")
+    company_logo: Locator = page.get_by_alt_text("Acme Corporation")
     close_btn: Locator = page.get_by_title("Close modal")
-    card: Locator = page.get_by_test_id("user-summary-card")
+    data_card: Locator = page.get_by_test_id("user-summary-card")
+
+    submit_btn.click()
+    nav_heading.wait_for()
+    terms_checkbox.check()
+    country_select.select_option("US")
+    username_input.fill("jane@example.com")
+    search_input.fill("mouse")
+    welcome_text.wait_for()
+    company_logo.wait_for()
+    close_btn.wait_for()
+    data_card.wait_for()
 ```
 
 ---
@@ -48,6 +53,8 @@ def filter_and_chain(page: Page) -> None:
     pending_items: Locator = page.get_by_role("row").filter(
         has_not=page.get_by_text("Completed")
     )
+
+    visible_buttons: Locator = page.locator("button:visible")
 
     dialog: Locator = page.get_by_role("dialog", name="Edit Profile")
     dialog.get_by_role("textbox", name="Full Name").fill("Jane Doe")
