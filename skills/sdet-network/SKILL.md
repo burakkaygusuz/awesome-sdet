@@ -50,12 +50,12 @@ By controlling network responses, SDET suites simulate hard-to-reproduce edge ca
 
 ## 4. Universal Framework Paradigm Mapping
 
-| Automation Framework | Interception & Mocking API                              | Request Synchronization                           | Direct API Testing Engine                                 |
-| :------------------- | :------------------------------------------------------ | :------------------------------------------------ | :-------------------------------------------------------- |
-| **Playwright**       | Full-duplex `page.route()`, `route.fulfill()`           | `page.waitForResponse()`, `page.waitForRequest()` | `playwright.request.newContext()` (`APIRequestContext`)   |
-| **Cypress**          | `cy.intercept('METHOD', '**/path', ...)`                | `cy.wait('@alias')` (implicit route matching)     | `cy.request()`                                            |
-| **Selenium 4**       | CDP `Network.setRequestInterception` / W3C BiDi Network | BiDi `network.responseCompleted` event streams    | HTTP client libraries (HttpClient, requests, RestAssured) |
-| **Vibium**           | BiDi network routing and mock response rules            | BiDi response event subscriptions                 | Integrated BiDi network driver                            |
+| Automation Framework | Interception & Mocking API                                                 | Request Synchronization                                         | Direct API Testing Engine                                 |
+| :------------------- | :------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------------- |
+| **Playwright**       | Full-duplex `page.route()`, `route.fulfill()`                              | `page.waitForResponse()`, `page.waitForRequest()`               | `playwright.request.newContext()` (`APIRequestContext`)   |
+| **Cypress**          | `cy.intercept('METHOD', '**/path', ...)`                                   | `cy.wait('@alias')` (implicit route matching)                   | `cy.request()`                                            |
+| **Selenium 4**       | W3C BiDi `Network.addIntercept()` / `driver.network.add_request_handler()` | BiDi `onBeforeRequestSent` / `responseCompleted` event handlers | HTTP client libraries (HttpClient, requests, RestAssured) |
+| **Vibium**           | BiDi network routing and mock response rules                               | BiDi response event subscriptions                               | Integrated BiDi network driver                            |
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 

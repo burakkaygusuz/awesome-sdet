@@ -49,12 +49,12 @@ Observability encompasses execution tracing (DOM snapshots, network logs, action
 
 ## 4. Universal Framework Paradigm Mapping
 
-| Automation Framework | Execution Tracing Engine                     | Visual Regression Engine               | Console & Network Telemetry                                  |
-| :------------------- | :------------------------------------------- | :------------------------------------- | :----------------------------------------------------------- |
-| **Playwright**       | `context.tracing` (`trace.zip` Trace Viewer) | `expect(page).toHaveScreenshot()`      | `page.on('console')`, `page.on('pageerror')`                 |
-| **Cypress**          | Native Time-Travel Command Log               | `cy.screenshot()` + pixelmatch plugins | `cy.on('window:before:load')`, `cy.on('uncaught:exception')` |
-| **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi log events                     |
-| **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                 |
+| Automation Framework | Execution Tracing Engine                     | Visual Regression Engine               | Console & Network Telemetry                                   |
+| :------------------- | :------------------------------------------- | :------------------------------------- | :------------------------------------------------------------ |
+| **Playwright**       | `context.tracing` (`trace.zip` Trace Viewer) | `expect(page).toHaveScreenshot()`      | `page.on('console')`, `page.on('pageerror')`                  |
+| **Cypress**          | Native Time-Travel Command Log               | `cy.screenshot()` + pixelmatch plugins | `cy.on('window:before:load')`, `cy.on('uncaught:exception')`  |
+| **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi `driver.script.add_*_handler()` |
+| **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                  |
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
