@@ -17,7 +17,6 @@ class LocatorExamples {
     const username = await driver.findElement(By.id('username'));
     const submitBtn = await driver.findElement(By.css("button.btn-success[type='submit']"));
 
-    // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
     const passwordInput = await driver.findElement(locateWith(By.tagName('input')).below(username));
     const cancelButton = await driver.findElement(
       locateWith(By.tagName('button')).toLeftOf(submitBtn)
@@ -36,7 +35,7 @@ Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them wi
 const shadowHost = await driver.findElement(By.css('my-card'));
 const shadowRoot = await shadowHost.getShadowRoot();
 const inner = await shadowRoot.findElement(By.css('p'));
-const nestedRoot = (await shadowRoot.findElement(By.css('child-widget'))).getShadowRoot();
+const nestedRoot = await (await shadowRoot.findElement(By.css('child-widget'))).getShadowRoot();
 ```
 
 ## Link Text Strategies

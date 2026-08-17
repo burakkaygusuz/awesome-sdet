@@ -31,7 +31,7 @@ class LocatorExamples:
             locate_with(By.TAG_NAME, "input").below(username)
         )
         cancel_button: WebElement = driver.find_element(
-            locate_with(By.TAG_NAME, "button").left_of(submit_btn)
+            locate_with(By.TAG_NAME, "button").to_left_of(submit_btn)
         )
 ```
 
@@ -40,11 +40,11 @@ class LocatorExamples:
 ## Best Practices
 
 - **Tuple Unpacking**: Define locators as `(By.<STRATEGY>, "selector")` tuples and unpack them with `*` when calling `find_element`.
-- **Relative Locators**: Prefer spatial relative locators (`below`, `above`, `left_of`, `right_of`, `near`) for dynamic forms where IDs change.
+- **Relative Locators**: Prefer spatial relative locators (`below`, `above`, `to_left_of`, `to_right_of`, `near`) for dynamic forms where IDs change.
 
 ## Shadow DOM Piercing
 
-Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+Selenium 4 exposes open shadow roots via `.shadow_root`; query inside them with standard locators:
 
 ```python
 shadow_host = driver.find_element(By.CSS_SELECTOR, "my-card")

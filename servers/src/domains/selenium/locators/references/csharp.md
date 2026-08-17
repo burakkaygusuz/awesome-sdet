@@ -24,12 +24,11 @@ namespace Com.Example.Locators
             IWebElement username = driver.FindElement(UsernameInput);
             IWebElement submitBtn = driver.FindElement(SubmitButton);
 
-            // Selenium 4 Relative Locators (spatial queries: Below, LeftOf)
             IWebElement passwordInput = driver.FindElement(
                 RelativeBy.WithLocator(TagName("input")).Below(username)
             );
             IWebElement cancelButton = driver.FindElement(
-                RelativeBy.WithLocator(TagName("button")).LeftOf(submitBtn)
+                RelativeBy.WithLocator(TagName("button")).ToLeftOf(submitBtn)
             );
         }
     }
@@ -38,7 +37,7 @@ namespace Com.Example.Locators
 
 ## Shadow DOM Piercing
 
-Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+Selenium 4 exposes open shadow roots via `GetShadowRoot()`; query inside them with standard locators:
 
 ```csharp
 IWebElement shadowHost = driver.FindElement(By.CssSelector("my-card"));

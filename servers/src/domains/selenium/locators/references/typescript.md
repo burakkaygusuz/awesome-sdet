@@ -7,7 +7,7 @@
 ## Code Examples
 
 ```typescript
-import { By, locateWith, WebDriver, WebElement } from 'selenium-webdriver';
+import { By, locateWith, SearchContext, WebDriver, WebElement } from 'selenium-webdriver';
 
 export class LocatorExamples {
   private readonly usernameInput = By.id('username');
@@ -19,7 +19,6 @@ export class LocatorExamples {
     const username = await driver.findElement(this.usernameInput);
     const submitBtn = await driver.findElement(this.submitButton);
 
-    // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
     const passwordInput = await driver.findElement(locateWith(By.tagName('input')).below(username));
     const cancelButton = await driver.findElement(
       locateWith(By.tagName('button')).toLeftOf(submitBtn)
@@ -36,7 +35,9 @@ Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them wi
 const shadowHost: WebElement = await driver.findElement(By.css('my-card'));
 const shadowRoot: SearchContext = await shadowHost.getShadowRoot();
 const inner: WebElement = await shadowRoot.findElement(By.css('p'));
-const nestedRoot = (await shadowRoot.findElement(By.css('child-widget'))).getShadowRoot();
+const nestedRoot: SearchContext = await (
+  await shadowRoot.findElement(By.css('child-widget'))
+).getShadowRoot();
 ```
 
 ## Link Text Strategies

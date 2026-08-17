@@ -20,11 +20,9 @@ class LocatorExamples
   end
 
   def demonstrate_locators
-    # 1. Standard Hash Locators
     username   = @driver.find_element(USERNAME_INPUT)
     submit_btn = @driver.find_element(SUBMIT_BUTTON)
 
-    # 2. Selenium 4 Relative Locators (Spatial) — Ruby uses the :relative hash form
     password_input = @driver.find_element({ relative: { tag_name: 'input', below: username } })
 
     cancel_button = @driver.find_element(
@@ -44,7 +42,7 @@ end
 
 ## Shadow DOM Piercing
 
-Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+Selenium 4 exposes open shadow roots via `.shadow_root`; query inside them with standard locators:
 
 ```ruby
 shadow_host = @driver.find_element(css: 'my-card')
