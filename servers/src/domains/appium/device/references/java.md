@@ -1,6 +1,6 @@
-# Appium Device & Application Management — Java API Reference (Appium 3.x+)
+# Appium Device & Application Management — Java API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Java Client (`InteractsWithApps`) application lifecycle controls, clipboard, and device orientation.
+> Official Appium 2.x Java Client (`io.appium:java-client` v9.x+) `InteractsWithApps` application lifecycle controls, clipboard, and device orientation.
 
 ---
 
@@ -18,24 +18,22 @@ import java.time.Duration;
 public class AppiumDeviceManager {
     public static void controlAppAndDevice(AppiumDriver driver) {
         String appId = "com.example.app";
+        try {
+            if (driver instanceof InteractsWithApps appDriver) {
+                if (!appDriver.isAppInstalled(appId)) {
+                    appDriver.installApp("/path/to/app.apk");
+                }
 
-        if (driver instanceof InteractsWithApps appDriver) {
-            // 1. Install & Activate
-            if (!appDriver.isAppInstalled(appId)) {
-                appDriver.installApp("/path/to/app.apk");
+                appDriver.activateApp(appId);
+
+                ApplicationState state = appDriver.queryAppState(appId);
+                System.out.println("App State: " + state);
+
+                appDriver.runAppInBackground(Duration.ofSeconds(5));
+                appDriver.terminateApp(appId);
             }
-
-            appDriver.activateApp(appId);
-
-            // 2. Query App State
-            ApplicationState state = appDriver.queryAppState(appId);
-            System.out.println("App State: " + state);
-
-            // 3. Background App
-            appDriver.runAppInBackground(Duration.ofSeconds(5));
-
-            // 4. Terminate App
-            appDriver.terminateApp(appId);
+        } finally {
+            driver.quit();
         }
     }
 }
