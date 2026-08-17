@@ -1,6 +1,6 @@
-# Appium W3C Actions API & Mobile Gestures — Python API Reference (Appium 3.x+)
+# Appium W3C Actions API & Mobile Gestures — Python API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Python Client W3C ActionChains, PointerInput touch sequences, and mobile execute scripts.
+> Official Appium 2.x Python Client W3C ActionChains, PointerInput touch sequences, and mobile execute scripts.
 
 ---
 

@@ -1,6 +1,6 @@
-# Appium Driver Architecture & W3C Capabilities — C# API Reference (Appium 3.x+)
+# Appium Driver Architecture & W3C Capabilities — C# API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ .NET Client (`Appium.WebDriver` 5.x+) AppiumOptions and driver instantiation.
+> Official Appium 2.x .NET Client (`OpenQA.Selenium.Appium.AppiumOptions`) capabilities and driver instantiation.
 
 ---
 
@@ -25,11 +25,11 @@ namespace AwesomeSdet.Appium
                 App = "/path/to/app.apk"
             };
 
-            options.AddAdditionalAppiumOption("appium:appPackage", "com.example.app");
-            options.AddAdditionalAppiumOption("appium:appActivity", "com.example.app.MainActivity");
-            options.AddAdditionalAppiumOption("appium:noReset", false);
-            options.AddAdditionalAppiumOption("appium:autoGrantPermissions", true);
-            options.AddAdditionalAppiumOption("appium:newCommandTimeout", 300);
+            options.AddAdditionalAppiumOption("appPackage", "com.example.app");
+            options.AddAdditionalAppiumOption("appActivity", "com.example.app.MainActivity");
+            options.AddAdditionalAppiumOption("noReset", false);
+            options.AddAdditionalAppiumOption("autoGrantPermissions", true);
+            options.AddAdditionalAppiumOption("newCommandTimeout", 300);
 
             return new AndroidDriver(new Uri(serverUrl), options, TimeSpan.FromSeconds(120));
         }
@@ -60,9 +60,9 @@ namespace AwesomeSdet.Appium
                 PlatformVersion = "17.2"
             };
 
-            options.AddAdditionalAppiumOption("appium:bundleId", "com.example.sampleapp");
-            options.AddAdditionalAppiumOption("appium:noReset", true);
-            options.AddAdditionalAppiumOption("appium:wdaLocalPort", 8100);
+            options.AddAdditionalAppiumOption("bundleId", "com.example.sampleapp");
+            options.AddAdditionalAppiumOption("noReset", true);
+            options.AddAdditionalAppiumOption("wdaLocalPort", 8100);
 
             return new IOSDriver(new Uri(serverUrl), options, TimeSpan.FromSeconds(120));
         }
@@ -74,6 +74,6 @@ namespace AwesomeSdet.Appium
 
 ## 3. Best Practices & Invariants
 
-- **Prefix Custom Options**: Use `options.AddAdditionalAppiumOption("appium:...", value)`.
+- **Use `AddAdditionalAppiumOption`**: Pass custom and driver-specific capabilities through `options.AddAdditionalAppiumOption()`.
 - **Dispose Drivers**: Implement `IDisposable` or wrap test execution in `using var driver = ...`.
 - **Command Timeout**: Always provide explicit `TimeSpan` command timeout on driver creation.

@@ -24,7 +24,7 @@ export function registerAppiumTools(
     {
       title: 'Appium Driver & Capabilities Docs',
       description:
-        'Returns Appium 3.6.0+ modular driver options, W3C capabilities (UiAutomator2, XCUITest), and setup guides.',
+        'Returns Appium 2.x modular driver options, W3C capabilities (UiAutomator2, XCUITest), and setup guides.',
       inputSchema: AppiumCapabilitiesDocsSchema,
       annotations,
     },

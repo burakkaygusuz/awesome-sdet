@@ -9,7 +9,7 @@ export const AppiumCapabilitiesDocsSchema = z
 
 export type AppiumCapabilitiesDocsArgs = z.infer<typeof AppiumCapabilitiesDocsSchema>;
 
-const FULL_HEADER = `# API Reference — Appium Driver Architecture & W3C Capabilities (Appium 3.6.0+)`;
+const FULL_HEADER = `# API Reference — Appium Driver Architecture & W3C Capabilities (Appium 2.x+)`;
 
 export async function handleAppiumCapabilitiesDocs(args: AppiumCapabilitiesDocsArgs) {
   const targetLanguage: SupportedLanguage = args.language;
