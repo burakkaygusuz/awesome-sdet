@@ -30,9 +30,12 @@ class LocatorExamples:
         password_input: WebElement = driver.find_element(
             locate_with(By.TAG_NAME, "input").below(username)
         )
+        password_input.send_keys("secret123")
+
         cancel_button: WebElement = driver.find_element(
             locate_with(By.TAG_NAME, "button").to_left_of(submit_btn)
         )
+        cancel_button.click()
 ```
 
 ---

@@ -32,7 +32,10 @@ public class LocatorExamples {
 
         // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
         WebElement passwordInput = driver.findElement(with(tagName("input")).below(username));
+        passwordInput.sendKeys("secret123");
+
         WebElement cancelButton = driver.findElement(with(tagName("button")).toLeftOf(submitBtn));
+        cancelButton.click();
     }
 }
 ```

@@ -27,9 +27,12 @@ namespace Com.Example.Locators
             IWebElement passwordInput = driver.FindElement(
                 RelativeBy.WithLocator(TagName("input")).Below(username)
             );
+            passwordInput.SendKeys("secret123");
+
             IWebElement cancelButton = driver.FindElement(
                 RelativeBy.WithLocator(TagName("button")).ToLeftOf(submitBtn)
             );
+            cancelButton.Click();
         }
     }
 }

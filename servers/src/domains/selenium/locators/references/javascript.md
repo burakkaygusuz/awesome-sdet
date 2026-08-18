@@ -18,9 +18,12 @@ class LocatorExamples {
     const submitBtn = await driver.findElement(By.css("button.btn-success[type='submit']"));
 
     const passwordInput = await driver.findElement(locateWith(By.tagName('input')).below(username));
+    await passwordInput.sendKeys('secret123');
+
     const cancelButton = await driver.findElement(
       locateWith(By.tagName('button')).toLeftOf(submitBtn)
     );
+    await cancelButton.click();
   }
 }
 
