@@ -11,7 +11,6 @@ import { remote } from 'webdriverio';
 
 export async function handleHybridContext(driver: WebdriverIO.Browser): Promise<void> {
   const contexts = await driver.getContexts();
-  console.log('Available contexts:', contexts);
 
   const webviewContext = contexts.find(
     (ctx): ctx is string => typeof ctx === 'string' && ctx.startsWith('WEBVIEW')
@@ -20,12 +19,10 @@ export async function handleHybridContext(driver: WebdriverIO.Browser): Promise<
   if (webviewContext) {
     await driver.switchContext(webviewContext);
     try {
-      console.log('Switched to WebView:', webviewContext);
       const webButton = await driver.$('button#checkout-btn');
       await webButton.click();
     } finally {
       await driver.switchContext('NATIVE_APP');
-      console.log('Returned to NATIVE_APP context');
     }
   }
 }

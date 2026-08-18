@@ -22,7 +22,6 @@ namespace AwesomeSdet.Appium
             if (driver is IContextAware contextAwareDriver)
             {
                 var contexts = contextAwareDriver.Contexts;
-                Console.WriteLine($"Available contexts: {contexts.Count}");
 
                 foreach (var context in contexts)
                 {
@@ -31,7 +30,6 @@ namespace AwesomeSdet.Appium
                         contextAwareDriver.Context = context;
                         try
                         {
-                            Console.WriteLine($"Switched to: {contextAwareDriver.Context}");
                             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
                             var submitBtn = wait.Until(d => d.FindElement(By.CssSelector("button.action-submit")));
                             submitBtn.Click();
@@ -39,7 +37,6 @@ namespace AwesomeSdet.Appium
                         finally
                         {
                             contextAwareDriver.Context = "NATIVE_APP";
-                            Console.WriteLine($"Active Context: {contextAwareDriver.Context}");
                         }
                         break;
                     }

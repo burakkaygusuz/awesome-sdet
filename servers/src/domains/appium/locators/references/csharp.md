@@ -22,7 +22,7 @@ namespace AwesomeSdet.Appium
             var navTitle = driver.FindElement(
                 MobileBy.IosClassChain("**/XCUIElementTypeNavigationBar/XCUIElementTypeStaticText[`label == 'Settings'`]")
             );
-            var text = navTitle.Text;
+            Console.WriteLine($"Title text: {navTitle.Text}");
 
             var saveBtn = driver.FindElement(
                 MobileBy.IosNSPredicate("type == 'XCUIElementTypeButton' AND name == 'Save' AND visible == 1")
