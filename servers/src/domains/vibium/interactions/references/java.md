@@ -42,7 +42,7 @@ public class InteractionsExample {
         password.type("secret");
         password.press("Enter");
 
-        String userVal = username.value();
+        System.out.println("Username value: " + username.value());
 
         Element roleSelect = vibe.find(Map.of("role", "combobox", "text", "Role"));
         roleSelect.select("ADMIN");
@@ -54,8 +54,8 @@ public class InteractionsExample {
         Element menuBtn = vibe.find(Map.of("testid", "menu-btn"));
         menuBtn.hover();
         menuBtn.highlight();
-        String menuText = menuBtn.text();
-        Map<String, Object> menuBounds = menuBtn.bounds();
+        System.out.println("Menu text: " + menuBtn.text());
+        System.out.println("Menu bounds: " + menuBtn.bounds());
 
         Element source = vibe.find(Map.of("testid", "source-card"));
         Element target = vibe.find(Map.of("testid", "target-bin"));

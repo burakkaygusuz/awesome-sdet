@@ -50,6 +50,7 @@ async function handleTabs(mainVibe) {
   await newTab.go('https://app.example.com/docs');
 
   const pages = await mainVibe.pages();
+  console.log('Open tab count:', pages.length);
 
   await mainVibe.bringToFront();
   await newTab.close();
@@ -74,6 +75,7 @@ async function manageCookiesAndStorage(vibe) {
   ]);
 
   const cookies = await vibe.cookies('https://app.example.com');
+  console.log('Active cookies:', cookies);
 
   await vibe.evaluate(() => {
     localStorage.setItem('theme', 'dark');

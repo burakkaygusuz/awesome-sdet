@@ -18,7 +18,7 @@ public class VibiumCoreExample {
     public static void main(String[] args) {
         try (Vibe vibe = Vibium.launch()) {
             vibe.go("https://app.example.com");
-            vibe.evaluate("() => document.title");
+            System.out.println("Page Title: " + vibe.evaluate("() => document.title"));
 
             Element submitBtn = vibe.find("button");
             submitBtn.click();

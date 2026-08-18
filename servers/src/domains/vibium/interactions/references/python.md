@@ -34,7 +34,7 @@ def test_interactions(vibe: Vibe) -> None:
     username.fill("admin")
     username.type("_dev")
     username.press("Enter")
-    username.value()
+    print("Username input value:", username.value())
 
     country_select: Element = vibe.find(role="combobox", text="Country")
     country_select.select("US")
@@ -47,7 +47,8 @@ def test_interactions(vibe: Vibe) -> None:
     menu.hover()
     menu.highlight()
     box: dict[str, Any] = menu.bounds()
-    menu.text()
+    print("Bounding box:", box)
+    print("Menu text content:", menu.text())
 
     source: Element = vibe.find(testid="task-1")
     target: Element = vibe.find(testid="column-done")

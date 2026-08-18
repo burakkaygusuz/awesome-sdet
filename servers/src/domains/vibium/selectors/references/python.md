@@ -18,10 +18,10 @@ def test_semantic_locators() -> None:
 
         email_field: Element = vibe.find(label="Email address")
         email_field.fill("sdet@example.com")
-        field_value: str = email_field.value()
+        print("Field value:", email_field.value())
 
         cart_badge: Element = vibe.find(testid="cart-badge")
-        badge_text: str = cart_badge.text()
+        print("Badge text:", cart_badge.text())
 
         search: Element = vibe.find(placeholder="Search catalog...")
         search.fill("automation")
@@ -80,6 +80,7 @@ def test_scoping() -> None:
         all_rows: list[Element] = vibe.find_all(role="row")
         for row in all_rows:
             row_buttons: list[Element] = row.find_all("button")
+            print(f"Row contains {len(row_buttons)} buttons")
     finally:
         vibe.quit()
 ```

@@ -31,7 +31,7 @@ export async function demonstrateInteractions(vibe: Vibe): Promise<void> {
 
   await username.fill('sdet-engineer');
   await password.type('SuperSecretP@ss!');
-  await username.value();
+  console.log('Username field value:', await username.value());
 
   await loginBtn.click();
 
@@ -51,7 +51,8 @@ export async function demonstrateInteractions(vibe: Vibe): Promise<void> {
   await infoIcon.hover();
   await infoIcon.highlight();
   const box = await infoIcon.bounds();
-  await infoIcon.text();
+  console.log('Element bounding box:', box);
+  console.log('Tooltip text:', await infoIcon.text());
 
   const sourceItem: Element = await vibe.find({ testid: 'draggable-item-1' });
   const targetZone: Element = await vibe.find({ testid: 'drop-target-zone' });

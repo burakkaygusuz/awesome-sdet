@@ -13,10 +13,10 @@ async function demonstrateSemanticLocators(vibe) {
 
   const emailInput = await vibe.find({ label: 'Email' });
   await emailInput.fill('user@example.com');
-  const emailValue = await emailInput.value();
+  console.log('Email input value:', await emailInput.value());
 
   const submitCard = await vibe.find({ testid: 'submit-card' });
-  const cardText = await submitCard.text();
+  console.log('Card text:', await submitCard.text());
 
   const searchInput = await vibe.find({ placeholder: 'Search catalog...' });
   await searchInput.fill('test query');
@@ -65,6 +65,7 @@ async function scopedLocators(vibe) {
   const allRows = await vibe.findAll({ role: 'row' });
   for (const r of allRows) {
     const actionButtons = await r.findAll('button');
+    console.log(`Found ${actionButtons.length} buttons in row`);
   }
 }
 

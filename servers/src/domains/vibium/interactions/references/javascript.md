@@ -29,7 +29,7 @@ async function executeInteractions(vibe) {
   const input = await vibe.find({ label: 'Search Query' });
   await input.fill('test automation');
   await input.type(' keyword');
-  await input.value();
+  console.log('Current input value:', await input.value());
 
   await input.press('Enter');
 
@@ -44,7 +44,8 @@ async function executeInteractions(vibe) {
   await navDropdown.hover();
   await navDropdown.highlight();
   const box = await navDropdown.bounds();
-  await navDropdown.text();
+  console.log('Nav dropdown bounds:', box);
+  console.log('Nav text content:', await navDropdown.text());
 
   const source = await vibe.find({ testid: 'card-source' });
   const target = await vibe.find({ testid: 'card-target' });

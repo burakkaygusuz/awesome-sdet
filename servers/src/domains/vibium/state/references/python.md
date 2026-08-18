@@ -55,6 +55,8 @@ def test_tabs() -> None:
         new_vibe: Vibe = vibe.new_page()
         new_vibe.go("https://app.example.com/docs")
 
+        print("Open tab count:", len(vibe.pages()))
+
         vibe.bring_to_front()
         new_vibe.close()
     finally:
@@ -86,6 +88,7 @@ def test_cookies_and_storage() -> None:
         )
 
         cookies = vibe.cookies("https://app.example.com")
+        print("Active cookies:", cookies)
 
         vibe.evaluate(
             "() => localStorage.setItem('user_prefs', JSON.stringify({ theme: 'dark' }))"

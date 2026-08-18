@@ -17,10 +17,10 @@ export async function demonstrateSemanticLocators(vibe: Vibe): Promise<void> {
 
   const usernameInput: Element = await vibe.find({ label: 'Email address' });
   await usernameInput.fill('sdet@example.com');
-  const fieldValue: string = await usernameInput.value();
+  console.log('Username field value:', await usernameInput.value());
 
   const cartBadge: Element = await vibe.find({ testid: 'cart-item-count' });
-  const badgeText: string = await cartBadge.text();
+  console.log('Cart count text:', await cartBadge.text());
 
   const confirmationMsg: Element = await vibe.find({ text: 'Order confirmed successfully' });
   await confirmationMsg.waitFor();
@@ -73,9 +73,11 @@ export async function scopedLocators(vibe: Vibe): Promise<void> {
   await editButton.click();
 
   const allRows: Element[] = await vibe.findAll({ role: 'row' });
+  console.log(`Found ${allRows.length} total rows`);
 
   for (const row of allRows) {
     const rowButtons: Element[] = await row.findAll('button');
+    console.log(`Row contains ${rowButtons.length} action buttons`);
   }
 }
 ```

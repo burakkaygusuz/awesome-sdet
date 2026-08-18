@@ -14,7 +14,7 @@ def run_vibium_sync() -> None:
     vibe: Vibe = browserSync.launch(headless=True)
     try:
         vibe.go("https://app.example.com")
-        vibe.evaluate("() => document.title")
+        print("Page Title:", vibe.evaluate("() => document.title"))
 
         submit_btn: Element = vibe.find(role="button", text="Get Started")
         submit_btn.click()

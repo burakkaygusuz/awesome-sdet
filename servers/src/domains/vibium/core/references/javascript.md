@@ -13,7 +13,8 @@ async function runVibiumAsyncLifecycle() {
   const vibe = await browser.launch({ headless: true });
   try {
     await vibe.go('https://app.example.com');
-    await vibe.evaluate('() => document.title');
+    const title = await vibe.evaluate('() => document.title');
+    console.log('Page Title:', title);
 
     const submitBtn = await vibe.find({ role: 'button', text: 'Get Started' });
     await submitBtn.click();

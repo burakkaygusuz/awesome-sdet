@@ -47,11 +47,11 @@ import { type Vibe } from 'vibium';
 
 export async function setupBiDiEventListeners(vibe: Vibe): Promise<void> {
   vibe.on('console', (msg) => {
-    msg.text();
+    console.log(`[Browser Console ${msg.type()}]: ${msg.text()}`);
   });
 
   vibe.on('pageerror', (error: Error) => {
-    error.message;
+    console.error(`[Unhandled Browser Exception]: ${error.message}`);
   });
 
   vibe.on('dialog', async (dialog) => {

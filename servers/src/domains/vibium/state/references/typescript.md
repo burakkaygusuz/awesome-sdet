@@ -56,6 +56,7 @@ export async function handleMultiTab(vibe: Vibe): Promise<void> {
   await newVibe.go('https://app.example.com/docs');
 
   const pages: Vibe[] = await vibe.pages();
+  console.log('Open tab count:', pages.length);
 
   await vibe.bringToFront();
   await newVibe.close();
@@ -82,6 +83,7 @@ export async function manageCookiesAndStorage(vibe: Vibe): Promise<void> {
   ]);
 
   const cookies = await vibe.cookies('https://app.example.com');
+  console.log('Active cookies:', cookies);
 
   await vibe.evaluate(() => {
     localStorage.setItem('theme', 'dark');

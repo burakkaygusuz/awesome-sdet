@@ -53,6 +53,8 @@ public class MultiTabExample {
         Vibe newTab = mainTab.newPage();
         newTab.go("https://app.example.com/docs");
 
+        System.out.println("Open tab count: " + mainTab.pages().size());
+
         mainTab.bringToFront();
         newTab.close();
     }
@@ -83,7 +85,7 @@ public class CookieAndStorageExample {
             )
         ));
 
-        List<Map<String, Object>> cookies = vibe.cookies("https://app.example.com");
+        System.out.println("Active cookies: " + vibe.cookies("https://app.example.com"));
 
         vibe.evaluate("() => localStorage.setItem('theme', 'dark')");
 

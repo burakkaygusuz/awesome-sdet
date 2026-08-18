@@ -29,8 +29,8 @@ async function configureNetworkMocking(vibe) {
 
 ```javascript
 function attachEventListeners(vibe) {
-  vibe.on('console', (msg) => msg.text());
-  vibe.on('pageerror', (err) => err.message);
+  vibe.on('console', (msg) => console.log('[Console]:', msg.text()));
+  vibe.on('pageerror', (err) => console.error('[Error]:', err.message));
 }
 ```
 

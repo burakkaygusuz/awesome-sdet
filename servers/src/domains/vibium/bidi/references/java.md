@@ -33,8 +33,8 @@ import dev.vibium.Vibe;
 
 public class BiDiListeners {
     public void attachListeners(Vibe vibe) {
-        vibe.on("console", msg -> {});
-        vibe.on("pageerror", err -> {});
+        vibe.on("console", msg -> System.out.println("Console: " + msg));
+        vibe.on("pageerror", err -> System.err.println("Page Error: " + err));
     }
 }
 ```

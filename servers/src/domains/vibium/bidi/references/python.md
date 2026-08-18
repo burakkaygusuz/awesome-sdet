@@ -34,8 +34,8 @@ from vibium import Vibe
 
 
 def setup_listeners(vibe: Vibe) -> None:
-    vibe.on("console", lambda msg: msg.text)
-    vibe.on("pageerror", lambda err: err)
+    vibe.on("console", lambda msg: print(f"Console: {msg.text}"))
+    vibe.on("pageerror", lambda err: print(f"Page Error: {err}"))
 ```
 
 ---

@@ -23,10 +23,10 @@ public class SelectorsExample {
 
             Element email = vibe.find(Map.of("label", "Email Address"));
             email.fill("test@example.com");
-            String emailValue = email.value();
+            System.out.println("Email value: " + email.value());
 
             Element badge = vibe.find(Map.of("testid", "item-count"));
-            String badgeCount = badge.text();
+            System.out.println("Badge count text: " + badge.text());
 
             Element search = vibe.find(Map.of("placeholder", "Search..."));
             search.fill("Java SDET");
@@ -91,9 +91,11 @@ public class SubtreeScoping {
             editBtn.click();
 
             List<Element> allRows = vibe.findAll(Map.of("role", "row"));
+            System.out.println("Total rows found: " + allRows.size());
 
             for (Element r : allRows) {
                 List<Element> actionBtns = r.findAll("button");
+                System.out.println("Row buttons count: " + actionBtns.size());
             }
         }
     }
