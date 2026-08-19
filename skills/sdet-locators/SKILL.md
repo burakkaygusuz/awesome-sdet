@@ -1,6 +1,6 @@
 ---
 name: sdet-locators
-description: 'Use this skill when authoring, querying, or refactoring UI element locators and selectors. Trigger when finding elements by accessible role or name, converting brittle XPath/CSS to semantic selectors, piercing Shadow DOM, or scoping within tables, lists, and modals.'
+description: 'Use this skill when authoring, querying, or refactoring UI element selectors and locators. Trigger when finding elements by accessible role or name, replacing brittle CSS/XPath with semantic selectors, piercing Shadow DOM, or scoping within tables, lists, and modals, even if not explicitly mentioned.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,30 +12,21 @@ metadata:
 
 ## 1. Overview
 
-Element location is the foundational bridge between automated test logic and the application under test (AUT). Modern test automation rejects implementation-dependent targeting (e.g., brittle CSS hierarchies, auto-generated IDs, absolute XPath paths) in favor of **Accessibility-First Semantic Locators**.
-
-Semantic locators identify UI elements exactly as users and assistive technologies perceive them—via explicit accessibility roles, accessible names, visible text labels, and dedicated test identifiers. This ensures tests are resilient against CSS refactoring, DOM re-structuring, component redesigns, and framework migrations.
+Accessibility-first semantic locators identify UI elements via ARIA roles, accessible names, visible text, and test IDs to ensure tests remain resilient against CSS refactoring and DOM redesigns.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Accessibility-First Priority Hierarchy**: Always resolve locators using the following priority order:
-   - **Tier 1 (Semantic Role & Name)**: ARIA role + accessible name (e.g., `button`, `checkbox`, `dialog` with accessible label).
-   - **Tier 2 (Visible Text & Label Association)**: Associated `<label>`, placeholder text, or distinct button/heading text.
-   - **Tier 3 (Dedicated Test Attributes)**: Dedicated test IDs (`data-testid`, `data-cy`, `accessibilityIdentifier`) when semantic roles are ambiguous.
-   - **Forbidden / Anti-Pattern**: Brittle CSS classes (`.btn-primary.v2`), dynamic DOM IDs (`#input-1234`), and absolute XPath chains (`/html/body/div[2]/...`).
-2. **Lazy Evaluation & Dynamic Re-Querying**: Never capture or store static DOM snapshots or raw element pointers that can go stale. Locators must represent lazy, dynamically evaluated queries executed on-demand.
-3. **Strictness & Multi-Element Disambiguation**: By default, locators targeting single interactive elements must enforce strict single-element resolution. Ambiguities must be resolved via subtree scoping or semantic filtering, never by blindly selecting `.first()` or index `0`.
-4. **Shadow DOM & Piercing Discipline**: Encapsulated Web Components must be traversed using native framework piercing mechanisms or open shadow root handles rather than brittle JavaScript evaluations.
+1. **Accessibility-First Targeting Hierarchy**: Prioritize ARIA roles, accessible names, visible text labels, and dedicated test IDs (`data-testid`) over CSS classes or XPath chains, because semantic selectors mirror actual user and screen-reader interactions and remain resilient during UI redesigns.
+2. **Lazy Evaluation Over Stale References**: Author locators as dynamically evaluated queries rather than caching static DOM references, because lazy locators automatically re-query the live DOM and prevent StaleElementReference errors.
+3. **Strict Single-Element Resolution**: Require queries targeting individual interactive elements to resolve unambiguously to a single node, because blindly indexing with `.first()` masks duplicate element regressions in UI components.
+4. **Container Scoping Over Global Queries**: Scope element searches inside parent container elements, table rows, or modal dialogs (`container.getByRole(...)`), because scoped queries eliminate cross-component selector ambiguities.
+5. **Standard Shadow DOM Piercing**: Traverse encapsulated Web Components using native framework piercing mechanisms rather than brittle JavaScript shadow root evaluations.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category              | Best Practice                                                                    | Anti-Pattern                                                           |
-| :-------------------- | :------------------------------------------------------------------------------- | :--------------------------------------------------------------------- |
-| **Element Targeting** | Anchor on ARIA roles and accessible names (`role="button"`, name `"Save"`).      | Binding to utility CSS classes (`.flex.items-center.py-2`).            |
-| **Dynamic IDs**       | Use dedicated `data-testid="submit-order"` for non-semantic elements.            | Binding to dynamic framework-generated IDs (`#react-aria-123`).        |
-| **Strict Resolution** | Scope parent containers (`list.filter({ hasText: 'Item' })`) to resolve matches. | Slapping `.first()` or index `[0]` on ambiguous multi-match sets.      |
-| **DOM Traversal**     | Scope queries within container elements or parent cards.                         | Searching the global root DOM document repeatedly across nested steps. |
-| **Stale Elements**    | Pass lazy locator objects between page objects and helpers.                      | Storing raw element references across navigation or DOM changes.       |
+- **Hidden Accessibility Names**: Elements with `aria-hidden="true"`, `display: none`, or `visibility: hidden` are omitted from the accessibility tree and cannot be matched by `getByRole`.
+- **Ambiguous Text Matching**: Generic text queries like `getByText('Submit')` match both paragraph text and buttons; disambiguate with explicit role filters (`getByRole('button', { name: 'Submit' })`).
+- **XPath Piercing Limitations**: Native browser XPath engines cannot pierce open or closed Shadow DOM boundaries; use semantic selectors or framework piercing combinators (`>>`, `>>>`).
 
 ## 3. When to Use
 
@@ -43,7 +34,7 @@ Semantic locators identify UI elements exactly as users and assistive technologi
   - Designing, querying, or refactoring element locators for Web, Mobile, or Hybrid applications.
   - Migrating brittle CSS/XPath test suites to resilient accessibility-first locators.
   - Scoping queries inside nested components, data tables, modals, or Shadow DOM roots.
-  - Defining locator locators within Page Object Models (POM) or Screen Object Models (SOM).
+  - Defining locators within Page Object Models (POM) or Screen Object Models (SOM).
 
 - **When NOT to Use (Route to Neighboring Skills)**:
   - Performing clicks, fills, drag-and-drop, or gestures -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
@@ -62,10 +53,10 @@ Semantic locators identify UI elements exactly as users and assistive technologi
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when querying elements:
 
-- **Playwright**: `read_pw_locators_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://locators/{language}`
-- **Cypress**: `read_cy_commands_docs`, `read_cy_shadow_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://commands/{language}`, `cypress://shadow/{language}`
-- **Selenium**: `read_se_locator_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
-- **Vibium**: `read_vibium_selectors_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://selectors/{language}`
-- **Appium**: `read_appium_locators_docs` (Parameters: `strategy: "accessibility_id" | "ios_class_chain" | "ios_predicate_string" | "android_uiautomator" | "id" | "xpath"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://locators/{language}`
+- **Playwright Locators**: When selecting elements in Playwright, invoke `read_pw_locators_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://locators/{language}`
+- **Cypress Locators & Shadow DOM**: When selecting elements in Cypress or piercing Shadow DOM, invoke `read_cy_commands_docs` or `read_cy_shadow_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://commands/{language}`, `cypress://shadow/{language}`
+- **Selenium Locators**: When authoring Selenium By queries or Relative Locators, invoke `read_se_locator_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
+- **Vibium Selectors**: When querying elements with semantic or piercing selectors in Vibium, invoke `read_vibium_selectors_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://selectors/{language}`
+- **Appium Locators**: When authoring mobile selectors across Android and iOS, invoke `read_appium_locators_docs` (Parameters: `strategy: "accessibility_id" | "ios_class_chain" | "ios_predicate_string" | "android_uiautomator" | "id" | "xpath"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://locators/{language}`

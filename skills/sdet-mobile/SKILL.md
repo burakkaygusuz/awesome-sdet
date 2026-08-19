@@ -1,6 +1,6 @@
 ---
 name: sdet-mobile
-description: 'Use this skill when authoring mobile test automation for iOS or Android. Trigger when configuring driver capabilities, switching between native and webview contexts, automating multi-touch gestures, or controlling device app lifecycles.'
+description: 'Use this skill when authoring mobile test automation for iOS or Android applications. Trigger when configuring driver capabilities, switching between native and webview contexts, automating touch gestures, or controlling device app lifecycles, even if not explicitly mentioned.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,27 +12,21 @@ metadata:
 
 ## 1. Overview
 
-Mobile application test automation requires specialized handling of mobile operating system environments (iOS XCUITest, Android UiAutomator2). Unlike browser automation, mobile SDET engineering deals with native accessibility trees, multi-touch gestures, device hardware controls (orientation, biometrics, notifications, permissions), hybrid WebView context switching, and application lifecycle states.
-
-The **sdet-mobile** capability standardizes mobile testing architecture in Appium 2.x/3.x, enforcing W3C driver capabilities, Screen Object Model (SOM) abstractions, and robust hybrid context management.
+Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing via Appium 2.x W3C options, polled WebView context switching, and W3C pointer gestures.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **W3C Standard Capabilities (`appium:options`)**: All driver capabilities must be nested under the `appium:options` vendor prefix conforming to W3C WebDriver specifications (e.g. `appium:automationName`, `appium:deviceName`, `appium:app`).
-2. **Deterministic Context Switching**: Hybrid application flows must explicitly poll available contexts (`driver.getContexts()`) before switching between `NATIVE_APP` and `WEBVIEW_<id>` to avoid context race conditions.
-3. **Idempotent Device & App State Management**: Configure `appium:noReset` and `appium:fullReset` intentionally. Teardown hooks must ensure background processes, device alerts, and app instances are cleanly reset between test runs.
-4. **W3C PointerInput Gestures**: All touch gestures (swipes, long presses, multi-touch pinches) must use W3C Actions `PointerInput` rather than deprecated `TouchAction` APIs.
-5. **Hardware & Biometric State Mocking**: Use Appium mobile extension commands (`mobile: enrollBiometric`, `mobile: acceptAlert`) rather than manual UI navigations to bypass OS security prompts.
+1. **W3C Standard Capabilities**: Always nest driver capabilities under `appium:options` or use language-specific option builders (`UiAutomator2Options`, `XCUITestOptions`), because legacy un-namespaced capabilities are deprecated and rejected by Appium 2.x/3.x servers.
+2. **Deterministic Hybrid Context Polling**: Poll `driver.getContexts()` until the target `WEBVIEW` handle is initialized before switching contexts, because webviews take variable time to mount and immediate switching causes race condition failures.
+3. **W3C PointerInput Gestures**: Compose touch actions using W3C `PointerInput` / `ActionChains` sequences instead of deprecated `TouchAction` APIs, because legacy touch APIs were removed in modern Appium clients.
+4. **Idempotent App Lifecycle Reset**: Use driver lifecycle methods (`terminateApp`, `activateApp`, `installApp`) and clean teardown hooks to ensure each test starts from a clean application state.
+5. **OS Permission & Alert Handling**: Handle system dialogs via capabilities (`appium:autoGrantPermissions`) or mobile extension commands (`mobile: acceptAlert`) rather than manual UI clicks, because system dialogs vary across OS versions.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category                 | Best Practice                                                                 | Anti-Pattern                                                                |
-| :----------------------- | :---------------------------------------------------------------------------- | :-------------------------------------------------------------------------- |
-| **Capabilities**         | Use W3C prefixed options: `appium:automationName = 'XCUITest'`.               | Using un-namespaced legacy capabilities like `automationName`.              |
-| **Context Switching**    | Poll `driver.getContexts()` until the target `WEBVIEW` is available.          | Immediately calling `switchContext('WEBVIEW')` before WebView initializes.  |
-| **App Lifecycle**        | Use driver app lifecycle commands (`terminateApp`, `activateApp`).            | Relying on UI clicks to navigate back to device home screen.                |
-| **Touch Gestures**       | Compose W3C `PointerInput` action sequences with clear pauses.                | Using deprecated `TouchAction` chains that fail in modern Appium.           |
-| **Permissions / Alerts** | Set `appium:autoGrantPermissions = true` or handle via `mobile: acceptAlert`. | Writing brittle manual UI clicks to dismiss standard OS permission dialogs. |
+- **iOS sendKeys Text Append**: On iOS XCUITest, `element.sendKeys()` appends text to existing field content unless `element.clear()` is called first.
+- **Context Handle Naming on Android**: Android WebView context names often include package or process IDs (e.g. `WEBVIEW_org.chromium.webview_shell`), requiring regex or prefix matching rather than static string equality.
+- **Appium 2.0 Base Path**: Appium 2.x servers default to `/` rather than `/wd/hub`; connecting to `/wd/hub` causes 404 errors unless explicitly configured with `--base-path=/wd/hub`.
 
 ## 3. When to Use
 
@@ -58,6 +52,9 @@ The **sdet-mobile** capability standardizes mobile testing architecture in Appiu
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when configuring mobile automation:
 
-- **Appium**: `read_appium_capabilities_docs`, `read_appium_context_docs`, `read_appium_device_docs`, `read_appium_gestures_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://context/{language}`, `appium://device/{language}`, `appium://gestures/{language}`
+- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_appium_capabilities_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://capabilities/{language}`
+- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_appium_context_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://context/{language}`
+- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_appium_device_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://device/{language}`
+- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_gestures_docs` (Parameters: `gesture: "tap" | "double_tap" | "long_press" | "swipe" | "scroll" | "drag_and_drop" | "pinch_zoom"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`
