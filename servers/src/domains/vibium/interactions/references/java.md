@@ -4,22 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before dispatching an action, Vibium ensures the target element meets all relevant criteria:
-
-| Check               | Description                                                        | Click | Fill / Type | Select | Hover | Check / Uncheck | DragTo |
-| :------------------ | :----------------------------------------------------------------- | :---: | :---------: | :----: | :---: | :-------------: | :----: |
-| **Attached**        | Element is connected to the active DOM tree.                       |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Visible**         | Element has non-zero geometry and is not hidden (`display: none`). |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Stable**          | Element is not actively animating or transitioning.                |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Receives Events** | Element is top-most at coordinates and not obscured.               |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Enabled**         | Element is not marked `disabled` or `aria-disabled`.               |  ✅   |     ✅      |   ✅   |   —   |       ✅        |   ✅   |
-| **Editable**        | Element is not marked `readonly` or immutable.                     |   —   |     ✅      |   ✅   |   —   |        —        |   —    |
-
----
-
-## 2. Interaction Methods
+## 1. Interaction Methods
 
 ```java
 package com.example.sdet.vibium;
@@ -66,7 +51,7 @@ public class InteractionsExample {
 
 ---
 
-## 3. Best Practices & Action Invariants
+## 2. Best Practices & Action Invariants
 
 - **Zero Hardcoded Sleeps**: Eliminate `Thread.sleep()` entirely. Vibium auto-waits on the 6-point actionability pipeline.
 - **Prefer `fill()` over `type()`**: Use `fill()` for deterministic form clearing and entry; reserve `type()` for physical keyboard event testing.

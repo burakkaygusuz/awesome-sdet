@@ -4,22 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before dispatching an action, Vibium ensures the target element meets all relevant criteria:
-
-| Check               | Description                                                        | Click | Fill / Type | Select | Hover | Check / Uncheck | DragTo |
-| :------------------ | :----------------------------------------------------------------- | :---: | :---------: | :----: | :---: | :-------------: | :----: |
-| **Attached**        | Element is connected to the active DOM tree.                       |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Visible**         | Element has non-zero geometry and is not hidden (`display: none`). |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Stable**          | Element is not actively animating or transitioning.                |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Receives Events** | Element is top-most at coordinates and not obscured.               |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Enabled**         | Element is not marked `disabled` or `aria-disabled`.               |  ✅   |     ✅      |   ✅   |   —   |       ✅        |   ✅   |
-| **Editable**        | Element is not marked `readonly` or immutable.                     |   —   |     ✅      |   ✅   |   —   |        —        |   —    |
-
----
-
-## 2. Interaction Methods
+## 1. Interaction Methods
 
 ```javascript
 async function executeInteractions(vibe) {
@@ -57,7 +42,7 @@ module.exports = { executeInteractions };
 
 ---
 
-## 3. Best Practices & Action Invariants
+## 2. Best Practices & Action Invariants
 
 - **Zero Arbitrary Sleeps**: Never use `setTimeout()` or manual delays. Vibium automatically synchronizes on actionability checks.
 - **Atomic Form Input**: Always prefer `fill()` over `type()` for form automation unless physical keydown events are specifically tested.

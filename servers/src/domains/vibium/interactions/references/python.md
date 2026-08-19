@@ -4,22 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before dispatching an action, Vibium ensures the target element meets all relevant criteria:
-
-| Check               | Description                                                        | Click | Fill / Type | Select | Hover | Check / Uncheck | Drag_To |
-| :------------------ | :----------------------------------------------------------------- | :---: | :---------: | :----: | :---: | :-------------: | :-----: |
-| **Attached**        | Element is connected to the active DOM tree.                       |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
-| **Visible**         | Element has non-zero geometry and is not hidden (`display: none`). |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
-| **Stable**          | Element is not actively animating or transitioning.                |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
-| **Receives Events** | Element is top-most at coordinates and not obscured.               |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅    |
-| **Enabled**         | Element is not marked `disabled` or `aria-disabled`.               |  ✅   |     ✅      |   ✅   |   —   |       ✅        |   ✅    |
-| **Editable**        | Element is not marked `readonly` or immutable.                     |   —   |     ✅      |   ✅   |   —   |        —        |    —    |
-
----
-
-## 2. Interaction Methods
+## 1. Interaction Methods
 
 ```python
 from typing import Any
@@ -57,7 +42,7 @@ def test_interactions(vibe: Vibe) -> None:
 
 ---
 
-## 3. Best Practices & Action Invariants
+## 2. Best Practices & Action Invariants
 
 - **Use `fill()` for Form Inputs**: `fill()` atomically sets field values and triggers change events; use `type()` only for real-time keypress validation testing.
 - **Actionability Auto-Waiting**: Vibium auto-waits for elements to become attached, visible, stable, enabled, and non-obscured before interacting. Avoid manual delays (`time.sleep()`).

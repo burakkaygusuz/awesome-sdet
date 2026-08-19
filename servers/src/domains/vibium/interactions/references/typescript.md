@@ -4,22 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before dispatching an action, Vibium ensures the target element meets all relevant criteria:
-
-| Check               | Description                                                        | Click | Fill / Type | Select | Hover | Check / Uncheck | DragTo |
-| :------------------ | :----------------------------------------------------------------- | :---: | :---------: | :----: | :---: | :-------------: | :----: |
-| **Attached**        | Element is connected to the active DOM tree.                       |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Visible**         | Element has non-zero geometry and is not hidden (`display: none`). |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Stable**          | Element is not actively animating or transitioning.                |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Receives Events** | Element is top-most at coordinates and not obscured.               |  ✅   |     ✅      |   ✅   |  ✅   |       ✅        |   ✅   |
-| **Enabled**         | Element is not marked `disabled` or `aria-disabled`.               |  ✅   |     ✅      |   ✅   |   —   |       ✅        |   ✅   |
-| **Editable**        | Element is not marked `readonly` or immutable.                     |   —   |     ✅      |   ✅   |   —   |        —        |   —    |
-
----
-
-## 2. Interaction Methods
+## 1. Interaction Methods
 
 ```typescript
 import { type Vibe, type Element } from 'vibium';
@@ -62,7 +47,7 @@ export async function demonstrateInteractions(vibe: Vibe): Promise<void> {
 
 ---
 
-## 3. Best Practices & Action Invariants
+## 2. Best Practices & Action Invariants
 
 - **Avoid manual sleep intervals**: Never insert `sleep()` or arbitrary delays before interactions. Rely on Vibium's built-in actionability auto-waiting.
 - **Prefer `fill()` over `type()` for forms**: Use `fill()` for standard form inputs to speed up test execution, reserving `type()` only for auto-complete search boxes or rate-limited inputs.
