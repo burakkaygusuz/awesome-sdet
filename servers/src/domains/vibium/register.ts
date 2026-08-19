@@ -1,18 +1,29 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
-import type { safeToolHandler } from '../../server.js';
+import { z } from 'zod';
+import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
 import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
-import {
-  handleVibiumCoreDocs,
-  handleVibiumSelectorsDocs,
-  handleVibiumInteractionsDocs,
-  handleVibiumBidiDocs,
-  handleVibiumStateDocs,
-  VibiumCoreDocsSchema,
-  VibiumSelectorsDocsSchema,
-  VibiumInteractionsDocsSchema,
-  VibiumBidiDocsSchema,
-  VibiumStateDocsSchema,
-} from './index.js';
+import { VIBIUM_DOMAINS, VIBIUM_SUPPORTED_LANGUAGES, readVibiumReferenceDoc } from './common.js';
+
+export const VibiumDocsArgsSchema = z
+  .object({
+    domain: z
+      .enum(VIBIUM_DOMAINS)
+      .describe('Vibium domain: bidi, core, interactions, selectors, state'),
+    language: z
+      .enum(VIBIUM_SUPPORTED_LANGUAGES)
+      .default('typescript')
+      .describe('Target language: typescript, javascript, python, java. Defaults to typescript.'),
+  })
+  .strict();
+
+export type VibiumDocsArgs = z.infer<typeof VibiumDocsArgsSchema>;
+
+export async function handleVibiumDocs(args: VibiumDocsArgs): Promise<ToolExecutionResult> {
+  const text = await readVibiumReferenceDoc(args.domain, args.language);
+  return {
+    content: [{ type: 'text', text }],
+  };
+}
 
 export function registerVibiumTools(
   server: McpServer,
@@ -20,62 +31,14 @@ export function registerVibiumTools(
   annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
-    'read_vibium_core_docs',
+    'read_vibium_docs',
     {
-      title: 'Vibium Core & CLI Docs',
+      title: 'Vibium Documentation & AI-Native BiDi Idioms',
       description:
-        'Returns Vibium browser lifecycle, launch options, and Sense-Think-Act CLI/SDK/MCP architecture reference.',
-      inputSchema: VibiumCoreDocsSchema,
+        'Returns Vibium API documentation, semantic selectors, BiDi routing, and Sense-Think-Act agent loop patterns.',
+      inputSchema: VibiumDocsArgsSchema,
       annotations,
     },
-    safeHandler((args) => handleVibiumCoreDocs(args))
-  );
-
-  server.registerTool(
-    'read_vibium_selectors_docs',
-    {
-      title: 'Vibium Selectors & Locators',
-      description:
-        'Returns Vibium semantic locator strategies, pierce combinators (>>, >>>), and scoping reference for target language.',
-      inputSchema: VibiumSelectorsDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleVibiumSelectorsDocs(args))
-  );
-
-  server.registerTool(
-    'read_vibium_interactions_docs',
-    {
-      title: 'Vibium Interactions & Actionability',
-      description:
-        'Returns Vibium auto-waiting actionability, click, fill, type, select, hover, and drag interaction reference.',
-      inputSchema: VibiumInteractionsDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleVibiumInteractionsDocs(args))
-  );
-
-  server.registerTool(
-    'read_vibium_bidi_docs',
-    {
-      title: 'Vibium BiDi & Network Routing',
-      description:
-        'Returns WebDriver BiDi protocol, page.route network mocking, console/error listeners, and clock virtualization.',
-      inputSchema: VibiumBidiDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleVibiumBidiDocs(args))
-  );
-
-  server.registerTool(
-    'read_vibium_state_docs',
-    {
-      title: 'Vibium State & Recording Docs',
-      description:
-        'Returns Vibium storage state/auth snapshots, session tracing, video recording, and multi-tab contexts reference.',
-      inputSchema: VibiumStateDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleVibiumStateDocs(args))
+    safeHandler((args) => handleVibiumDocs(args))
   );
 }

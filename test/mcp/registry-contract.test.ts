@@ -28,6 +28,17 @@ describe('framework registry contract', () => {
     const data = await parseMcpResponse(response);
     const toolNames = new Set((data.result?.tools ?? []).map((tool) => tool.name));
 
+    expect(toolNames.size).toBe(5);
+    expect(toolNames).toEqual(
+      new Set([
+        'read_pw_docs',
+        'read_se_docs',
+        'read_cy_docs',
+        'read_vibium_docs',
+        'read_appium_docs',
+      ])
+    );
+
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
 

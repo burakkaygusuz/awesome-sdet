@@ -23,10 +23,10 @@ export const SupportedLanguageSchema = z
 
 function frameworkReferenceGuidance(framework: SupportedFramework): string {
   const definition = FRAMEWORK_REGISTRY[framework];
-  const exampleTool = definition.toolNames[0];
+  const primaryTool = definition.toolNames[0];
 
   return `- Consult canonical capability skills (\`skills/sdet-*\`) and dynamic MCP resources via \`resources/read\`.
-- Read framework references from \`${definition.resourceUri}\` and use \`tools/list\` to select the registered \`${definition.toolPrefix}_*\` tools (for example \`${exampleTool}\`).`;
+- Read framework references from \`${definition.resourceUri}\` and use \`tools/list\` to select the registered tools (for example \`${primaryTool}\`).`;
 }
 
 export function registerPrompts(server: McpServer): void {
