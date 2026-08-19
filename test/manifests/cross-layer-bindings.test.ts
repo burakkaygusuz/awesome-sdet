@@ -37,7 +37,6 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
       for (const tool of definition.toolNames) registeredTools.add(tool);
       domainsByFramework.set(framework, new Set(definition.domains));
     }
-    registeredTools.add('execute_se_explicit_wait');
 
     const files = await collectKnowledgeFiles();
     expect(files.length).toBeGreaterThanOrEqual(13);
@@ -49,8 +48,7 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
       const content = await fs.readFile(file, 'utf8');
       const rel = path.relative(rootDir, file);
 
-      for (const tool of content.match(/\b(?:read|execute)_(?:pw|se|cy|vibium|appium)_[a-z_]+/g) ??
-        []) {
+      for (const tool of content.match(/\bread_(?:pw|se|cy|vibium|appium)_[a-z_]+/g) ?? []) {
         if (!registeredTools.has(tool)) toolOffenders.push(`${rel}: ${tool}`);
       }
 

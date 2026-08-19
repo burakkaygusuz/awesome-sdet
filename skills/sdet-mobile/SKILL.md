@@ -54,7 +54,7 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
 
 To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when configuring mobile automation:
 
-- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_appium_capabilities_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://capabilities/{language}`
-- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_appium_context_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://context/{language}`
-- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_appium_device_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://device/{language}`
-- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_gestures_docs` (Parameters: `gesture: "tap" | "double_tap" | "long_press" | "swipe" | "scroll" | "drag_and_drop" | "pinch_zoom"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`
+- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_appium_docs` (Parameters: `domain: "capabilities"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://capabilities/{language}`
+- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_appium_docs` (Parameters: `domain: "context"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://context/{language}`
+- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_appium_docs` (Parameters: `domain: "device"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://device/{language}`
+- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`

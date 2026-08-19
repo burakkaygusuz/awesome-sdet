@@ -55,7 +55,7 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 
 To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing network traffic:
 
-- **Playwright Network**: When stubbing routes or mocking responses in Playwright, invoke `read_pw_network_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
-- **Cypress Network & Fixtures**: When intercepting requests or loading fixture stubs in Cypress, invoke `read_cy_network_docs`, `read_cy_stubs_spies_docs`, or `read_cy_fixtures_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
-- **Selenium BiDi Network**: When managing network interception via Selenium 4 BiDi, invoke `read_se_bidi_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_bidi_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`
+- **Playwright Network**: When stubbing routes or mocking responses in Playwright, invoke `read_pw_docs` (Parameters: `domain: "network"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
+- **Cypress Network & Fixtures**: When intercepting requests or loading fixture stubs in Cypress, invoke `read_cy_docs` (Parameters: `domain: "network" | "stubs" | "fixtures"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
+- **Selenium BiDi Network**: When managing network interception via Selenium 4 BiDi, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
+- **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`

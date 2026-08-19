@@ -54,7 +54,7 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 
 To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing session state:
 
-- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_storage_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
-- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_session_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
-- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_bidi_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_state_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`
+- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
+- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
+- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
+- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`

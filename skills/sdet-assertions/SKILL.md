@@ -54,7 +54,7 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
 
 To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when implementing assertions:
 
-- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_pw_assertions_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
-- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_cy_commands_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `execute_se_explicit_wait`
-- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_core_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
+- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_pw_docs` (Parameters: `domain: "assertions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
+- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
+- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `read_se_docs` (Parameters: `domain: "actions" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp" | "ruby"`) -> URIs: `selenium://actions/{language}`, `selenium://locators/{language}`
+- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
