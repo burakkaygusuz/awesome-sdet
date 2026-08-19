@@ -1,8 +1,8 @@
 import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import markdown from '@eslint/markdown';
 import markdownlint from 'eslint-plugin-markdownlint';
+import markdownlintParser from 'eslint-plugin-markdownlint/parser.js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
 
@@ -27,10 +27,11 @@ export default defineConfig([
   {
     files: ['**/*.md'],
     plugins: {
-      markdown,
       markdownlint,
     },
-    language: 'markdown/commonmark',
+    languageOptions: {
+      parser: markdownlintParser,
+    },
     rules: {
       'markdownlint/md001': 'error',
       'markdownlint/md022': 'error',

@@ -1,6 +1,6 @@
-# Appium Mobile Locator Strategies — Python API Reference (Appium 3.x+)
+# Appium Mobile Locator Strategies — Python API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Python Client `AppiumBy` locator strategies and selector expressions.
+> Official Appium 2.x Python Client `AppiumBy` locator strategies and selector expressions.
 
 ---
 
@@ -54,3 +54,7 @@ def locate_elements(driver: WebDriver) -> None:
 
 - **Always Use `AppiumBy`**: Do not use legacy `MobileBy` or Selenium `By` for mobile-specific selectors.
 - **Escape Quotes in Class Chains**: Ensure internal string literals in Class Chains use proper backticks or escaped quotes.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `AppiumBy.IMAGE, "path/to/element.png"` (requires the Appium images plugin).

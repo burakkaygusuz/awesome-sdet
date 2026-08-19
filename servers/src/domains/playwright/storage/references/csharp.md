@@ -1,6 +1,6 @@
 # Playwright Storage State & Authentication — C# Reference
 
-> Microsoft.Playwright C# supports authentication persistence and state reuse via `StorageStateAsync` and `StorageStatePath`.
+> Official Playwright 1.62+ C# (.NET) authentication state persistence, StorageStatePath, and cookie management.
 
 ---
 
@@ -80,7 +80,7 @@ public class CookieManagementExamples
             }
         });
 
-        var cookies = await context.CookiesAsync("https://example.com");
+        var cookies = await context.CookiesAsync(new[] { "https://example.com" });
         await context.ClearCookiesAsync();
     }
 }

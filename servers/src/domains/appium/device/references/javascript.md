@@ -1,6 +1,6 @@
-# Appium Device & Application Management — JavaScript API Reference (Appium 3.x+)
+# Appium Device & Application Management — JavaScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO JavaScript application lifecycle controls and device state management.
+> Official Appium 2.x WebdriverIO JavaScript application lifecycle controls and device state management.
 
 ---
 
@@ -9,25 +9,22 @@
 ```javascript
 async function handleDeviceControls(driver) {
   const bundleId = 'com.example.sampleapp';
+  try {
+    const appState = await driver.queryAppState(bundleId);
+    console.log('App state code:', appState);
 
-  // Check app state (0: not installed, 1: not running, 2: running in background, 4: running in foreground)
-  const appState = await driver.queryAppState(bundleId);
-  console.log('App state code:', appState);
+    await driver.activateApp(bundleId);
+    await driver.background(3);
 
-  // Activate app
-  await driver.activateApp(bundleId);
+    await driver.pushFile(
+      '/sdcard/test-data.json',
+      Buffer.from(JSON.stringify({ user: 'test' })).toString('base64')
+    );
 
-  // Background app for 3 seconds
-  await driver.background(3);
-
-  // Push file to device
-  await driver.pushFile(
-    '/sdcard/test-data.json',
-    Buffer.from(JSON.stringify({ user: 'test' })).toString('base64')
-  );
-
-  // Terminate app
-  await driver.terminateApp(bundleId);
+    await driver.terminateApp(bundleId);
+  } finally {
+    await driver.deleteSession();
+  }
 }
 ```
 

@@ -1,24 +1,31 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
-import type { safeToolHandler } from '../../server.js';
+import { z } from 'zod';
+import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
 import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
-import {
-  handleCypressCommandsDocs,
-  handleCypressNetworkDocs,
-  handleCypressSessionDocs,
-  handleCypressShadowDocs,
-  handleCypressComponentDocs,
-  handleCypressTaskDocs,
-  handleCypressStubsDocs,
-  handleCypressFixturesDocs,
-  CypressCommandsDocsSchema,
-  CypressNetworkDocsSchema,
-  CypressSessionDocsSchema,
-  CypressShadowDocsSchema,
-  CypressComponentDocsSchema,
-  CypressTaskDocsSchema,
-  CypressStubsDocsSchema,
-  CypressFixturesDocsSchema,
-} from './index.js';
+import { CYPRESS_DOMAINS, CYPRESS_SUPPORTED_LANGUAGES, readCypressReferenceDoc } from './common.js';
+
+export const CypressDocsArgsSchema = z
+  .object({
+    domain: z
+      .enum(CYPRESS_DOMAINS)
+      .describe(
+        'Cypress domain: commands, component, fixtures, network, session, shadow, stubs, task'
+      ),
+    language: z
+      .enum(CYPRESS_SUPPORTED_LANGUAGES)
+      .default('typescript')
+      .describe('Target language: typescript or javascript. Defaults to typescript.'),
+  })
+  .strict();
+
+export type CypressDocsArgs = z.infer<typeof CypressDocsArgsSchema>;
+
+export async function handleCypressDocs(args: CypressDocsArgs): Promise<ToolExecutionResult> {
+  const text = await readCypressReferenceDoc(args.domain, args.language);
+  return {
+    content: [{ type: 'text', text }],
+  };
+}
 
 export function registerCypressTools(
   server: McpServer,
@@ -26,98 +33,14 @@ export function registerCypressTools(
   annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
-    'read_cy_commands_docs',
+    'read_cy_docs',
     {
-      title: 'Cypress Commands & Assertions Docs',
+      title: 'Cypress Documentation & Command Queue Idioms',
       description:
-        'Returns Cypress core commands, DOM queries, and assertion code examples for a given language.',
-      inputSchema: CypressCommandsDocsSchema,
+        'Returns Cypress API documentation, command chaining, network interception, sessions, and component tests.',
+      inputSchema: CypressDocsArgsSchema,
       annotations,
     },
-    safeHandler((args) => handleCypressCommandsDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_network_docs',
-    {
-      title: 'Cypress Network Interception Docs',
-      description:
-        'Returns cy.intercept, cy.request, and API stubbing code examples for a given language.',
-      inputSchema: CypressNetworkDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressNetworkDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_session_docs',
-    {
-      title: 'Cypress Session & Multi-Origin Docs',
-      description:
-        'Returns cy.session auth caching and cy.origin multi-domain testing code examples for a given language.',
-      inputSchema: CypressSessionDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressSessionDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_shadow_docs',
-    {
-      title: 'Cypress Shadow DOM Docs',
-      description:
-        'Returns cy.shadow and Shadow DOM element traversal code examples for a given language.',
-      inputSchema: CypressShadowDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressShadowDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_component_docs',
-    {
-      title: 'Cypress Component Testing Docs',
-      description:
-        'Returns Cypress component testing and mount API code examples for a given language.',
-      inputSchema: CypressComponentDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressComponentDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_task_docs',
-    {
-      title: 'Cypress Node Task & OS Command Docs',
-      description:
-        'Returns cy.task Node.js event execution, database seeding, and cy.exec shell commands for a given language.',
-      inputSchema: CypressTaskDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressTaskDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_stubs_spies_docs',
-    {
-      title: 'Cypress Stubs, Spies & Timers Docs',
-      description:
-        'Returns cy.stub, cy.spy, cy.clock, and cy.tick time manipulation code examples for a given language.',
-      inputSchema: CypressStubsDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressStubsDocs(args))
-  );
-
-  server.registerTool(
-    'read_cy_fixtures_docs',
-    {
-      title: 'Cypress Fixtures & Viewport Docs',
-      description:
-        'Returns cy.fixture, cy.readFile, cy.writeFile, and cy.viewport emulation code examples for a given language.',
-      inputSchema: CypressFixturesDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleCypressFixturesDocs(args))
+    safeHandler((args) => handleCypressDocs(args))
   );
 }

@@ -1,6 +1,6 @@
 # Playwright Observability, Tracing & Visual Testing — C# Reference
 
-> Microsoft.Playwright C# provides comprehensive tracing via `ITracing` and visual assertions via `ToHaveScreenshotAsync`.
+> Official Playwright 1.62+ C# (.NET) tracing (ITracing), visual regression assertions, and error event monitoring.
 
 ---
 
@@ -43,7 +43,6 @@ public class TracingExamples
 ## 2. Visual Regression Testing (`ToHaveScreenshotAsync`)
 
 ```csharp
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using static Microsoft.Playwright.Assertions;

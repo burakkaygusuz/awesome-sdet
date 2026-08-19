@@ -9,7 +9,7 @@ export const AppiumDeviceDocsSchema = z
 
 export type AppiumDeviceDocsArgs = z.infer<typeof AppiumDeviceDocsSchema>;
 
-const FULL_HEADER = `# API Reference — Appium Device & App Lifecycle Management (Appium 3.6.0+)`;
+const FULL_HEADER = `# API Reference — Appium Device & App Lifecycle Management (Appium 2.x+)`;
 
 export async function handleAppiumDeviceDocs(args: AppiumDeviceDocsArgs) {
   const targetLanguage: SupportedLanguage = args.language;

@@ -1,6 +1,15 @@
 # WebDriver BiDi Protocol — Ruby API Reference (Selenium 4.x+)
 
-> Official Selenium 4 Ruby WebDriver BiDi (`bidi`) & LogInspector implementation.
+> Official Selenium 4 Ruby WebDriver BiDi (`driver.script`).
+
+---
+
+## Enabling BiDi
+
+```ruby
+options = Selenium::WebDriver::Options.firefox(web_socket_url: true)
+driver = Selenium::WebDriver.for(:firefox, options: options)
+```
 
 ---
 
@@ -12,17 +21,18 @@
 require 'selenium-webdriver'
 
 def demonstrate_bidi
-  options = Selenium::WebDriver::Options.chrome(web_socket_url: true)
-  driver = Selenium::WebDriver.for(:chrome, options: options)
+  options = Selenium::WebDriver::Options.firefox(web_socket_url: true)
+  driver = Selenium::WebDriver.for(:firefox, options: options)
+  wait = Selenium::WebDriver::Wait.new(timeout: 5)
 
-  # Selenium 4 BiDi LogInspector for real-time console log monitoring
-  log_inspector = Selenium::WebDriver::BiDi::LogInspector.new(driver)
+  log_entries = []
+  handler_id = driver.script.add_console_message_handler { |log| log_entries << log }
 
-  log_inspector.on_console_entry do |entry|
-    puts "Console entry [#{entry.type}]: #{entry.text}"
-  end
+  driver.navigate.to 'https://www.selenium.dev/selenium/web/bidi/logEntryAdded.html'
+  driver.find_element(id: 'consoleLog').click
+  wait.until { log_entries.any? }
 
-  driver.get('https://example.com')
+  driver.script.remove_console_message_handler(handler_id)
 ensure
   driver&.quit
 end
@@ -30,7 +40,7 @@ end
 
 ## Best Practices
 
-- **Enable BiDi Capability**: Pass `web_socket_url: true` in driver options to enable WebDriver BiDi.
-- **Use LogInspector**: Utilize `Selenium::WebDriver::BiDi::LogInspector` for asynchronous event handling rather than legacy log polling.
-- **Use BiDi over CDP**: BiDi provides standard cross-browser bidirectional event streams across Chrome, Firefox, and Edge.
+- **Enable BiDi capability**: Pass `web_socket_url: true` in driver options to enable WebDriver BiDi.
+- **Use `driver.script` namespace**: Utilize `add_console_message_handler` and `add_javascript_error_handler` for asynchronous event handling.
+- **Remove handlers by ID**: Store the handler ID returned on add and pass it to `remove_*_handler` during teardown.
 - **Ensure Resource Cleanup**: Always wrap session execution in `begin...ensure` blocks to guarantee `driver.quit` releases BiDi sockets.

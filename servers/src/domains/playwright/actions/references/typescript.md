@@ -1,24 +1,10 @@
 # Playwright Actions & Auto-Waiting — TypeScript Reference
 
-> Playwright performs thorough actionability checks before performing any action (e.g. click, fill), eliminating the need for manual sleeps or arbitrary wait loops.
+> Official Playwright 1.62+ TypeScript auto-waiting actions, keyboard/mouse input, and file uploads.
 
 ---
 
-## 1. Actionability Guarantees
-
-Before executing an action, Playwright auto-waits for the target element to pass all relevant actionability checks:
-
-| Action               | Attached | Visible | Stable | Receives Events | Enabled | Editable |
-| :------------------- | :------: | :-----: | :----: | :-------------: | :-----: | :------: |
-| **`click()`**        |    ✅    |   ✅    |   ✅   |       ✅        |   ✅    |    —     |
-| **`fill()`**         |    ✅    |   ✅    |   ✅   |       ✅        |   ✅    |    ✅    |
-| **`check()`**        |    ✅    |   ✅    |   ✅   |       ✅        |   ✅    |    —     |
-| **`selectOption()`** |    ✅    |   ✅    |   ✅   |       ✅        |   ✅    |    —     |
-| **`hover()`**        |    ✅    |   ✅    |   ✅   |       ✅        |    —    |    —     |
-
----
-
-## 2. Common User Interactions
+## 1. Common User Interactions
 
 ```typescript
 import { test, type Page, type Locator } from '@playwright/test';
@@ -57,7 +43,7 @@ test('demonstrate standard actions', async ({ page }: { page: Page }) => {
 
 ---
 
-## 3. Drag and Drop & File Uploads
+## 2. Drag and Drop & File Uploads
 
 ```typescript
 import { type Page, type Locator } from '@playwright/test';
@@ -72,7 +58,6 @@ export async function advancedActions(page: Page): Promise<void> {
   await fileInput.setInputFiles(['fixtures/doc1.pdf', 'fixtures/doc2.pdf']);
   await fileInput.setInputFiles([]);
 
-  // In-memory buffer file upload
   await fileInput.setInputFiles({
     name: 'report.csv',
     mimeType: 'text/csv',
@@ -83,8 +68,8 @@ export async function advancedActions(page: Page): Promise<void> {
 
 ---
 
-## 4. Best Practices & Action Invariants
+## 3. Best Practices & Action Invariants
 
-1. ⚡ **Rely on Auto-Waiting:** Never add arbitrary sleeps (`await page.waitForTimeout(3000)` is strictly discouraged).
-2. 🔒 **Avoid `force: true`:** Using `{ force: true }` bypasses actionability checks and can trigger flaky tests where the UI was not actually ready.
-3. 📝 **Use `fill()` over `type()`:** `locator.fill()` is deterministic, clears existing values, and triggers input/change events. Use `pressSequentially()` only when testing keydown/keyup event listeners.
+- **Auto-Waiting**: Playwright auto-waits for target elements to be attached, visible, stable, enabled, and editable before executing actions. Never insert manual `page.waitForTimeout()`.
+- **Avoid `{ force: true }`**: Bypasses actionability checks and masks real UI blockers (e.g. modals, overlays).
+- **Prefer `fill()` over `type()`**: `locator.fill()` atomically clears existing text and sets the value. Use `pressSequentially()` only for real-time keypress event listener tests.

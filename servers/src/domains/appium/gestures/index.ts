@@ -26,7 +26,7 @@ export const AppiumGesturesDocsSchema = z
 
 export type AppiumGesturesDocsArgs = z.infer<typeof AppiumGesturesDocsSchema>;
 
-const FULL_HEADER = `# API Reference — Appium W3C Actions API & Mobile Gestures (Appium 3.6.0+)`;
+const FULL_HEADER = `# API Reference — Appium W3C Actions API & Mobile Gestures (Appium 2.x+)`;
 
 export async function handleAppiumGesturesDocs(args: AppiumGesturesDocsArgs) {
   const targetLanguage: SupportedLanguage = args.language;

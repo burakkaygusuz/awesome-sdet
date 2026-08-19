@@ -8,20 +8,21 @@ Selenium 4 includes built-in OpenTelemetry support for tracking end-to-end drive
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import java.net.URL;
+import java.net.URI;
 
 public class ObservabilityExample {
     public static void main(String[] args) throws Exception {
-        // Set OpenTelemetry system properties before session startup
-        System.setProperty("otel.traces.exporter", "jaeger");
-        System.setProperty("otel.exporter.jaeger.endpoint", "http://jaeger-host:14250");
+        System.setProperty("otel.traces.exporter", "otlp");
+        System.setProperty("otel.exporter.otlp.endpoint", "http://jaeger-host:4317");
         System.setProperty("otel.resource.attributes", "service.name=sdet-selenium-client");
 
         ChromeOptions options = new ChromeOptions();
-        WebDriver driver = new RemoteWebDriver(new URL("http://grid-hub:4444/"), options);
-
-        driver.get("https://example.com");
-        driver.quit();
+        WebDriver driver = new RemoteWebDriver(URI.create("http://grid-hub:4444/").toURL(), options);
+        try {
+            driver.get("https://example.com");
+        } finally {
+            driver.quit();
+        }
     }
 }
 ```

@@ -1,32 +1,40 @@
 # Vibium Core & CLI Architecture — JavaScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) is an AI-native browser automation framework built on W3C WebDriver BiDi, unifying the Sense-Think-Act agent loop, `@ref` element mapping, and multi-language client libraries.
+> Official Vibium 26.5+ JavaScript browser lifecycle, launch options, and Sense-Think-Act CLI architecture.
 
 ---
 
 ## 1. Browser Lifecycle & Setup
 
 ```javascript
-const { browser } = require('vibium');
+const { browser, browserSync } = require('vibium');
 
-async function runVibiumLifecycle() {
-  const bro = await browser.start({ headless: true });
+async function runVibiumAsyncLifecycle() {
+  const vibe = await browser.launch({ headless: true });
   try {
-    const vibe = await bro.page();
     await vibe.go('https://app.example.com');
-
     const title = await vibe.evaluate('() => document.title');
     console.log('Page Title:', title);
 
     const submitBtn = await vibe.find({ role: 'button', text: 'Get Started' });
     await submitBtn.click();
   } finally {
-    // Guaranteed graceful teardown preventing orphaned daemon processes
-    await bro.stop();
+    await vibe.quit();
   }
 }
 
-module.exports = { runVibiumLifecycle };
+function runVibiumSyncLifecycle() {
+  const vibe = browserSync.launch({ headless: true });
+  try {
+    vibe.go('https://app.example.com');
+    const submitBtn = vibe.find({ role: 'button', text: 'Get Started' });
+    submitBtn.click();
+  } finally {
+    vibe.quit();
+  }
+}
+
+module.exports = { runVibiumAsyncLifecycle, runVibiumSyncLifecycle };
 ```
 
 ---
@@ -37,9 +45,8 @@ module.exports = { runVibiumLifecycle };
 const { browser } = require('vibium');
 
 async function senseThinkActWorkflow() {
-  const bro = await browser.start();
+  const vibe = await browser.launch();
   try {
-    const vibe = await bro.page();
     await vibe.go('https://app.example.com/login');
 
     const emailInput = await vibe.find({ role: 'textbox', text: 'Email' });
@@ -50,7 +57,7 @@ async function senseThinkActWorkflow() {
 
     await vibe.check('verify user lands on dashboard');
   } finally {
-    await bro.stop();
+    await vibe.quit();
   }
 }
 
@@ -61,7 +68,15 @@ module.exports = { senseThinkActWorkflow };
 
 ## 3. CLI vs SDK Modes
 
-| Mode    | Command                                 | Description                                               |
-| :------ | :-------------------------------------- | :-------------------------------------------------------- |
-| **CLI** | `vibium go <url>` / `vibium map`        | Terminal debugging, shell scripts, live agent inspection. |
-| **SDK** | `const { browser } = require('vibium')` | Scripted automation and CI/CD test suites.                |
+| Mode    | Command                                              | Description                                               |
+| :------ | :--------------------------------------------------- | :-------------------------------------------------------- |
+| **CLI** | `vibium go <url>` / `vibium map`                     | Terminal debugging, shell scripts, live agent inspection. |
+| **SDK** | `const { browser, browserSync } = require('vibium')` | Scripted automation and CI/CD test suites.                |
+
+---
+
+## 4. Best Practices
+
+- **Zero Arbitrary Sleeps**: Rely exclusively on Vibium's auto-waiting actionability pipeline.
+- **Always Quit Browser**: Ensure `await vibe.quit()` or `vibe.quit()` is invoked in `try / finally` blocks to prevent orphaned browser daemon processes.
+- **Prefer Semantic Selectors**: Locate elements by role and text before falling back to CSS or XPath.

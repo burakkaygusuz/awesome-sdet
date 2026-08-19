@@ -1,6 +1,6 @@
 # Vibium Selectors & Locators — JavaScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) provides high-resilience semantic locators, open Shadow DOM piercing combinators (`>>`, `>>>`), and chainable locator scoping.
+> Official Vibium 26.5+ JavaScript semantic locators, open Shadow DOM piercing combinators, and scoped element queries.
 
 ---
 
@@ -11,39 +11,73 @@ async function demonstrateSemanticLocators(vibe) {
   const submitBtn = await vibe.find({ role: 'button', text: 'Sign In' });
   await submitBtn.click();
 
-  const emailInput = await vibe.find('label=Email');
+  const emailInput = await vibe.find({ label: 'Email' });
   await emailInput.fill('user@example.com');
+  console.log('Email input value:', await emailInput.value());
 
-  const submitCard = await vibe.find('testid=submit-card');
+  const submitCard = await vibe.find({ testid: 'submit-card' });
+  console.log('Card text:', await submitCard.text());
 
-  const successText = await vibe.find('text=Account created');
+  const searchInput = await vibe.find({ placeholder: 'Search catalog...' });
+  await searchInput.fill('test query');
+
+  const successText = await vibe.find({ text: 'Account created' });
   await successText.waitFor();
 }
+
+module.exports = { demonstrateSemanticLocators };
 ```
 
 ---
 
 ## 2. Pierce Combinators (`>>` and `>>>`)
 
-```javascript
-async function pierceShadowRoots(vibe) {
-  const formSubmit = await vibe.find('form.auth-form >> button[type="submit"]');
-  await formSubmit.click();
+| Combinator | Behavior                                                                               | Example                                                               |
+| :--------- | :------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| **`>>`**   | **Single Boundary Piercing** — Crosses host element shadow root or enters an iframe.   | `vibe.find('user-card >> p')` / `vibe.find('iframe#login >> button')` |
+| **`>>>`**  | **Deep Shadow DOM Piercing** — Pierces across open Shadow Root boundaries recursively. | `vibe.find('custom-header >>> account-menu >>> button#logout')`       |
 
-  // '>>>' pierces nested Web Components across open Shadow Root boundaries
+```javascript
+async function pierceShadowRootsAndFrames(vibe) {
+  const editButton = await vibe.find('user-card >> button.edit');
+  await editButton.click();
+
   const shadowBtn = await vibe.find('custom-header >>> account-menu >>> button#logout');
   await shadowBtn.click();
+
+  const frameInput = await vibe.find('iframe#checkout-frame >> input#zipcode');
+  await frameInput.fill('94105');
 }
+
+module.exports = { pierceShadowRootsAndFrames };
 ```
 
 ---
 
-## 3. Subtree Scoping & Chaining
+## 3. Subtree Scoping & Multi-Element Collections (`find`, `findAll`)
 
 ```javascript
 async function scopedLocators(vibe) {
   const row = await vibe.find({ role: 'row', text: 'Alice Smith' });
   const editBtn = await row.find({ role: 'button', text: 'Edit' });
   await editBtn.click();
+
+  const allRows = await vibe.findAll({ role: 'row' });
+  for (const r of allRows) {
+    const actionButtons = await r.findAll('button');
+    console.log(`Found ${actionButtons.length} buttons in row`);
+  }
 }
+
+module.exports = { scopedLocators };
 ```
+
+---
+
+## 4. Best Practices & Priority Hierarchy
+
+1. **`find({ role, text })` / `find({ label })`**: User-facing accessibility contracts.
+2. **`find({ testid })`**: Dedicated QA contract (`data-testid`).
+3. **`find({ text })` / `find({ placeholder })`**: Content matching.
+4. **`>>>` Piercing / `>>` Iframe**: Complex shadow root boundaries and embedded frames.
+5. Avoid raw XPath or brittle CSS paths (`div > div:nth-child(3) > span`).

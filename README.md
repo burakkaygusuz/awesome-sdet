@@ -125,6 +125,8 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
 
 ## 🛠️ Development & Validation
 
+**Prerequisites:** Node.js `>=22.0.0`, pnpm `>=11.0.0`
+
 ```bash
 # Install dependencies
 pnpm install

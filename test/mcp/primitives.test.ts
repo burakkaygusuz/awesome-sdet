@@ -77,7 +77,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         jsonrpc: '2.0',
         id: 40,
         method: 'tools/call',
-        params: { name: docTool.name, arguments: {} },
+        params: { name: docTool.name, arguments: { domain: 'locators', language: 'typescript' } },
       });
 
       expect.soft(res.status).toBe(200);
@@ -100,7 +100,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         method: 'tools/call',
         params: {
           name: targetTool.name,
-          arguments: { language: '__invalid_unsupported_language__' },
+          arguments: {
+            domain: '__invalid_unsupported_domain__',
+            language: '__invalid_unsupported_language__',
+          },
         },
       });
 
@@ -116,8 +119,12 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         id: 52,
         method: 'tools/call',
         params: {
-          name: 'read_vibium_core_docs',
-          arguments: { language: 'typescript', unrecognized_hallucinated_param: 'unexpected' },
+          name: 'read_vibium_docs',
+          arguments: {
+            domain: 'core',
+            language: 'typescript',
+            unrecognized_hallucinated_param: 'unexpected',
+          },
         },
       });
 
@@ -128,24 +135,30 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('tools/call successfully executes documentation tools across all supported frameworks', async () => {
       const crossFrameworkTools = [
-        { name: 'read_pw_locators_docs', lang: 'typescript', expectText: 'Playwright' },
-        { name: 'read_pw_actions_docs', lang: 'python', expectText: 'Playwright' },
-        { name: 'read_pw_assertions_docs', lang: 'java', expectText: 'Playwright' },
-        { name: 'read_pw_network_docs', lang: 'csharp', expectText: 'Playwright' },
-        { name: 'read_pw_storage_docs', lang: 'typescript', expectText: 'Playwright' },
-        { name: 'read_pw_observability_docs', lang: 'python', expectText: 'Playwright' },
-        { name: 'read_se_actions_docs', lang: 'java', expectText: 'Selenium' },
-        { name: 'read_cy_commands_docs', lang: 'typescript', expectText: 'Cypress' },
-        { name: 'read_vibium_core_docs', lang: 'python', expectText: 'Vibium' },
-        { name: 'read_vibium_selectors_docs', lang: 'typescript', expectText: 'Vibium' },
-        { name: 'read_vibium_interactions_docs', lang: 'java', expectText: 'Vibium' },
-        { name: 'read_vibium_bidi_docs', lang: 'javascript', expectText: 'Vibium' },
-        { name: 'read_vibium_state_docs', lang: 'typescript', expectText: 'Vibium' },
-        { name: 'read_appium_capabilities_docs', lang: 'typescript', expectText: 'Appium' },
-        { name: 'read_appium_locators_docs', lang: 'python', expectText: 'Appium' },
-        { name: 'read_appium_gestures_docs', lang: 'java', expectText: 'Appium' },
-        { name: 'read_appium_context_docs', lang: 'csharp', expectText: 'Appium' },
-        { name: 'read_appium_device_docs', lang: 'javascript', expectText: 'Appium' },
+        { name: 'read_pw_docs', domain: 'locators', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_docs', domain: 'actions', lang: 'python', expectText: 'Playwright' },
+        { name: 'read_pw_docs', domain: 'assertions', lang: 'java', expectText: 'Playwright' },
+        { name: 'read_pw_docs', domain: 'network', lang: 'csharp', expectText: 'Playwright' },
+        { name: 'read_pw_docs', domain: 'storage', lang: 'typescript', expectText: 'Playwright' },
+        { name: 'read_pw_docs', domain: 'observability', lang: 'python', expectText: 'Playwright' },
+        { name: 'read_se_docs', domain: 'actions', lang: 'java', expectText: 'Selenium' },
+        { name: 'read_se_docs', domain: 'bidi', lang: 'python', expectText: 'Selenium' },
+        { name: 'read_cy_docs', domain: 'commands', lang: 'typescript', expectText: 'Cypress' },
+        { name: 'read_vibium_docs', domain: 'core', lang: 'python', expectText: 'Vibium' },
+        { name: 'read_vibium_docs', domain: 'selectors', lang: 'typescript', expectText: 'Vibium' },
+        { name: 'read_vibium_docs', domain: 'interactions', lang: 'java', expectText: 'Vibium' },
+        { name: 'read_vibium_docs', domain: 'bidi', lang: 'javascript', expectText: 'Vibium' },
+        { name: 'read_vibium_docs', domain: 'state', lang: 'typescript', expectText: 'Vibium' },
+        {
+          name: 'read_appium_docs',
+          domain: 'capabilities',
+          lang: 'typescript',
+          expectText: 'Appium',
+        },
+        { name: 'read_appium_docs', domain: 'locators', lang: 'python', expectText: 'Appium' },
+        { name: 'read_appium_docs', domain: 'gestures', lang: 'java', expectText: 'Appium' },
+        { name: 'read_appium_docs', domain: 'context', lang: 'csharp', expectText: 'Appium' },
+        { name: 'read_appium_docs', domain: 'device', lang: 'javascript', expectText: 'Appium' },
       ];
 
       for (const item of crossFrameworkTools) {
@@ -153,7 +166,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
           jsonrpc: '2.0',
           id: 60,
           method: 'tools/call',
-          params: { name: item.name, arguments: { language: item.lang } },
+          params: { name: item.name, arguments: { domain: item.domain, language: item.lang } },
         });
 
         expect.soft(res.status).toBe(200);
@@ -187,6 +200,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const templates = [
         { uri: 'playwright://locators/typescript', expectText: 'Playwright' },
         { uri: 'selenium://actions/typescript', expectText: 'Selenium' },
+        { uri: 'selenium://bidi/python', expectText: 'Selenium' },
         { uri: 'cypress://commands/typescript', expectText: 'Cypress' },
         { uri: 'vibium://core/typescript', expectText: 'Vibium Core' },
         { uri: 'appium://capabilities/typescript', expectText: 'Appium' },
@@ -204,20 +218,6 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(readData.result?.contents).toBeDefined();
         expect.soft(readData.result?.contents?.[0]?.text).toContain(t.expectText);
       }
-    });
-
-    it('resources/read returns Playwright JavaScript reference', async () => {
-      const readRes = await mcpFetch(url, {
-        jsonrpc: '2.0',
-        id: 14,
-        method: 'resources/read',
-        params: { uri: 'playwright://locators/javascript' },
-      });
-      const readData = await parseMcpResponse(readRes);
-
-      expect(readData.error).toBeUndefined();
-      expect(readData.result?.contents?.[0]?.uri).toBe('playwright://locators/javascript');
-      expect(readData.result?.contents?.[0]?.text).toContain('Playwright');
     });
 
     it('resources/read returns JSON-RPC error -32602 when resource is not found across all framework templates', async () => {
@@ -280,7 +280,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(genData.result?.messages?.[0]?.content?.text)
         .toContain('vibium://{domain}/{language}');
-      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_vibium_core_docs');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_vibium_docs');
       expect(genData.result?.messages?.[0]?.content?.text).not.toContain(
         'skills/sdet-*/references'
       );
@@ -306,9 +306,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(pwGenData.result?.messages?.[0]?.content?.text)
         .toContain('playwright://{domain}/{language}');
-      expect
-        .soft(pwGenData.result?.messages?.[0]?.content?.text)
-        .toContain('read_pw_locators_docs');
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('read_pw_docs');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -331,7 +329,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(migData.result?.messages?.[0]?.content?.text)
         .toContain('cypress://{domain}/{language}');
-      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_cy_commands_docs');
+      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_cy_docs');
 
       const diagRes = await mcpFetch(url, {
         jsonrpc: '2.0',

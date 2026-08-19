@@ -1,6 +1,8 @@
 # Playwright Web-First Assertions — JavaScript Reference
 
-> Playwright assertions retry until the expected browser state is reached or the configured assertion timeout expires.
+> Official Playwright 1.62+ JavaScript auto-retrying web-first assertions, soft assertions, and dynamic polling.
+
+---
 
 ## 1. Locator State Assertions
 
@@ -17,6 +19,8 @@ test('assert the state of page elements', async ({ page }) => {
 });
 ```
 
+---
+
 ## 2. Content and Attribute Assertions
 
 ```javascript
@@ -30,6 +34,8 @@ test('assert content and attributes', async ({ page }) => {
 });
 ```
 
+---
+
 ## 3. Page Assertions and Soft Assertions
 
 ```javascript
@@ -42,6 +48,8 @@ test('assert page state and collect independent failures', async ({ page }) => {
   await expect.soft(page.getByRole('heading', { name: 'Order summary' })).toBeVisible();
 });
 ```
+
+---
 
 ## 4. Polling Dynamic State
 
@@ -59,4 +67,9 @@ test('wait for an asynchronous API state', async () => {
 });
 ```
 
-Use web-first assertions for browser state and `expect.poll` or `expect.toPass` for external state. Do not replace retrying assertions with fixed delays.
+---
+
+## 5. Best Practices & Invariants
+
+- Use web-first assertions for browser state and `expect.poll` or `expect.toPass` for external state.
+- Do not replace retrying assertions with fixed delays or sleep commands.

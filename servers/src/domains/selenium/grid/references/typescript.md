@@ -7,17 +7,18 @@ import { Builder, Capabilities } from 'selenium-webdriver';
 
 const chromeCapabilities = Capabilities.chrome();
 chromeCapabilities.set('se:downloadsEnabled', true);
+chromeCapabilities.set('nodename:applicationName', 'node_1');
 
 const driver = await new Builder()
   .usingServer('http://localhost:4444')
   .withCapabilities(chromeCapabilities)
   .build();
 
-// Match custom node stereotypes defined in Grid TOML config
-chromeCapabilities.set('nodename:applicationName', 'node_1');
-
-await driver.get('https://example.com');
-await driver.quit();
+try {
+  await driver.get('https://example.com');
+} finally {
+  await driver.quit();
+}
 ```
 
 ## Best Practices

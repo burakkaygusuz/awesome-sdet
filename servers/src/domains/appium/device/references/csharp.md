@@ -1,6 +1,6 @@
-# Appium Device & Application Management — C# API Reference (Appium 3.x+)
+# Appium Device & Application Management — C# API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ .NET Client (`IInteractsWithApps`) application lifecycle controls and device state management.
+> Official Appium 2.x .NET Client (`IInteractsWithApps`) application lifecycle controls and device state management.
 
 ---
 
@@ -18,26 +18,27 @@ namespace AwesomeSdet.Appium
         public static void ControlApp(AppiumDriver driver)
         {
             var bundleId = "com.example.sampleapp";
-
-            if (driver is IInteractsWithApps appDriver)
+            try
             {
-                // 1. Install & Activate
-                if (!appDriver.IsAppInstalled(bundleId))
+                if (driver is IInteractsWithApps appDriver)
                 {
-                    appDriver.InstallApp("/path/to/app.apk");
+                    if (!appDriver.IsAppInstalled(bundleId))
+                    {
+                        appDriver.InstallApp("/path/to/app.apk");
+                    }
+
+                    appDriver.ActivateApp(bundleId);
+                    appDriver.BackgroundApp(TimeSpan.FromSeconds(5));
+
+                    var state = appDriver.GetAppState(bundleId);
+                    Console.WriteLine($"State: {state}");
+
+                    appDriver.TerminateApp(bundleId);
                 }
-
-                appDriver.ActivateApp(bundleId);
-
-                // 2. Background App
-                appDriver.BackgroundApp(TimeSpan.FromSeconds(5));
-
-                // 3. Query App State
-                var state = appDriver.GetAppState(bundleId);
-                Console.WriteLine($"State: {state}");
-
-                // 4. Terminate App
-                appDriver.TerminateApp(bundleId);
+            }
+            finally
+            {
+                driver.Quit();
             }
         }
     }

@@ -7,19 +7,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.HasDownloads;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 
 ChromeOptions options = new ChromeOptions();
 options.setCapability("se:downloadsEnabled", true);
-
-WebDriver driver = new RemoteWebDriver(new URL("http://localhost:4444/"), options);
-
-// Custom Node Stereotype matching (TOML Grid stereotypes)
 options.setCapability("networkname:applicationName", "node_1");
 options.setCapability("nodename:applicationName", "app_1");
 
-List<String> downloadableFiles = ((HasDownloads) driver).getDownloadableFiles();
+WebDriver driver = new RemoteWebDriver(URI.create("http://localhost:4444/").toURL(), options);
+try {
+    driver.get("https://example.com");
+    List<String> downloadableFiles = ((HasDownloads) driver).getDownloadableFiles();
+} finally {
+    driver.quit();
+}
 ```
 
 ## Best Practices & Scaling

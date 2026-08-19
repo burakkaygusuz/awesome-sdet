@@ -1,6 +1,6 @@
 # Playwright Observability, Tracing & Visual Testing — Python Reference
 
-> Playwright Python captures diagnostic Traces, snapshots, visual comparisons, and step logs.
+> Official Playwright 1.62+ Python execution tracing, visual regression diffing, and error event monitoring.
 
 ---
 

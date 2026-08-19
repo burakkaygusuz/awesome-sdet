@@ -1,6 +1,6 @@
-# Appium Mobile Locator Strategies — TypeScript API Reference (Appium 3.x+)
+# Appium Mobile Locator Strategies — TypeScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ & WebdriverIO v9.30.1+ TypeScript selector strategies, accessibility trees, and Screen Object Model.
+> Official Appium 2.x & WebdriverIO v9+ TypeScript selector strategies, accessibility trees, and Screen Object Model.
 
 ---
 
@@ -10,36 +10,30 @@
 import { remote } from 'webdriverio';
 
 export async function demonstrateLocators(driver: WebdriverIO.Browser): Promise<void> {
-  // 1. Accessibility ID (Cross-Platform Gold Standard)
   const loginBtn = await driver.$('~login_button');
   await loginBtn.click();
 
-  // 2. iOS Class Chain (Fast hierarchical query)
   const navHeader = await driver.$(
     '-ios class chain:**/XCUIElementTypeNavigationBar/XCUIElementTypeStaticText[`label == "Dashboard"`]'
   );
   const headerText = await navHeader.getText();
   console.log('Nav Header:', headerText);
 
-  // 3. iOS Predicate String (Fast native predicate)
   const submitBtn = await driver.$(
     '-ios predicate string:type == "XCUIElementTypeButton" AND name == "Submit" AND visible == 1'
   );
   await submitBtn.click();
 
-  // 4. Android UiAutomator (Native Android selector)
   const settingsItem = await driver.$(
     'android=new UiSelector().text("Settings").className("android.widget.TextView")'
   );
   await settingsItem.click();
 
-  // 5. Android UiScrollable (Dynamic scroll into view)
   const devOptions = await driver.$(
     'android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("Developer Options"))'
   );
   await devOptions.click();
 
-  // 6. Resource ID
   const userInput = await driver.$('id=com.example.app:id/input_username');
   await userInput.setValue('sdet_user');
 }
@@ -83,3 +77,7 @@ export class LoginScreen {
 - **Encapsulate in Screen Objects**: Structure tests into Screen Object Model classes with typed getters (see `skills/sdet-authoring`).
 - **Avoid Recursive XPath**: Do not write deep absolute XPath queries (`/hierarchy/android.widget...`) on mobile trees.
 - **Native Scroll with `UiScrollable`**: Use Android `UiScrollable` to scroll and locate in a single operation.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: the `-image` prefix in WebdriverIO selectors (e.g. `$('-image:path/to/element.png')`) (requires the Appium images plugin).

@@ -1,17 +1,16 @@
 # Vibium BiDi Protocol & Network Routing — TypeScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) leverages the W3C WebDriver BiDi standard to provide high-performance network interception, live browser event listening, and clock virtualization.
+> Official Vibium 26.5+ TypeScript WebDriver BiDi protocol, network routing, event listeners, and clock virtualization.
 
 ---
 
 ## 1. Network Interception & Mocking (`vibe.route`)
 
 ```typescript
-import { type Vibe } from 'vibium';
+import { type Vibe, type Route } from 'vibium';
 
 export async function demonstrateNetworkMocking(vibe: Vibe): Promise<void> {
-  // Mock API response before network dispatch
-  await vibe.route('**/api/v1/profile', async (route) => {
+  await vibe.route('**/api/v1/profile', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -23,12 +22,11 @@ export async function demonstrateNetworkMocking(vibe: Vibe): Promise<void> {
     });
   });
 
-  // Block third-party tracking requests
-  await vibe.route('**/*{google-analytics,segment,doubleclick}*', (route) => {
+  await vibe.route('**/*{google-analytics,segment,doubleclick}*', (route: Route) => {
     route.abort('blockedbyclient');
   });
 
-  await vibe.route('**/api/**', async (route) => {
+  await vibe.route('**/api/**', async (route: Route) => {
     const headers = {
       ...route.request().headers(),
       'X-Mock-Environment': 'staging-e2e',
@@ -57,7 +55,6 @@ export async function setupBiDiEventListeners(vibe: Vibe): Promise<void> {
   });
 
   vibe.on('dialog', async (dialog) => {
-    console.log(`Dialog opened: ${dialog.message()}`);
     await dialog.accept();
   });
 }
@@ -73,17 +70,14 @@ Fast-forward timers without arbitrary `sleep()` intervals:
 import { type Vibe } from 'vibium';
 
 export async function virtualizeClock(vibe: Vibe): Promise<void> {
-  // Freeze and set initial virtual time
   await vibe.clock.install({
     time: new Date('2026-08-01T12:00:00.000Z'),
   });
 
   await vibe.go('https://app.example.com/countdown');
-
-  // Fast-forward virtual timer by 10 minutes without real sleep delays
   await vibe.clock.fastForward(10 * 60 * 1000);
 
-  const expiredMsg = await vibe.find('text=Offer Expired');
+  const expiredMsg = await vibe.find({ text: 'Offer Expired' });
   await expiredMsg.waitFor();
 }
 ```

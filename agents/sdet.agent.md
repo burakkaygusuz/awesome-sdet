@@ -1,6 +1,6 @@
 ---
 name: sdet
-description: 'Use this agent when coordinating, authoring, or migrating test automation across Playwright, Selenium, Cypress, Vibium, or Appium. Trigger on multi-framework strategy, cross-framework suite migration, framework selection, and any request to delegate to a framework specialist or route through sdet-mcp.'
+description: 'Use this agent when coordinating, authoring, or migrating test automation across web, mobile, and API testing frameworks. Trigger on multi-framework strategy, cross-framework suite migration, framework selection, and any request to delegate to a framework specialist or route through sdet-mcp.'
 user-invocable: true
 ---
 

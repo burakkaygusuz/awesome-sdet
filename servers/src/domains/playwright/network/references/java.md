@@ -1,6 +1,6 @@
 # Playwright Network Mocking & API Testing — Java Reference
 
-> Playwright Java API provides HTTP/HTTPS mocking via `Page.route()` and high-speed API verification via `APIRequestContext`.
+> Official Playwright 1.62+ Java network interception (Page.route), request modification (route.resume), and APIRequestContext.
 
 ---
 
@@ -9,6 +9,8 @@
 ```java
 package com.example.playwright;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Route;
 
@@ -23,6 +25,13 @@ public class NetworkMockingExamples {
         });
 
         page.route("**/*analytics*/**", Route::abort);
+
+        page.route("**/api/v1/secure/**", route -> {
+            Map<String, String> headers = new HashMap<>(route.request().headers());
+            headers.put("X-Mock-Authorization", "Bearer test-token-123");
+            route.resume(new Route.ResumeOptions().setHeaders(headers));
+        });
+
         page.unroute("**/api/v1/user/profile");
     }
 }

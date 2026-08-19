@@ -36,7 +36,7 @@ export const APPIUM_LOCATOR_HIERARCHY_MARKDOWN = `## Mobile Locator Strategy Hie
 | **\`id\`** | 🥉 #3 (Native Resource-ID) | Android / iOS | Android package:id/view_id or iOS identifier. Stable for native components. |
 | **\`xpath\`** | 🏅 #4 (Fallback Only - Slow) | iOS & Android | ⚠️ Avoid deep absolute XPaths. Recursively parses massive accessibility XML trees; causes severe latency. |`;
 
-const FULL_HEADER = `# API Reference — Appium Mobile Locator Strategies & Selectors (Appium 3.6.0+)`;
+const FULL_HEADER = `# API Reference — Appium Mobile Locator Strategies & Selectors (Appium 2.x+)`;
 
 export async function handleAppiumLocatorsDocs(args: AppiumLocatorsDocsArgs) {
   const targetLanguage: SupportedLanguage = args.language;

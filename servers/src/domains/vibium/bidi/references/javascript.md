@@ -1,14 +1,15 @@
 # Vibium BiDi Protocol & Network Routing — JavaScript API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) leverages the W3C WebDriver BiDi standard to provide high-performance network interception, live browser event listening, and clock virtualization.
+> Official Vibium 26.5+ JavaScript WebDriver BiDi protocol, network routing, event listeners, and clock virtualization.
 
 ---
 
 ## 1. Network Interception (`vibe.route`)
 
 ```javascript
+const { browser } = require('vibium');
+
 async function configureNetworkMocking(vibe) {
-  // Mock API response before network dispatch
   await vibe.route('**/api/users', async (route) => {
     await route.fulfill({
       status: 200,
@@ -17,9 +18,7 @@ async function configureNetworkMocking(vibe) {
     });
   });
 
-  // Block images and tracking assets
   await vibe.route('**/*.{png,jpg,jpeg}', (route) => route.abort());
-
   await vibe.go('https://app.example.com');
 }
 ```
@@ -42,9 +41,16 @@ function attachEventListeners(vibe) {
 ```javascript
 async function manipulateClock(vibe) {
   await vibe.clock.install({ time: new Date('2026-01-01') });
-  // Fast-forward virtual timer without real sleep delay
   await vibe.clock.fastForward(5000);
 }
 
 module.exports = { configureNetworkMocking, attachEventListeners, manipulateClock };
 ```
+
+---
+
+## 4. Best Practices
+
+- **Mock external dependencies**: Intercept unstable backend endpoints and third-party tracking scripts with `vibe.route()`.
+- **Real-Time Error Observability**: Register `vibe.on('pageerror')` to catch uncaught front-end exceptions during test runs.
+- **Deterministic Time Acceleration**: Use `vibe.clock.fastForward()` instead of real-time timer sleeps.

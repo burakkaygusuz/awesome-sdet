@@ -1,6 +1,6 @@
 ---
 name: sdet-observability
-description: 'Use this skill when capturing execution traces, debugging CI test failures with Trace Viewer, configuring visual regression screenshot comparisons, or subscribing to browser console and network telemetry.'
+description: 'Use this skill when configuring test execution tracing, debugging CI test failures with Trace Viewer, setting up visual regression screenshot testing, or capturing browser console and network telemetry, even if not explicitly mentioned.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,27 +12,21 @@ metadata:
 
 ## 1. Overview
 
-Diagnosing why an automated test failed in a remote CI/CD pipeline without live observability is slow and error-prone. Modern SDET test architecture treats **Observability as a First-Class Citizen**, capturing comprehensive diagnostic artifacts upon failure or throughout execution.
-
-Observability encompasses execution tracing (DOM snapshots, network logs, action metadata), video recordings, failure screenshots, visual regression diffing, browser console listeners, and unhandled exception telemetry.
+Observability treats test diagnostics (DOM snapshots, network logs, video recordings, visual diffs, console errors) as first-class artifacts to enable rapid root-cause analysis of CI failures.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Retain-on-Failure Artifact Policy**: Always configure heavy artifacts (full video recordings and full traces) with `retain-on-failure` or `on-first-retry` in CI environments to optimize storage and pipeline speed.
-2. **Deterministic Visual Regression**: Visual comparison assertions must use strict masking of dynamic content (timestamps, usernames, avatars, ads) and deterministic font rendering/viewports to prevent pixel flakiness.
-3. **Continuous Console & Uncaught Exception Telemetry**: Test runners should monitor browser console warnings, network error responses (4xx/5xx), and uncaught JavaScript errors (`pageerror`, `console.error`) during test execution.
-4. **Structured Error Logging**: Assertion failures must include meaningful context: target selector, actual vs expected values, page URL, and current viewport state.
-5. **Trace Viewer Portability**: Tracing packages (such as Playwright `.zip` traces) must be standalone and shareable for instant post-mortem debugging.
+1. **Retain-on-Failure CI Artifacts**: Configure heavy execution traces and video recordings with `retain-on-failure` or `on-first-retry` in CI pipelines, because recording and saving full media for thousands of passing tests wastes gigabytes of CI storage and slows test execution.
+2. **Mask Volatile Elements in Visual Diffs**: Mask dynamic UI elements (timestamps, user avatars, live counters, banner ads) during screenshot comparisons, because minor data changes cause false-positive visual regression failures.
+3. **Continuous Console & Exception Monitoring**: Listen for uncaught browser exceptions (`pageerror`, `window.onerror`) and unexpected console errors during test execution, because frontend JavaScript errors often indicate hidden regressions even when UI assertions pass.
+4. **Structured Failure Diagnostics**: Include the target selector, expected vs actual values, page URL, and current viewport in assertion error messages to enable immediate root-cause diagnosis without re-running tests locally.
+5. **Self-Contained Tracing Packages**: Export portable trace archives (e.g. Playwright `.zip` traces) that include DOM snapshots, action timelines, and network logs for post-mortem triage.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category            | Best Practice                                                             | Anti-Pattern                                                             |
-| :------------------ | :------------------------------------------------------------------------ | :----------------------------------------------------------------------- |
-| **CI Artifacts**    | Capture full traces and videos only on test retry / failure.              | Saving 10GB of video artifacts for thousands of passing CI tests.        |
-| **Visual Testing**  | Mask volatile UI elements (dates, badges) before diff comparison.         | Comparing entire unmasked pages that fail on minor timestamp ticks.      |
-| **Console Errors**  | Assert zero unhandled `window.onerror` exceptions during test runs.       | Silently ignoring fatal front-end JavaScript errors in test output.      |
-| **Failure Triage**  | Inspect step-by-step DOM snapshots and network timeline via Trace Viewer. | Relying purely on a one-line stack trace to diagnose remote CI failures. |
-| **Telemetry Hooks** | Use lifecycle event listeners (`WebDriverListener`, `page.on`) for logs.  | Manually sprinkling `console.log` statements throughout test specs.      |
+- **Font Rendering Differences Across OS**: Visual regression screenshots taken on macOS differ from Linux CI runners due to subpixel font antialiasing; always generate baseline screenshots in Docker or matching CI containers.
+- **Console Listener Timing**: Attaching `page.on('console')` after `page.goto()` misses console logs emitted during initial page bootstrapping and hydration.
+- **Trace File Size Explosion**: Tracing with full screenshot and snapshot capture on long-running workflows can generate multi-hundred megabyte trace files; scope tracing tightly around critical test steps.
 
 ## 3. When to Use
 
@@ -49,18 +43,18 @@ Observability encompasses execution tracing (DOM snapshots, network logs, action
 
 ## 4. Universal Framework Paradigm Mapping
 
-| Automation Framework | Execution Tracing Engine                     | Visual Regression Engine               | Console & Network Telemetry                                  |
-| :------------------- | :------------------------------------------- | :------------------------------------- | :----------------------------------------------------------- |
-| **Playwright**       | `context.tracing` (`trace.zip` Trace Viewer) | `expect(page).toHaveScreenshot()`      | `page.on('console')`, `page.on('pageerror')`                 |
-| **Cypress**          | Native Time-Travel Command Log               | `cy.screenshot()` + pixelmatch plugins | `cy.on('window:before:load')`, `cy.on('uncaught:exception')` |
-| **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi log events                     |
-| **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                 |
+| Automation Framework | Execution Tracing Engine                     | Visual Regression Engine               | Console & Network Telemetry                                   |
+| :------------------- | :------------------------------------------- | :------------------------------------- | :------------------------------------------------------------ |
+| **Playwright**       | `context.tracing` (`trace.zip` Trace Viewer) | `expect(page).toHaveScreenshot()`      | `page.on('console')`, `page.on('pageerror')`                  |
+| **Cypress**          | Native Time-Travel Command Log               | `cy.screenshot()` + pixelmatch plugins | `cy.on('window:before:load')`, `cy.on('uncaught:exception')`  |
+| **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi `driver.script.add_*_handler()` |
+| **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                  |
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when configuring observability:
 
-- **Playwright**: `read_pw_observability_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://observability/{language}`
-- **Cypress**: `read_cy_commands_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium**: `read_se_observability_docs`, `read_se_listeners_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://observability/{language}`, `selenium://listeners/{language}`
-- **Vibium**: `read_vibium_state_docs`, `read_vibium_bidi_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URIs: `vibium://state/{language}`, `vibium://bidi/{language}`
+- **Playwright Observability**: When capturing traces, screenshots, or console logs in Playwright, invoke `read_pw_docs` (Parameters: `domain: "observability"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://observability/{language}`
+- **Cypress Observability**: When configuring Cypress screenshots, logs, or error hooks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
+- **Selenium Observability**: When configuring OpenTelemetry spans, WebDriver listeners, or BiDi logging in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "observability" | "listeners"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://observability/{language}`, `selenium://listeners/{language}`
+- **Vibium State & BiDi Tracing**: When recording action timelines or capturing state in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state" | "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URIs: `vibium://state/{language}`, `vibium://bidi/{language}`

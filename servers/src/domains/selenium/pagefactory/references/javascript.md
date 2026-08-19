@@ -35,10 +35,12 @@ class LoginPage {
   }
 
   async clickLogin() {
-    const btn = await this.driver.wait(
-      until.elementIsVisible(this.driver.findElement(this.loginButton)),
-      10000
+    const el = await this.driver.wait(
+      until.elementLocated(this.loginButton),
+      10000,
+      'Login button element not found'
     );
+    const btn = await this.driver.wait(until.elementIsVisible(el), 10000);
     await btn.click();
   }
 

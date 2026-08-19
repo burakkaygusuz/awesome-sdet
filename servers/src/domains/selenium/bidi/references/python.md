@@ -1,39 +1,70 @@
 # WebDriver BiDi Protocol — Python API Reference (Selenium 4.x+)
 
-> Official Selenium 4 Python BiDi implementation (`web_socket_url` and `LogInspector`).
+> Official Selenium 4 Python WebDriver BiDi (`driver.script` · `driver.network`).
+
+---
+
+## Enabling BiDi
+
+```python
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+options.enable_bidi = True
+driver = webdriver.Chrome(options=options)
+```
 
 ---
 
 ## Code Examples
 
 ```python
-from typing import Any
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.log import LogInspector
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 
-class BidiExamples:
+def demonstrate_bidi() -> None:
+    options = Options()
+    options.enable_bidi = True
 
-    async def demonstrate_bidi(self) -> None:
-        options = ChromeOptions()
-        options.web_socket_url = True
+    driver = webdriver.Chrome(options=options)
+    try:
+        log_entries: list = []
+        handler_id = driver.script.add_console_message_handler(log_entries.append)
 
-        driver = webdriver.Chrome(options=options)
-        try:
+        driver.get("https://www.selenium.dev/selenium/web/bidi/logEntryAdded.html")
+        driver.find_element(By.ID, "consoleLog").click()
+        WebDriverWait(driver, 5).until(lambda _: log_entries)
 
-            async def on_log_entry(entry: Any) -> None:
-                print(f"Log: {entry.text}")
+        driver.script.remove_console_message_handler(handler_id)
+    finally:
+        driver.quit()
 
-            log_inspector = LogInspector(driver)
-            await log_inspector.on_console_entry(on_log_entry)
-            driver.get("https://example.com")
-        finally:
-            driver.quit()
+
+def demonstrate_network_intercept() -> None:
+    options = Options()
+    options.enable_bidi = True
+
+    driver = webdriver.Chrome(options=options)
+    try:
+        requests = []
+
+        def on_before_request(request):
+            requests.append(request)
+
+        callback_id = driver.network.add_request_handler("before_request", on_before_request)
+        driver.get("https://www.selenium.dev/selenium/web/blank.html")
+        driver.network.remove_request_handler("before_request", callback_id)
+    finally:
+        driver.quit()
 ```
 
 ## Best Practices
 
-- **Enable BiDi Capability**: Enable WebSocket W3C BiDi in options prior to session initialization (`options.web_socket_url = True`).
-- **Use BiDi over CDP**: BiDi is the W3C cross-browser standard supported on Chrome, Edge, and Firefox.
+- **Enable BiDi in options**: Set `options.enable_bidi = True` before session creation.
+- **Use high-level namespaces**: Prefer `driver.script.add_console_message_handler()` and `driver.network.add_request_handler()` over legacy log polling.
+- **Remove handlers by ID**: Store the handler ID returned on add and pass it to `remove_*_handler()` during teardown.
 - **Clean Teardown**: Always wrap session execution in `try ... finally: driver.quit()` to prevent lingering browser processes.

@@ -1,6 +1,6 @@
 ---
 name: sdet-assertions
-description: 'Use this skill when asserting expected test outcomes, verifying UI states, or synchronizing asynchronous events. Trigger when writing auto-retrying web-first expectations, polling custom conditions, or eliminating flaky arbitrary sleeps.'
+description: 'Use this skill when verifying test outcomes, asserting UI states, or synchronizing asynchronous events. Trigger when writing auto-retrying expectations, polling custom conditions, checking soft assertions, or eliminating flaky arbitrary sleeps across test suites, even without explicit mention of assertions.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,27 +12,21 @@ metadata:
 
 ## 1. Overview
 
-In modern web applications, the DOM is asynchronous, dynamic, and reactive. UI elements render, hydrate, mutate, and animate over time. Traditional static assertions (e.g. `assert(element.getText() == "Saved")`) take instantaneous snapshots that fail immediately if asynchronous rendering or network requests are in-flight.
-
-**Web-First Auto-Retrying Assertions** poll the DOM continuously until the expected condition is satisfied or a specified timeout expires. Combined with condition-based synchronization, this architecture guarantees zero flakiness without resorting to hardcoded time delays.
+Web-first auto-retrying assertions poll the DOM continuously until expectations pass or timeouts expire, eliminating race conditions caused by asynchronous rendering, animation delays, or hydration lag.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Zero-Tolerance for Arbitrary Sleeps**: Never use hardcoded time delays (`sleep()`, `cy.wait(3000)`, `Thread.sleep(5000)`). All synchronization must bind to framework-native condition waiters, auto-retrying assertions, or network/event streams.
-2. **Web-First Auto-Retrying Assertions**: Assertions on DOM elements must retry automatically across the configured assertion timeout (e.g. `expect(locator).toBeVisible()`, `cy.should('be.visible')`, `wait.until(ExpectedConditions...)`).
-3. **Soft Assertions for Non-Fatal Validations**: When verifying multiple independent fields (such as form validation states or reporting tables), use soft assertions (`expect.soft()`) to aggregate all failures in a single test run without aborting early.
-4. **Custom Condition Polling**: Complex asynchronous states (such as background task completion or database updates) must be awaited using deterministic polling blocks (`expect.poll()`, `expect().toPass()`, `FluentWait`) with explicit timeouts and intervals.
-5. **Clear Separation of Logic**: Assertions belong exclusively in test spec files and orchestration steps—never embedded invisibly inside page object interaction methods.
+1. **Eliminate Arbitrary Sleeps**: Avoid hardcoded delays (`sleep(3000)`, `cy.wait(5000)`) because fixed timers waste execution time when tests are fast and still fail when environments slow down; synchronize strictly on condition waiters and event streams.
+2. **Web-First Auto-Retrying Assertions**: Assert directly on element locators (`expect(locator).toBeVisible()`) rather than fetching static text variables, because static variables snapshot a single instant and miss asynchronous DOM mutations.
+3. **Soft Assertions for Form & Matrix Validations**: Use soft assertions (`expect.soft()`) when verifying independent fields on a single page, because failing on the first field prevents uncovering all validation errors in one run.
+4. **Deterministic Custom Polling**: Await background jobs or database mutations using bounded polling blocks (`expect.poll()`, `expect().toPass()`, `FluentWait`) with explicit timeouts and intervals to prevent infinite hangs.
+5. **Keep Assertions in Test Specs**: Place assertions exclusively in test spec files and orchestration flows rather than inside Page Object helper methods, because embedding assertions in page objects destroys their reusability across negative test scenarios.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category                   | Best Practice                                                                           | Anti-Pattern                                                                                |
-| :------------------------- | :-------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| **Synchronization**        | Use framework-native auto-retrying assertions (`toBeVisible()`, `should('have.text')`). | Adding hardcoded `sleep(3000)` waiting for animations or AJAX calls.                        |
-| **DOM Verification**       | Assert on locator objects directly (`await expect(locator).toHaveValue('x')`).          | Extracting static text into a variable and asserting with generic `expect(text).toBe('x')`. |
-| **Multi-Field Validation** | Use soft assertions (`expect.soft()`) to collect all field discrepancies.               | Single assertion failure masking 10 other broken fields on the page.                        |
-| **Async Polling**          | Use `expect.poll()` or `toPass()` with explicit timeout and message.                    | Writing infinite `while (!condition)` loops without backoff or timeouts.                    |
-| **Page Object Design**     | Return locators or state objects to spec files for assertion.                           | Embedding hardcoded assertions inside Page Object helper methods.                           |
+- **Negated Assertion Timeouts**: Negated assertions (`expect(locator).not.toBeVisible()`) wait for the full timeout if the element remains visible; configure targeted short timeouts when asserting rapid element removal.
+- **Detached vs Hidden Verification**: Elements styled with `opacity: 0` or obscured by overlays remain connected in the DOM; asserting `.not.toBeAttached()` will fail where `.not.toBeVisible()` succeeds.
+- **Cypress `.then()` Retry Break**: Chaining `.should()` after `.then()` blocks breaks Cypress's automatic retry-and-re-query loop for dynamic elements.
 
 ## 3. When to Use
 
@@ -58,9 +52,9 @@ In modern web applications, the DOM is asynchronous, dynamic, and reactive. UI e
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when implementing assertions:
 
-- **Playwright**: `read_pw_assertions_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
-- **Cypress**: `read_cy_commands_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium**: `execute_se_explicit_wait` (executable dynamic wait validator; explicit-wait patterns ship in the tool response)
-- **Vibium**: `read_vibium_core_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
+- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_pw_docs` (Parameters: `domain: "assertions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
+- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
+- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `read_se_docs` (Parameters: `domain: "actions" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp" | "ruby"`) -> URIs: `selenium://actions/{language}`, `selenium://locators/{language}`
+- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`

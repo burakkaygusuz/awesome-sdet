@@ -1,6 +1,6 @@
-# Appium Device & Application Management — TypeScript API Reference (Appium 3.x+)
+# Appium Device & Application Management — TypeScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO TypeScript application lifecycle controls, system panos, and device state management.
+> Official Appium 2.x WebdriverIO TypeScript application lifecycle controls, system panos, and device state management.
 
 ---
 
@@ -11,40 +11,35 @@ import { remote } from 'webdriverio';
 
 export async function manageDeviceAndApp(driver: WebdriverIO.Browser): Promise<void> {
   const appId = 'com.example.app';
+  try {
+    const isInstalled = await driver.isAppInstalled(appId);
+    if (!isInstalled) {
+      await driver.installApp('/path/to/app.apk');
+    }
 
-  // 1. App Lifecycle Control
-  const isInstalled = await driver.isAppInstalled(appId);
-  if (!isInstalled) {
-    await driver.installApp('/path/to/app.apk');
+    await driver.activateApp(appId);
+    await driver.background(5);
+
+    const appState = await driver.queryAppState(appId);
+    console.log('App state code:', appState);
+
+    await driver.setClipboard('sdet-auth-token-12345', 'plaintext');
+    const clipContent = await driver.getClipboard();
+    console.log('Clipboard content:', clipContent);
+
+    const orientation = await driver.getOrientation();
+    if (orientation === 'PORTRAIT') {
+      await driver.setOrientation('LANDSCAPE');
+    }
+
+    if (await driver.isKeyboardShown()) {
+      await driver.hideKeyboard();
+    }
+
+    await driver.terminateApp(appId);
+  } finally {
+    await driver.deleteSession();
   }
-
-  // Activate / Foreground application
-  await driver.activateApp(appId);
-
-  // Background app for 5 seconds and automatically resume
-  await driver.background(5);
-
-  // Query App State (0: not installed, 1: not running, 2: background, 4: foreground)
-  const appState = await driver.queryAppState(appId);
-  console.log('App state code:', appState);
-
-  // 2. Clipboard Operations
-  await driver.setClipboard('sdet-auth-token-12345', 'plaintext');
-  const clipContent = await driver.getClipboard();
-  console.log('Clipboard content:', clipContent);
-
-  // 3. Screen Orientation & Keyboard
-  const orientation = await driver.getOrientation();
-  if (orientation === 'PORTRAIT') {
-    await driver.setOrientation('LANDSCAPE');
-  }
-
-  if (await driver.isKeyboardShown()) {
-    await driver.hideKeyboard();
-  }
-
-  // 4. Terminate App
-  await driver.terminateApp(appId);
 }
 ```
 

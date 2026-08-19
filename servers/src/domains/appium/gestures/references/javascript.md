@@ -1,6 +1,6 @@
-# Appium W3C Actions API & Mobile Gestures — JavaScript API Reference (Appium 3.x+)
+# Appium W3C Actions API & Mobile Gestures — JavaScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO JavaScript W3C Actions touch gestures and script extensions.
+> Official Appium 2.x WebdriverIO JavaScript W3C Actions touch gestures and script extensions.
 
 ---
 
@@ -8,7 +8,6 @@
 
 ```javascript
 async function performMobileGestures(driver) {
-  // Tap by coordinates
   await driver
     .action('pointer', { parameters: { pointerType: 'touch' } })
     .move({ x: 300, y: 500 })
@@ -17,7 +16,6 @@ async function performMobileGestures(driver) {
     .up()
     .perform();
 
-  // Long Press
   await driver
     .action('pointer', { parameters: { pointerType: 'touch' } })
     .move({ x: 300, y: 500 })
@@ -26,7 +24,6 @@ async function performMobileGestures(driver) {
     .up()
     .perform();
 
-  // Horizontal Swipe (Carousel / Paging)
   await driver
     .action('pointer', { parameters: { pointerType: 'touch' } })
     .move({ x: 900, y: 500 })
@@ -44,7 +41,6 @@ async function performMobileGestures(driver) {
 
 ```javascript
 async function executePlatformScripts(driver) {
-  // iOS Scroll by Predicate
   await driver.execute('mobile: scroll', {
     direction: 'down',
     predicateString: 'label == "Target Cell"',

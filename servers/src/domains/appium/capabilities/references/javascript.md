@@ -1,6 +1,6 @@
-# Appium Driver Architecture & W3C Capabilities — JavaScript API Reference (Appium 3.x+)
+# Appium Driver Architecture & W3C Capabilities — JavaScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ WebdriverIO JavaScript session setup, driver management, and W3C compliant capabilities.
+> Official Appium 2.x WebdriverIO JavaScript session setup, driver management, and W3C compliant capabilities.
 
 ---
 

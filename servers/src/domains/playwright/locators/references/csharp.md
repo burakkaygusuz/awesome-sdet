@@ -1,10 +1,12 @@
 # Playwright Locators & Selectors — C# Reference
 
-> Microsoft.Playwright C# binding provides asynchronous, strongly-typed locators with built-in auto-waiting.
+> Official Playwright 1.62+ C# (.NET) locator strategies, accessibility queries, filtering, and chaining.
 
 ---
 
 ## 1. Recommended User-Facing Locators
+
+Prefer accessibility semantics and user-facing contracts over brittle CSS or XPath selectors:
 
 ```csharp
 using System.Threading.Tasks;
@@ -17,21 +19,26 @@ public class LocatorExamples
     public static async Task DemonstrateLocatorsAsync(IPage page)
     {
         ILocator submitBtn = page.GetByRole(AriaRole.Button, new() { Name = "Submit Order" });
-        ILocator heading = page.GetByRole(AriaRole.Heading, new() { Name = "Dashboard", Level = 1 });
+        ILocator navHeading = page.GetByRole(AriaRole.Heading, new() { Name = "Dashboard", Level = 1 });
         ILocator termsCheckbox = page.GetByRole(AriaRole.Checkbox, new() { Name = "I agree to Terms" });
         ILocator countrySelect = page.GetByRole(AriaRole.Combobox, new() { Name = "Country" });
-
         ILocator usernameInput = page.GetByLabel("Username or Email");
-        ILocator passwordInput = page.GetByLabel("Password");
-
-        ILocator searchField = page.GetByPlaceholder("Search products, categories...");
-
+        ILocator searchInput = page.GetByPlaceholder("Search products, categories...");
         ILocator welcomeText = page.GetByText("Welcome back, Admin!");
-        ILocator exactText = page.GetByText("Active", new() { Exact = true });
-
-        ILocator logo = page.GetByAltText("Acme Corporation");
+        ILocator companyLogo = page.GetByAltText("Acme Corporation");
         ILocator closeBtn = page.GetByTitle("Close modal");
-        ILocator card = page.GetByTestId("user-summary-card");
+        ILocator dataCard = page.GetByTestId("user-summary-card");
+
+        await submitBtn.ClickAsync();
+        await navHeading.WaitForAsync();
+        await termsCheckbox.CheckAsync();
+        await countrySelect.SelectOptionAsync("US");
+        await usernameInput.FillAsync("jane@example.com");
+        await searchInput.FillAsync("mouse");
+        await welcomeText.WaitForAsync();
+        await companyLogo.WaitForAsync();
+        await closeBtn.WaitForAsync();
+        await dataCard.WaitForAsync();
     }
 }
 ```
@@ -56,6 +63,11 @@ public class FilterAndChainExamples
 
         ILocator activeRow = page.GetByRole(AriaRole.Row)
             .Filter(new() { Has = page.GetByRole(AriaRole.Status, new() { Name = "Active" }) });
+
+        ILocator pendingItems = page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasNot = page.GetByText("Completed") });
+
+        ILocator visibleButtons = page.Locator("button:visible");
 
         ILocator dialog = page.GetByRole(AriaRole.Dialog, new() { Name = "Edit Profile" });
         await dialog.GetByRole(AriaRole.Textbox, new() { Name = "Full Name" }).FillAsync("Jane Doe");

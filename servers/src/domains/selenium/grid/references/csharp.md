@@ -10,11 +10,9 @@ using OpenQA.Selenium.Remote;
 
 var options = new ChromeOptions();
 options.AddAdditionalOption("se:downloadsEnabled", true);
+options.AddAdditionalOption("nodename:applicationName", "node_1");
 
 IWebDriver driver = new RemoteWebDriver(new Uri("http://localhost:4444/"), options);
-
-// Match custom node stereotypes defined in Grid TOML config
-options.AddAdditionalOption("nodename:applicationName", "node_1");
 
 driver.Navigate().GoToUrl("https://example.com");
 driver.Quit();

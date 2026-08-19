@@ -1,6 +1,6 @@
 # Playwright Storage State & Authentication — Java Reference
 
-> Playwright Java persists authentication state across test runs using `BrowserContext.storageState`.
+> Official Playwright 1.62+ Java authentication persistence, BrowserContext.storageState, and cookie management.
 
 ---
 

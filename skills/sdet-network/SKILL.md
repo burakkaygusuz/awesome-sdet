@@ -1,6 +1,6 @@
 ---
 name: sdet-network
-description: 'Use this skill when intercepting HTTP/HTTPS traffic, stubbing backend API responses, mocking network errors, replaying HAR files, or making direct API requests. Trigger when shifting API setup left or isolating frontend tests.'
+description: 'Use this skill when intercepting HTTP/HTTPS traffic, stubbing backend API responses, simulating network errors, replaying HAR files, or making direct API requests to fast-seed data and isolate frontend tests, even if not explicitly mentioned.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,27 +12,21 @@ metadata:
 
 ## 1. Overview
 
-Reliable test automation requires precise control over external HTTP/HTTPS traffic. Modern test runners provide full-duplex network routing, request interception, response stubbing, latency injection, and headless API execution.
-
-By controlling network responses, SDET suites simulate hard-to-reproduce edge cases (e.g. 500 internal server errors, rate limiting, partial outages, timeout race conditions) deterministically, while also replacing slow UI-based setup flows with high-speed API requests.
+Controlling HTTP/HTTPS traffic via route interception, response stubbing, latency injection, and headless API requests isolates frontend tests and enables deterministic failure mode simulation.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Shift-Left State Preparation**: Never execute repetitive multi-step UI flows solely to seed data. Use direct headless API requests (`request.post()`, `cy.request()`) or mock fixtures to seed test state instantaneously.
-2. **Deterministic Route Registration Before Navigation**: Interception routes and stubs must be registered _before_ triggering actions or navigating to the target URL to prevent unmocked race conditions.
-3. **Explicit Response Waiting**: When actions trigger network activity, synchronize explicitly on the response promise or route alias (`waitForResponse()`, `cy.wait('@alias')`) rather than guessing DOM transition timings.
-4. **Isolated Stub Scope**: Clean up or unroute network mocks after test completion to prevent route contamination across test suites.
-5. **HAR Recording & Replay for Determinism**: Use HAR archives for deterministic replay in third-party API dependencies or offline CI environments.
+1. **Shift-Left State Seeding**: Seed test prerequisites and user data via headless HTTP requests (`request.post()`, `cy.request()`) rather than clicking through multi-page UI forms, because API seeding executes in milliseconds and eliminates frontend UI flakiness during test setup.
+2. **Register Interceptors Before Navigation**: Define network stubs and routes before calling `page.goto()` or triggering actions, because registering routes after navigation starts results in unintercepted in-flight requests.
+3. **Explicit Response Synchronization**: Await specific network response promises (`waitForResponse()`, `cy.wait('@alias')`) when user actions trigger background requests, because guessing DOM settlement timing leads to race conditions.
+4. **Scoped Mock Cleanup**: Scope mock routes per test or explicitly unroute them in teardown hooks, because leaked interceptors silently mutate the network behavior of subsequent tests.
+5. **Contract & Status Verification**: Validate API response schemas and status codes directly when simulating service failure modes (e.g. 500 server errors, 429 rate limits) to verify frontend error boundary handling.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category            | Best Practice                                                     | Anti-Pattern                                                            |
-| :------------------ | :---------------------------------------------------------------- | :---------------------------------------------------------------------- |
-| **Data Seeding**    | Seed database or state via direct API requests before loading UI. | Clicking through 10 registration forms in UI before every test.         |
-| **Synchronization** | Await explicit network response promises (`waitForResponse`).     | Hardcoding arbitrary sleeps hoping background AJAX finishes.            |
-| **Route Timing**    | Define network routes and mock interceptors before `page.goto()`. | Registering routes after page navigation has already begun.             |
-| **Failure Testing** | Mock 500 / 429 status codes to test UI error boundary resilience. | Manually shutting down staging backend servers to test UI error states. |
-| **Mock Isolation**  | Scope mocks per test or use context-level routing.                | Leaking global mock interceptors across unrelated test cases.           |
+- **Cypress Single-Use Wait vs Persistent Intercept**: In Cypress, `cy.intercept()` stubs apply to all matching requests by default, but waiting on an alias (`cy.wait('@alias')`) only consumes the first occurrence.
+- **Service Worker Interception Bypass**: Browser Service Workers can intercept fetch requests before standard devtools network routing catches them; bypass service workers when comprehensive API stubbing is required.
+- **Missing CORS Headers on Fulfilled Routes**: When stubbing cross-origin responses with `route.fulfill()`, ensure required CORS headers (`access-control-allow-origin: '*'`) are included, otherwise the browser will block the response.
 
 ## 3. When to Use
 
@@ -50,18 +44,18 @@ By controlling network responses, SDET suites simulate hard-to-reproduce edge ca
 
 ## 4. Universal Framework Paradigm Mapping
 
-| Automation Framework | Interception & Mocking API                              | Request Synchronization                           | Direct API Testing Engine                                 |
-| :------------------- | :------------------------------------------------------ | :------------------------------------------------ | :-------------------------------------------------------- |
-| **Playwright**       | Full-duplex `page.route()`, `route.fulfill()`           | `page.waitForResponse()`, `page.waitForRequest()` | `playwright.request.newContext()` (`APIRequestContext`)   |
-| **Cypress**          | `cy.intercept('METHOD', '**/path', ...)`                | `cy.wait('@alias')` (implicit route matching)     | `cy.request()`                                            |
-| **Selenium 4**       | CDP `Network.setRequestInterception` / W3C BiDi Network | BiDi `network.responseCompleted` event streams    | HTTP client libraries (HttpClient, requests, RestAssured) |
-| **Vibium**           | BiDi network routing and mock response rules            | BiDi response event subscriptions                 | Integrated BiDi network driver                            |
+| Automation Framework | Interception & Mocking API                                                 | Request Synchronization                                         | Direct API Testing Engine                                 |
+| :------------------- | :------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------------- |
+| **Playwright**       | Full-duplex `page.route()`, `route.fulfill()`                              | `page.waitForResponse()`, `page.waitForRequest()`               | `playwright.request.newContext()` (`APIRequestContext`)   |
+| **Cypress**          | `cy.intercept('METHOD', '**/path', ...)`                                   | `cy.wait('@alias')` (implicit route matching)                   | `cy.request()`                                            |
+| **Selenium 4**       | W3C BiDi `Network.addIntercept()` / `driver.network.add_request_handler()` | BiDi `onBeforeRequestSent` / `responseCompleted` event handlers | HTTP client libraries (HttpClient, requests, RestAssured) |
+| **Vibium**           | BiDi network routing and mock response rules                               | BiDi response event subscriptions                               | Integrated BiDi network driver                            |
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing network traffic:
 
-- **Playwright**: `read_pw_network_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
-- **Cypress**: `read_cy_network_docs`, `read_cy_stubs_spies_docs`, `read_cy_fixtures_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
-- **Selenium**: `read_se_bidi_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium**: `read_vibium_bidi_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`
+- **Playwright Network**: When stubbing routes or mocking responses in Playwright, invoke `read_pw_docs` (Parameters: `domain: "network"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
+- **Cypress Network & Fixtures**: When intercepting requests or loading fixture stubs in Cypress, invoke `read_cy_docs` (Parameters: `domain: "network" | "stubs" | "fixtures"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
+- **Selenium BiDi Network**: When managing network interception via Selenium 4 BiDi, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
+- **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`

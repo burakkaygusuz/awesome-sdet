@@ -1,6 +1,8 @@
 # Playwright Locators & Selectors — JavaScript Reference
 
-> Playwright locators are strict, auto-waiting, and resilient element pointers that query the live DOM at execution time.
+> Official Playwright 1.62+ JavaScript locator strategies, accessibility queries, filtering, and chaining.
+
+---
 
 ## 1. Recommended User-Facing Locators
 
@@ -13,20 +15,28 @@ test('locate elements through user-facing contracts', async ({ page }) => {
   const submitButton = page.getByRole('button', { name: 'Submit Order' });
   const navigationHeading = page.getByRole('heading', { name: 'Dashboard', level: 1 });
   const termsCheckbox = page.getByRole('checkbox', { name: 'I agree to Terms' });
+  const countrySelect = page.getByRole('combobox', { name: 'Country' });
   const usernameInput = page.getByLabel('Username or Email');
   const searchInput = page.getByPlaceholder('Search products, categories...');
+  const welcomeText = page.getByText('Welcome back, Admin!');
   const companyLogo = page.getByAltText('Acme Corporation');
+  const closeButton = page.getByTitle('Close modal');
   const dataCard = page.getByTestId('user-summary-card');
 
   await submitButton.click();
   await navigationHeading.waitFor();
   await termsCheckbox.check();
+  await countrySelect.selectOption('US');
   await usernameInput.fill('jane@example.com');
   await searchInput.fill('mouse');
+  await welcomeText.waitFor();
   await companyLogo.waitFor();
+  await closeButton.waitFor();
   await dataCard.waitFor();
 });
 ```
+
+---
 
 ## 2. Locator Filtering and Chaining
 
@@ -42,11 +52,19 @@ test('filter and chain locators', async ({ page }) => {
   });
   await activeUserRow.getByRole('button', { name: 'View' }).click();
 
+  const pendingItems = page.getByRole('row').filter({
+    hasNot: page.getByText('Completed'),
+  });
+
+  const visibleSubmitButtons = page.locator('button:visible');
+
   const modal = page.getByRole('dialog', { name: 'Edit Profile' });
   await modal.getByRole('textbox', { name: 'Full Name' }).fill('Jane Doe');
   await modal.getByRole('button', { name: 'Save' }).click();
 });
 ```
+
+---
 
 ## 3. Lists and Multi-Element Operations
 
@@ -65,6 +83,8 @@ test('work with a list of elements', async ({ page }) => {
   }
 });
 ```
+
+---
 
 ## 4. Locator Priority Hierarchy
 

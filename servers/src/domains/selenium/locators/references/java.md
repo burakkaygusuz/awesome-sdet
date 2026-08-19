@@ -32,7 +32,25 @@ public class LocatorExamples {
 
         // Selenium 4 Relative Locators (spatial queries: below, toLeftOf)
         WebElement passwordInput = driver.findElement(with(tagName("input")).below(username));
+        passwordInput.sendKeys("secret123");
+
         WebElement cancelButton = driver.findElement(with(tagName("button")).toLeftOf(submitBtn));
+        cancelButton.click();
     }
 }
 ```
+
+## Shadow DOM Piercing
+
+Selenium 4 exposes open shadow roots via `getShadowRoot()`; query inside them with standard locators:
+
+```java
+WebElement shadowHost = driver.findElement(By.cssSelector("my-card"));
+SearchContext shadowRoot = shadowHost.getShadowRoot();
+WebElement inner = shadowRoot.findElement(By.cssSelector("p"));
+SearchContext nestedRoot = shadowRoot.findElement(By.cssSelector("child-widget")).getShadowRoot();
+```
+
+## Link Text Strategies
+
+Anchor-only strategies: `By.linkText("Sign in")` / `By.partialLinkText("Sign")`.

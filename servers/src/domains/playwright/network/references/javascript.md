@@ -1,6 +1,8 @@
 # Playwright Network Mocking & API Testing — JavaScript Reference
 
-> Playwright provides native HTTP/HTTPS interception with `page.route()`, HAR replay, and REST/GraphQL testing through `APIRequestContext`.
+> Official Playwright 1.62+ JavaScript network interception (page.route), HAR replay, and APIRequestContext.
+
+---
 
 ## 1. Network Interception and Mocking
 
@@ -36,6 +38,8 @@ test('mock API responses and block third-party traffic', async ({ page }) => {
 });
 ```
 
+---
+
 ## 2. HAR Replay
 
 ```javascript
@@ -51,6 +55,8 @@ test('replay checkout traffic from a HAR file', async ({ page }) => {
   await page.goto('/checkout');
 });
 ```
+
+---
 
 ## 3. API Testing with `APIRequestContext`
 
@@ -80,6 +86,8 @@ test('verify backend state directly', async ({ playwright }) => {
   }
 });
 ```
+
+---
 
 ## 4. Synchronizing UI Actions with Responses
 

@@ -1,6 +1,6 @@
-# Appium Device & Application Management — Python API Reference (Appium 3.x+)
+# Appium Device & Application Management — Python API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Python Client application lifecycle operations, system clipboard, and device state controls.
+> Official Appium 2.x Python Client application lifecycle operations, system clipboard, and device state controls.
 
 ---
 
@@ -16,24 +16,27 @@ def manage_device_and_app(driver: WebDriver) -> None:
     package_name = "com.example.app"
     app_path = Path("/path/to/app.apk")
 
-    if not driver.is_app_installed(package_name):
-        driver.install_app(str(app_path))
+    try:
+        if not driver.is_app_installed(package_name):
+            driver.install_app(str(app_path))
 
-    driver.activate_app(package_name)
-    driver.background_app(5)
+        driver.activate_app(package_name)
+        driver.background_app(5)
 
-    state: int = driver.query_app_state(package_name)
-    print("Application state:", state)
+        state: int = driver.query_app_state(package_name)
+        print("Application state:", state)
 
-    driver.set_clipboard_text("one-time-password-9988")
-    otp: str = driver.get_clipboard_text()
-    print("OTP from clipboard:", otp)
+        driver.set_clipboard_text("one-time-password-9988")
+        otp: str = driver.get_clipboard_text()
+        print("OTP from clipboard:", otp)
 
-    if driver.is_keyboard_shown():
-        driver.hide_keyboard()
+        if driver.is_keyboard_shown():
+            driver.hide_keyboard()
 
-    driver.orientation = "PORTRAIT"
-    driver.terminate_app(package_name)
+        driver.orientation = "PORTRAIT"
+        driver.terminate_app(package_name)
+    finally:
+        driver.quit()
 ```
 
 ---

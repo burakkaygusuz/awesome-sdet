@@ -4,39 +4,59 @@
 
 ---
 
+## Enabling BiDi
+
+```java
+FirefoxOptions options = new FirefoxOptions();
+options.setCapability("webSocketUrl", true);
+WebDriver driver = new FirefoxDriver(options);
+```
+
+---
+
 ## Code Examples
 
 ```java
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.bidi.HasBiDi;
-import org.openqa.selenium.bidi.BiDi;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.bidi.module.LogInspector;
 import org.openqa.selenium.bidi.module.Network;
+import org.openqa.selenium.bidi.network.AddInterceptParameters;
+import org.openqa.selenium.bidi.network.InterceptPhase;
 
 public class BidiExamples {
 
     public void demonstrateBidi() {
-        ChromeOptions options = new ChromeOptions();
-        options.setCapability(CapabilityType.ENABLE_BIDI, true);
+        FirefoxOptions options = new FirefoxOptions();
+        options.setCapability("webSocketUrl", true);
 
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = new FirefoxDriver(options);
+        try {
+            try (Network network = new Network(driver)) {
+                String intercept = network.addIntercept(
+                        new AddInterceptParameters(InterceptPhase.BEFORE_REQUEST_SENT));
+                network.onBeforeRequestSent(
+                        details -> System.out.println("Request: " + details.getRequest().getUrl()));
+                network.removeIntercept(intercept);
+            }
 
-        BiDi bidi = ((HasBiDi) driver).getBiDi();
-
-        LogInspector inspector = new LogInspector(driver);
-        inspector.onConsoleEntry(entry -> System.out.println("Log: " + entry.getText()));
-
-        Network network = new Network(driver);
+            try (LogInspector logInspector = new LogInspector(driver)) {
+                logInspector.onConsoleEntry(entry -> System.out.println("Log: " + entry.getText()));
+                driver.get("https://www.selenium.dev/selenium/web/bidi/logEntryAdded.html");
+                driver.findElement(By.id("consoleLog")).click();
+            }
+        } finally {
+            driver.quit();
+        }
     }
 }
 ```
 
 ## Best Practices
 
-- **Enable BiDi Capability**: BiDi options (`CapabilityType.ENABLE_BIDI` or `"webSocketUrl"`) must be set on `ChromeOptions`, `FirefoxOptions`, or `EdgeOptions` before session creation.
-- **Use HasBiDi Interface**: Access lower-level BiDi session commands using `((HasBiDi) driver).getBiDi()`.
+- **Enable BiDi capability**: Set `"webSocketUrl"` to `true` on browser options before session creation.
+- **Use try-with-resources**: Wrap `Network` and `LogInspector` in try-with-resources blocks for automatic cleanup.
 - **Use BiDi over CDP**: BiDi is the W3C cross-browser standard supported on Chrome, Edge, and Firefox.
-- **Clean up listeners**: Detach event listeners on test teardown to prevent memory leaks in persistent browser sessions.
+- **Remove intercepts explicitly**: Call `network.removeIntercept(interceptId)` when intercepts are no longer needed.

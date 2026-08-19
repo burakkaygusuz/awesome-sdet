@@ -1,6 +1,6 @@
 ---
 name: sdet-authoring
-description: 'Use this skill when structuring test automation architecture, designing Page Object Models (POM), authoring component mount tests, configuring test fixtures and lifecycle hooks, or setting up parallel test execution topologies.'
+description: 'Use this skill when structuring test automation suites, designing Page Object Models (POM) or Screen Object Models (SOM), authoring component mount tests, configuring custom test fixtures, setting up lifecycle hooks, or organizing parallel execution topologies.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,29 +12,21 @@ metadata:
 
 ## 1. Overview
 
-Writing maintainable, enterprise-grade test automation requires disciplined software engineering principles. As test suites scale to thousands of test cases across distributed CI/CD workers, monolithic or copy-pasted test scripts quickly become unmaintainable liabilities.
-
-**Test Authoring Architecture** establishes clean design patterns (Page Object Model, Screen Object Model, App Actions, Custom Fixtures, Component Mount Testing), deterministic lifecycle hook execution (`beforeAll`, `beforeEach`, `afterEach`, `afterAll`), and scalable parallel worker topologies that guarantee zero test cross-talk.
+Scalable test authoring establishes clean structural design patterns (Page Object Model, Screen Object Model, custom fixtures, component testing) and idempotent lifecycle hooks to guarantee isolated, parallel execution without test cross-talk.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Clean Separation of Concerns**:
-   - **Page Objects / Screen Objects**: Encapsulate element locators, component interactions, and navigation mechanics. Page objects must _never_ contain test assertions or hardcoded expectations.
-   - **Test Spec Files**: Contain the business workflows, scenario orchestration, and all validation assertions.
-2. **Lazy Locator Getters vs. Stale Elements**: Page objects must expose lazy locator properties or helper methods that re-evaluate queries on invocation, rather than caching static element handles in constructor properties.
-3. **Composable Custom Fixtures**: Prefer modular, composable dependency injection fixtures (e.g. Playwright `test.extend()`, Cypress custom commands) over sprawling global helper singletons.
-4. **Idempotent Lifecycle Hooks**: Setup and teardown hooks (`beforeEach`, `afterEach`) must be idempotent and self-contained. Never create temporal dependencies where Test B relies on mutations produced by Test A.
-5. **Parallel Worker Safety & Thread Isolation**: Never use global mutable variables or shared singleton drivers across parallel execution threads. Every worker must own an independent driver/browser instance.
+1. **Separation of Page Objects and Assertions**: Keep element definitions and interaction workflows in Page Objects, but place all assertions in test spec files, because mixing assertions into page models prevents using the same page actions in negative or alternative test cases.
+2. **Lazy Locator Getters**: Expose dynamic getter properties or locator factory methods in Page Objects rather than resolving elements in the constructor, because cached element references throw StaleElementReference exceptions upon DOM re-renders.
+3. **Composable Dependency Injection Fixtures**: Use modular, scoped test fixtures (e.g. Playwright `test.extend()`, Cypress custom commands) instead of global singleton classes, because global singletons leak mutable state across concurrent worker threads.
+4. **Idempotent & Independent Lifecycle**: Author `beforeEach` and `afterEach` hooks to be fully self-contained, because tests that depend on execution order fail unpredictably in parallel test runs.
+5. **Thread-Isolated Driver Instances**: Ensure every parallel worker manages an independent browser or driver instance, because shared drivers cause race conditions and session hijacking in CI.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category              | Best Practice                                                    | Anti-Pattern                                                                    |
-| :-------------------- | :--------------------------------------------------------------- | :------------------------------------------------------------------------------ |
-| **Assertions**        | Keep all `expect()` assertions inside test spec files.           | Embedding hidden assertions inside Page Object interaction methods.             |
-| **Page Objects**      | Expose lazy locator getters (`get submitBtn() { return ... }`).  | Caching `this.button = await page.$('...')` in constructors.                    |
-| **Test Independence** | Design every test case to run independently in any order.        | Forcing tests to execute sequentially (Test 1 creates user, Test 2 edits user). |
-| **Fixtures**          | Extend base test runners with composable, typed fixtures.        | Copy-pasting 30 lines of boilerplate setup across every spec file.              |
-| **Parallel Safety**   | Maintain ThreadLocal driver handles or worker-isolated contexts. | Sharing a static global `WebDriver driver` across concurrent threads.           |
+- **Async Constructors in Page Objects**: Class constructors cannot be async; avoid performing network or DOM initialization in constructors—use static async factory methods or fixture injection instead.
+- **Global Hook State Leaks**: Setting shared mutable variables in `beforeAll` hooks causes subtle race conditions and test pollution across parallel worker shards.
+- **Over-Abstracted Base Classes**: Deep multi-level inheritance hierarchies in test base classes obscure test failure origins and create rigid framework lock-in.
 
 ## 3. When to Use
 
@@ -61,10 +53,10 @@ Writing maintainable, enterprise-grade test automation requires disciplined soft
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when structuring test suites:
 
-- **Playwright**: `read_pw_locators_docs`, `read_pw_actions_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `playwright://locators/{language}`, `playwright://actions/{language}`
-- **Cypress**: `read_cy_component_docs`, `read_cy_commands_docs`, `read_cy_task_docs` (Parameters: `language: "typescript" | "javascript"`) -> URIs: `cypress://component/{language}`, `cypress://commands/{language}`, `cypress://task/{language}`
-- **Selenium**: `read_se_pagefactory_docs`, `read_se_locator_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
-- **Vibium**: `read_vibium_core_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
-- **Appium**: `read_appium_capabilities_docs`, `read_appium_locators_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://locators/{language}`
+- **Playwright Architecture**: When structuring Playwright POM, fixtures, or component tests, invoke `read_pw_docs` (Parameters: `domain: "locators" | "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `playwright://locators/{language}`, `playwright://actions/{language}`
+- **Cypress Architecture**: When structuring Cypress component tests, commands, or tasks, invoke `read_cy_docs` (Parameters: `domain: "component" | "commands" | "task"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://component/{language}`, `cypress://commands/{language}`, `cypress://task/{language}`
+- **Selenium POM & PageFactory**: When structuring Selenium Page Object Models or PageFactory patterns, invoke `read_se_docs` (Parameters: `domain: "pagefactory" | "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
+- **Vibium Architecture**: When structuring Vibium workflows and page helpers, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
+- **Appium Screen Objects**: When structuring Appium Screen Object Models or multi-platform factories, invoke `read_appium_docs` (Parameters: `domain: "capabilities" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://locators/{language}`

@@ -1,32 +1,34 @@
 # Playwright Storage State & Authentication — TypeScript Reference
 
-> Playwright accelerates test execution by reusing saved authentication states (`storageState`) and providing isolated `BrowserContext` fixtures.
+> Official Playwright 1.62+ TypeScript authentication setup project pattern, multi-role fixtures, and storage state isolation.
 
 ---
 
 ## 1. Authentication Setup Project Pattern
 
-Authenticate once during setup, store session cookies/storage to disk, and inject into dependent test projects:
+Authenticate once during setup, save the session state, and inject it into dependent projects:
+
+### A. Setup Spec (`tests/auth.setup.ts`)
 
 ```typescript
-// auth.setup.ts
 import { test as setup, expect } from '@playwright/test';
 
 const authFile = 'playwright/.auth/user.json';
 
-setup('authenticate user', async ({ page }) => {
+setup('authenticate', async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel('Username').fill('standard_user');
   await page.getByLabel('Password').fill('secret_pass');
   await page.getByRole('button', { name: 'Sign in' }).click();
 
+  await page.waitForURL('**/dashboard');
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
   await page.context().storageState({ path: authFile });
 });
 ```
 
-### Configure in `playwright.config.ts`
+### B. Configuration (`playwright.config.ts`)
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
@@ -75,8 +77,11 @@ export const test = base.extend<RoleFixtures>({
       storageState: 'playwright/.auth/admin.json',
     });
     const page: Page = await context.newPage();
-    await use(page);
-    await context.close();
+    try {
+      await use(page);
+    } finally {
+      await context.close();
+    }
   },
 
   customerPage: async ({ browser }, use) => {
@@ -84,8 +89,11 @@ export const test = base.extend<RoleFixtures>({
       storageState: 'playwright/.auth/customer.json',
     });
     const page: Page = await context.newPage();
-    await use(page);
-    await context.close();
+    try {
+      await use(page);
+    } finally {
+      await context.close();
+    }
   },
 });
 
@@ -99,11 +107,7 @@ export { expect } from '@playwright/test';
 ```typescript
 import { test, type BrowserContext } from '@playwright/test';
 
-test('inspect and manipulate cookies and context', async ({
-  context,
-}: {
-  context: BrowserContext;
-}) => {
+test('inject and read cookies dynamically', async ({ context }: { context: BrowserContext }) => {
   await context.addCookies([
     {
       name: 'session_id',
@@ -117,7 +121,7 @@ test('inspect and manipulate cookies and context', async ({
   ]);
 
   const cookies = await context.cookies('https://example.com');
-  console.log('Active cookies:', cookies);
+  console.log('Injected cookies:', cookies);
 
   await context.clearCookies();
 });
@@ -125,8 +129,8 @@ test('inspect and manipulate cookies and context', async ({
 
 ---
 
-## 4. Context Isolation & Invariants
+## 4. Context Isolation Invariants
 
-1. 🛡️ **Zero Cross-Test Contamination:** Each test gets a fresh, isolated `BrowserContext` with independent cookies, cache, and localStorage.
-2. 🚀 **Eliminate UI Login Repetition:** Never log in through the UI before every single test scenario. Seed auth state or storage state.
-3. 🧹 **Automatic Teardown:** Standard Playwright fixtures automatically close browser contexts and dispose of temp state.
+- **Isolated Browser Contexts**: Each test receives an isolated context with independent cookies, cache, and local storage.
+- **Setup Project Caching**: Use setup projects for authenticating once before executing parallel spec suites.
+- **Teardown Safety**: Ensure custom fixture contexts are always closed inside `finally` blocks.

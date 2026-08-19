@@ -1,5 +1,9 @@
 # Cypress Node.js Task & OS Command Execution — TypeScript API Reference (Cypress 15.x+)
 
+> Official Cypress 15+ TypeScript Node event handler execution (cy.task) and shell command execution (cy.exec).
+
+---
+
 ## 1. Node Task Execution (`cy.task`)
 
 ### Configuration & Task Handler (`cypress.config.ts`)
@@ -21,6 +25,8 @@ export default defineConfig({
 });
 ```
 
+---
+
 ### Spec Execution (`spec.cy.ts`)
 
 ```typescript
@@ -30,6 +36,8 @@ cy.task<{ success: boolean; count: number }>('seedDatabase', { users: 10 }).then
 });
 ```
 
+---
+
 ## 2. Shell Command Execution (`cy.exec`)
 
 ```typescript
@@ -38,6 +46,8 @@ cy.exec('npm run db:reset', { failOnNonZeroExit: true, timeout: 20000 }).then((r
   expect(result.stdout).to.contain('Database reset complete');
 });
 ```
+
+---
 
 ## 3. Best Practices & Anti-Patterns
 

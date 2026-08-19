@@ -1,6 +1,6 @@
 # Playwright Observability, Tracing & Visual Testing — TypeScript Reference
 
-> Playwright delivers rich observability through time-travel Tracing, visual regression diffing (`toHaveScreenshot()`), failure video recordings, and step telemetry.
+> Official Playwright 1.62+ TypeScript time-travel tracing, visual regression diffing (toHaveScreenshot), failure video recording, and step telemetry.
 
 ---
 

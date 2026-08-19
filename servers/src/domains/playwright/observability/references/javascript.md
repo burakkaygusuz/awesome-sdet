@@ -1,6 +1,8 @@
 # Playwright Observability, Tracing & Visual Testing — JavaScript Reference
 
-> Playwright provides tracing, visual regression diffing, failure recordings, and structured test steps for diagnosing failures.
+> Official Playwright 1.62+ JavaScript execution tracing, visual regression comparisons, test steps, and error monitoring.
+
+---
 
 ## 1. Trace Recording and Trace Viewer
 
@@ -31,6 +33,8 @@ export default defineConfig({
 });
 ```
 
+---
+
 ## 2. Visual Regression Testing
 
 ```javascript
@@ -49,6 +53,8 @@ test('compare a stable page screenshot', async ({ page }) => {
 });
 ```
 
+---
+
 ## 3. Test Steps and Telemetry
 
 ```javascript
@@ -66,6 +72,8 @@ test('group workflow actions into reportable steps', async ({ page }) => {
   });
 });
 ```
+
+---
 
 ## 4. Console and Uncaught Exception Monitoring
 

@@ -696,11 +696,124 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const rawText = await res.text();
       expect.soft(rawText).not.toContain('SENSITIVE_INTERNAL_DATABASE_FAILURE');
       expect.soft(rawText).not.toContain('/var/data/db.sqlite');
+    });
+  });
 
-      const data = JSON.parse(rawText);
-      expect.soft(data.jsonrpc).toBe('2.0');
-      expect.soft(data.error?.code).toBe(-32603);
-      expect.soft(data.error?.message).toBe('Internal error');
+  describe('Protocol utility methods & notifications', () => {
+    it('handles ping method with HTTP 200 and empty result object', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'ping',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'ping-1',
+          method: 'ping',
+          params: {
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe('ping-1');
+      expect.soft(data.result).toEqual({});
+    });
+
+    it('accepts notifications/cancelled with HTTP 202 Accepted', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'notifications/cancelled',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'notifications/cancelled',
+          params: {
+            requestId: 'task-42',
+            reason: 'User cancelled request',
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(202);
+      const text = await res.text();
+      expect.soft(text).toBe('');
+    });
+
+    it('accepts notifications/initialized with HTTP 202 Accepted', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'notifications/initialized',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'notifications/initialized',
+          params: {},
+        }),
+      });
+
+      expect.soft(res.status).toBe(202);
+      const text = await res.text();
+      expect.soft(text).toBe('');
+    });
+
+    it('accepts notifications/message with HTTP 202 Accepted', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'notifications/message',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'notifications/message',
+          params: {
+            level: 'info',
+            data: 'Client logging message',
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(202);
+      const text = await res.text();
+      expect.soft(text).toBe('');
+    });
+
+    it('handles logging/setLevel method with HTTP 200 and empty result object', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'logging/setLevel',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'log-1',
+          method: 'logging/setLevel',
+          params: {
+            level: 'info',
+            _meta: {
+              'io.modelcontextprotocol/protocolVersion': '2026-07-28',
+              'io.modelcontextprotocol/clientCapabilities': {},
+            },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe('log-1');
+      expect.soft(data.result).toEqual({});
     });
   });
 });

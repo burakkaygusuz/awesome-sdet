@@ -1,6 +1,6 @@
 # Playwright Web-First Assertions — TypeScript Reference
 
-> Playwright Web-First Assertions automatically poll and retry until the expected condition is met or the assertion timeout expires.
+> Official Playwright 1.62+ TypeScript auto-retrying web-first assertions, soft assertions, and polling loops.
 
 ---
 
@@ -13,45 +13,39 @@ test('demonstrate locator state assertions', async ({ page }: { page: Page }) =>
   const submitBtn: Locator = page.getByRole('button', { name: 'Submit' });
   const termsCheckbox: Locator = page.getByRole('checkbox', { name: 'Terms' });
   const searchInput: Locator = page.getByPlaceholder('Search');
-  const alertBanner: Locator = page.getByRole('alert');
 
   await expect(submitBtn).toBeVisible();
-  await expect(alertBanner).toBeHidden();
-  await expect(alertBanner).toBeAttached();
-
   await expect(submitBtn).toBeEnabled();
   await expect(submitBtn).not.toBeDisabled();
-  await expect(searchInput).toBeEditable();
-  await expect(searchInput).toBeFocused();
 
   await expect(termsCheckbox).toBeChecked();
-  await expect(searchInput).toBeEmpty();
+  await expect(searchInput).toBeFocused();
+  await expect(page.getByTestId('loading-spinner')).toBeHidden();
+  await expect(page.getByTestId('error-alert')).not.toBeVisible();
 });
 ```
 
 ---
 
-## 2. Content & Attribute Assertions
+## 2. Text, Value, Count & Attribute Assertions
 
 ```typescript
 import { test, expect, type Page, type Locator } from '@playwright/test';
 
-test('demonstrate content and attribute assertions', async ({ page }: { page: Page }) => {
-  const header: Locator = page.getByRole('heading', { level: 1 });
-  const items: Locator = page.getByRole('listitem');
-  const userCard: Locator = page.getByTestId('user-profile');
-  const input: Locator = page.getByLabel('User Email');
+test('demonstrate text, attribute and count assertions', async ({ page }: { page: Page }) => {
+  const statusBadge: Locator = page.getByTestId('user-status');
+  const userEmailInput: Locator = page.getByLabel('Email');
+  const productRows: Locator = page.getByRole('row');
 
-  await expect(header).toHaveText('Welcome to Dashboard');
-  await expect(header).toHaveText(/welcome to/i);
-  await expect(header).toContainText('Dashboard');
+  await expect(statusBadge).toHaveText('Active');
+  await expect(statusBadge).toHaveText(/active/i);
+  await expect(statusBadge).toContainText('Act');
 
-  await expect(userCard).toHaveAttribute('data-status', 'active');
-  await expect(userCard).toHaveClass(/card-highlighted/);
-  await expect(userCard).toHaveId('user-42');
+  await expect(userEmailInput).toHaveValue('admin@example.com');
+  await expect(userEmailInput).toHaveAttribute('type', 'email');
+  await expect(statusBadge).toHaveClass(/(^|\s)badge-success(\s|$)/);
 
-  await expect(input).toHaveValue('admin@example.com');
-  await expect(items).toHaveCount(5);
+  await expect(productRows).toHaveCount(10);
 });
 ```
 
@@ -67,9 +61,9 @@ test('demonstrate page & soft assertions', async ({ page }: { page: Page }) => {
   await expect(page).toHaveURL(/.*\/dashboard/);
   await expect(page).toHaveTitle('Enterprise SDET Dashboard');
 
-  expect.soft(page.getByRole('banner')).toBeVisible();
-  expect.soft(page.getByRole('navigation')).toBeVisible();
-  expect.soft(page.getByRole('contentinfo')).toBeVisible();
+  await expect.soft(page.getByRole('banner')).toBeVisible();
+  await expect.soft(page.getByRole('navigation')).toBeVisible();
+  await expect.soft(page.getByRole('contentinfo')).toBeVisible();
 
   await expect(
     page.getByTestId('sync-complete'),

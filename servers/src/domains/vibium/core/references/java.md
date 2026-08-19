@@ -1,39 +1,24 @@
 # Vibium Core & CLI Architecture — Java API Reference (Vibium 26.x+)
 
-> Vibium (v26.5.31) is an AI-native browser automation framework built on W3C WebDriver BiDi, unifying the Sense-Think-Act agent loop, `@ref` element mapping, and multi-language client libraries.
+> Official Vibium 26.5+ Java browser lifecycle, launch options, and Sense-Think-Act CLI architecture.
 
 ---
 
-## 1. Maven Dependency
-
-```xml
-<dependency>
-    <groupId>com.vibium</groupId>
-    <artifactId>vibium</artifactId>
-    <version>26.5.31</version>
-</dependency>
-```
-
----
-
-## 2. Browser Lifecycle & Setup
+## 1. Browser Lifecycle & Setup
 
 ```java
 package com.example.sdet.vibium;
 
-import com.vibium.Vibium;
-import com.vibium.Browser;
-import com.vibium.Vibe;
-import com.vibium.Element;
+import dev.vibium.Browser;
+import dev.vibium.Element;
+import dev.vibium.Vibe;
+import dev.vibium.Vibium;
 
 public class VibiumCoreExample {
     public static void main(String[] args) {
-        // Auto-closeable session ensures deterministic browser cleanup
-        try (Browser bro = Vibium.start()) {
-            Vibe vibe = bro.page();
+        try (Vibe vibe = Vibium.launch()) {
             vibe.go("https://app.example.com");
-
-            System.out.println("Page Title: " + vibe.evaluate("() -> document.title"));
+            System.out.println("Page Title: " + vibe.evaluate("() => document.title"));
 
             Element submitBtn = vibe.find("button");
             submitBtn.click();
@@ -44,21 +29,19 @@ public class VibiumCoreExample {
 
 ---
 
-## 3. Sense-Think-Act Execution Loop
+## 2. Sense-Think-Act Execution Loop
 
 ```java
 package com.example.sdet.vibium;
 
-import com.vibium.Vibium;
-import com.vibium.Browser;
-import com.vibium.Vibe;
-import com.vibium.Element;
+import dev.vibium.Element;
+import dev.vibium.Vibe;
+import dev.vibium.Vibium;
 import java.util.Map;
 
 public class AgentLoop {
     public void executeSenseThinkAct() {
-        try (Browser bro = Vibium.start()) {
-            Vibe vibe = bro.page();
+        try (Vibe vibe = Vibium.launch()) {
             vibe.go("https://app.example.com/login");
 
             Element emailInput = vibe.find(Map.of("role", "textbox", "text", "Email"));
@@ -72,3 +55,11 @@ public class AgentLoop {
     }
 }
 ```
+
+---
+
+## 3. Best Practices
+
+- **AutoCloseable Teardown**: Always use `try-with-resources` (`try (Vibe vibe = Vibium.launch())`) to guarantee `vibe.quit()` executes upon block exit.
+- **Zero Arbitrary Sleeps**: Rely on Vibium's built-in actionability auto-waiting on element interactions.
+- **Semantic Contracts**: Prioritize role and text attribute maps over brittle CSS or XPath strings.

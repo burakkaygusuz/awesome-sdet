@@ -1,6 +1,6 @@
 # Playwright Network Mocking & API Testing — TypeScript Reference
 
-> Playwright provides native HTTP/HTTPS network interception (`page.route()`), HAR replay, and a high-performance REST/GraphQL `APIRequestContext`.
+> Official Playwright 1.62+ TypeScript network interception (page.route), HAR replay, and APIRequestContext.
 
 ---
 

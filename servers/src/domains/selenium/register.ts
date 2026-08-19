@@ -1,24 +1,37 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
-import type { safeToolHandler } from '../../server.js';
+import { z } from 'zod';
+import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
 import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
 import {
-  handleSeleniumWait,
-  handlePageFactoryDocs,
-  handleLocatorDocs,
-  handleBidiDocs,
-  handleActionsDocs,
-  handleListenersDocs,
-  handleGridDocs,
-  handleObservabilityDocs,
-  SeleniumWaitSchema,
-  PageFactoryDocsSchema,
-  LocatorDocsSchema,
-  BidiDocsSchema,
-  ActionsDocsSchema,
-  ListenersDocsSchema,
-  GridDocsSchema,
-  ObservabilityDocsSchema,
-} from './index.js';
+  SELENIUM_DOMAINS,
+  SELENIUM_SUPPORTED_LANGUAGES,
+  readSeleniumReferenceDoc,
+} from './common.js';
+
+export const SeleniumDocsArgsSchema = z
+  .object({
+    domain: z
+      .enum(SELENIUM_DOMAINS)
+      .describe(
+        'Selenium domain: actions, bidi, grid, listeners, locators, observability, pagefactory'
+      ),
+    language: z
+      .enum(SELENIUM_SUPPORTED_LANGUAGES)
+      .default('typescript')
+      .describe(
+        'Target language: typescript, javascript, python, java, csharp, ruby. Defaults to typescript.'
+      ),
+  })
+  .strict();
+
+export type SeleniumDocsArgs = z.infer<typeof SeleniumDocsArgsSchema>;
+
+export async function handleSeleniumDocs(args: SeleniumDocsArgs): Promise<ToolExecutionResult> {
+  const text = await readSeleniumReferenceDoc(args.domain, args.language);
+  return {
+    content: [{ type: 'text', text }],
+  };
+}
 
 export function registerSeleniumTools(
   server: McpServer,
@@ -26,98 +39,14 @@ export function registerSeleniumTools(
   annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
-    'execute_se_explicit_wait',
+    'read_se_docs',
     {
-      title: 'Selenium Explicit Wait',
+      title: 'Selenium 4 Documentation & W3C Idioms',
       description:
-        'Validates a Selenium ExpectedConditions explicit wait configuration and returns the correct usage pattern.',
-      inputSchema: SeleniumWaitSchema,
+        'Returns Selenium 4 API documentation, locator strategies, W3C Actions, BiDi interception, and Grid patterns.',
+      inputSchema: SeleniumDocsArgsSchema,
       annotations,
     },
-    safeHandler(() => handleSeleniumWait())
-  );
-
-  server.registerTool(
-    'read_se_pagefactory_docs',
-    {
-      title: 'Selenium PageFactory & POM Docs',
-      description:
-        'Returns PageFactory API reference and Page Object Model (POM) code examples for a given language.',
-      inputSchema: PageFactoryDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handlePageFactoryDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_locator_docs',
-    {
-      title: 'Selenium Locator Docs',
-      description:
-        'Returns locator strategy guide, performance hierarchy, best practices, and code examples for a given language.',
-      inputSchema: LocatorDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleLocatorDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_bidi_docs',
-    {
-      title: 'Selenium BiDi Docs',
-      description:
-        'Returns W3C WebDriver BiDirectional (BiDi) protocol API reference and code examples for a given language.',
-      inputSchema: BidiDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleBidiDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_actions_docs',
-    {
-      title: 'Selenium Actions API Docs',
-      description:
-        'Returns Selenium Actions API reference for low-level mouse, keyboard, and wheel interactions per language.',
-      inputSchema: ActionsDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleActionsDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_listeners_docs',
-    {
-      title: 'Selenium Listeners Docs',
-      description:
-        'Returns EventFiringDecorator and WebDriverListener reference and code examples for event handling for a given language.',
-      inputSchema: ListenersDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleListenersDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_grid_docs',
-    {
-      title: 'Selenium Grid & RemoteWebDriver Docs',
-      description:
-        'Returns RemoteWebDriver API, Grid 4 capabilities, TOML stereotypes, and cloud grid configuration reference.',
-      inputSchema: GridDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleGridDocs(args))
-  );
-
-  server.registerTool(
-    'read_se_observability_docs',
-    {
-      title: 'Selenium Observability & OpenTelemetry Docs',
-      description:
-        'Returns OpenTelemetry tracing configuration and Grid 4 GraphQL API metrics querying code examples for a given language.',
-      inputSchema: ObservabilityDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleObservabilityDocs(args))
+    safeHandler((args) => handleSeleniumDocs(args))
   );
 }

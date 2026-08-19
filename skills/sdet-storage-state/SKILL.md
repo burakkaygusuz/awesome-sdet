@@ -1,6 +1,6 @@
 ---
 name: sdet-storage-state
-description: 'Use this skill when managing authentication sessions, caching login cookies and storage state, persisting user credentials, or isolating multi-role test contexts. Trigger when eliminating repetitive UI logins or setting up auth fixtures.'
+description: 'Use this skill when managing authentication sessions, caching login cookies and local storage snapshots, persisting credentials, or isolating multi-role test contexts to eliminate repetitive UI logins, even if not explicitly mentioned.'
 user-invocable: true
 license: MIT
 metadata:
@@ -12,27 +12,21 @@ metadata:
 
 ## 1. Overview
 
-In enterprise end-to-end test suites, logging in through the user interface for every single test case introduces immense execution overhead, rate-limiting risks, and test fragility.
-
-**Storage State & Session Persistence** captures authenticated state (HTTP cookies, `localStorage`, `sessionStorage`, and IndexedDB) once and snapshots it to disk or memory. Downstream test cases instantiate clean, isolated browser contexts pre-seeded with this storage snapshot, eliminating 90%+ of redundant authentication steps while maintaining complete test isolation and idempotency.
+Persisting authenticated state (cookies, local storage, session storage) allows new test contexts to instantiate pre-authenticated sessions, eliminating repetitive UI logins while guaranteeing complete test isolation.
 
 ## 2. Core Invariants & Universal Rules
 
-1. **Shift-Left Authentication**: Log in once per test role during global setup or through direct API calls, and serialize the resulting state snapshot. Never repeat UI login screens in non-login test specs.
-2. **Strict Test Context Isolation**: Every test scenario must execute within its own pristine browser context or isolated session sandbox. State mutated during test execution must never leak into subsequent tests.
-3. **Multi-Role Test Matrix**: Maintain distinct state snapshots for every discrete user persona (e.g. `adminStorageState.json`, `editorStorageState.json`, `unauthenticatedState`).
-4. **Session Validation & Cache Invalidation**: Cached session states must include validation mechanisms (`cy.session({ validate })`, token expiry checks) that automatically re-authenticate when tokens expire.
-5. **No Cross-Test Shared Mutable State**: Tests must remain completely independent, parallelizable, and idempotent.
+1. **Shift-Left Authentication Snapshots**: Authenticate once per user role during global setup or via API, and serialize the resulting cookies and storage state to disk, because repeating manual UI login forms across hundreds of test specs wastes significant execution time and triggers rate limits.
+2. **Strict Session & Context Isolation**: Instantiate every test spec in a clean, isolated browser context pre-seeded with the required storage state, because shared browser contexts allow mutable session cookies to leak between concurrent tests.
+3. **Multi-Role Persona Snapshots**: Maintain separate, pre-generated state files for each distinct user role (`adminStorageState.json`, `userStorageState.json`), enabling instant role-based testing without inter-test login/logout sequences.
+4. **Session Validation & Token Refresh**: Validate cached session state before test execution (e.g. `cy.session({ validate })`) to automatically re-authenticate when backend tokens expire.
+5. **No Shared Cross-Test Mutations**: Treat storage snapshots as immutable baselines and never mutate shared state files during test runs.
 
-### Best Practices vs. Anti-Patterns
+### Gotchas & Critical Traps
 
-| Category               | Best Practice                                                         | Anti-Pattern                                                                 |
-| :--------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| **Authentication**     | Snapshot authenticated storage state (`storageState.json`) and reuse. | Manually filling login credentials in the UI before every test.              |
-| **Session Isolation**  | Create fresh, isolated browser contexts for each test spec.           | Running 100 tests in a single persistent browser window with shared cookies. |
-| **Multi-Role Testing** | Parameterize test fixtures with dedicated persona snapshots.          | Manually logging in and logging out between roles inside a single test.      |
-| **State Reset**        | Ensure teardown resets mutated data or relies on ephemeral sandboxes. | Leaving persistent database mutations that cause subsequent tests to fail.   |
-| **Fast-Seeding**       | Populate `localStorage` and auth cookies directly via API responses.  | Navigating through 5 onboarding steps before testing feature settings.       |
+- **IndexedDB & Storage State**: Standard browser `storageState` exports capture cookies and `localStorage`/`sessionStorage`, but may not serialize IndexedDB; apps using IndexedDB for auth tokens require custom injection scripts.
+- **Domain-Scoped Cookies**: Injected cookies must match the exact protocol, domain, and path of the AUT, or the browser will silently ignore them during navigation.
+- **SameSite Cookie Restrictions**: Restoring storage snapshots across different subdomains can fail if authentication cookies are configured with `SameSite=Strict`.
 
 ## 3. When to Use
 
@@ -58,9 +52,9 @@ In enterprise end-to-end test suites, logging in through the user interface for 
 
 ## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools or read dynamic resources:
+To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing session state:
 
-- **Playwright**: `read_pw_storage_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
-- **Cypress**: `read_cy_session_docs` (Parameters: `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
-- **Selenium**: `read_se_observability_docs` (Parameters: `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://observability/{language}`
-- **Vibium**: `read_vibium_state_docs` (Parameters: `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`
+- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
+- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
+- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
+- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`

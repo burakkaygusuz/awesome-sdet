@@ -1,16 +1,17 @@
-# Appium Driver Architecture & W3C Capabilities — TypeScript API Reference (Appium 3.x+)
+# Appium Driver Architecture & W3C Capabilities — TypeScript API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ & WebdriverIO v9.30.1+ TypeScript session setup, modular driver management, and W3C compliant capabilities.
+> Official Appium 2.x & WebdriverIO v9+ TypeScript session setup, modular driver management, and W3C compliant capabilities.
 
 ---
 
-## 1. Android Session Setup (UiAutomator2)
+## 1. Android Driver Setup (WebdriverIO W3C Options)
 
 ```typescript
-import { remote, type RemoteOptions } from 'webdriverio';
+import { remote } from 'webdriverio';
 
 export async function createAndroidSession(): Promise<WebdriverIO.Browser> {
-  const options: RemoteOptions = {
+  return await remote({
+    protocol: 'http',
     hostname: '127.0.0.1',
     port: 4723,
     path: '/',
@@ -18,30 +19,27 @@ export async function createAndroidSession(): Promise<WebdriverIO.Browser> {
       platformName: 'Android',
       'appium:automationName': 'UiAutomator2',
       'appium:deviceName': 'Pixel_7_API_34',
-      'appium:app': '/path/to/app-release.apk',
+      'appium:app': '/path/to/app.apk',
       'appium:appPackage': 'com.example.app',
       'appium:appActivity': 'com.example.app.MainActivity',
       'appium:noReset': false,
-      'appium:fullReset': false,
       'appium:autoGrantPermissions': true,
       'appium:newCommandTimeout': 300,
-      'appium:chromedriverAutodownload': true,
     },
-  };
-
-  return await remote(options);
+  });
 }
 ```
 
 ---
 
-## 2. iOS Session Setup (XCUITest with Nested `appium:options`)
+## 2. iOS Driver Setup (WebdriverIO W3C Options)
 
 ```typescript
-import { remote, type RemoteOptions } from 'webdriverio';
+import { remote } from 'webdriverio';
 
-export async function createIosSession(): Promise<WebdriverIO.Browser> {
-  const options: RemoteOptions = {
+export async function createIOSSession(): Promise<WebdriverIO.Browser> {
+  return await remote({
+    protocol: 'http',
     hostname: '127.0.0.1',
     port: 4723,
     path: '/',
@@ -49,34 +47,38 @@ export async function createIosSession(): Promise<WebdriverIO.Browser> {
       platformName: 'iOS',
       'appium:options': {
         automationName: 'XCUITest',
-        platformVersion: '17.2',
         deviceName: 'iPhone 15 Pro',
-        app: '/path/to/SampleApp.app',
+        platformVersion: '17.2',
         bundleId: 'com.example.sampleapp',
-        noReset: false,
+        noReset: true,
         wdaLocalPort: 8100,
-        showXcodeLog: false,
         newCommandTimeout: 300,
       },
     },
-  };
-
-  return await remote(options);
+  });
 }
 ```
 
 ---
 
-## 3. Server CLI & Extension Management (Appium 3.6.0)
+## 3. Server CLI & Extension Management (Appium 2.x)
 
 ```bash
-# Manage Drivers and Plugins
+# Install Appium 2.x Server Globally
+npm install -g appium
+
+# Official Driver Management
 appium driver install uiautomator2
 appium driver install xcuitest
-appium driver doctor uiautomator2
+appium driver list --installed
 
-# Start Server (Appium 3.6.0 with scoped insecure features & unknown args tolerance)
-appium --port 4723 --allow-unknown-args --allow-insecure=uiautomator2:adb_shell
+# Official Plugin Management
+appium plugin install images
+appium plugin install execute-driver
+appium plugin list --installed
+
+# Start Server
+appium --address 127.0.0.1 --port 4723 --use-plugins=images --allow-insecure=chromedriver_autodownload
 ```
 
 ---

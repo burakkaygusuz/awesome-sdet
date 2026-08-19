@@ -1,6 +1,6 @@
 # Selenium Event Listeners — Python API Reference (Selenium 4.x+)
 
-> Official Selenium 4 Python EventFiringDecorator (`selenium.webdriver.support.event_firing_webdriver.EventFiringDecorator`).
+> Official Selenium 4 Python EventFiringWebDriver (`selenium.webdriver.support.event_firing_webdriver.EventFiringWebDriver`).
 
 ---
 
@@ -13,7 +13,7 @@ from selenium.webdriver.support.abstract_event_listener import (
     AbstractEventListener,
 )
 from selenium.webdriver.support.event_firing_webdriver import (
-    EventFiringDecorator,
+    EventFiringWebDriver,
 )
 
 
@@ -29,15 +29,14 @@ class CustomListener(AbstractEventListener):
 class ListenerExamples:
 
     def demonstrate_listener(self, original_driver: WebDriver) -> WebDriver:
-        event_driver: WebDriver = EventFiringDecorator(
-            CustomListener()
-        ).decorate(original_driver)
+        event_driver = EventFiringWebDriver(original_driver, CustomListener())
         event_driver.get("https://example.com")
         return event_driver
 ```
 
 ## Best Practices
 
-- **Use EventFiringDecorator**: Use `EventFiringDecorator` in Selenium 4+ instead of the deprecated `EventFiringWebDriver`.
+- **Wrap Target Driver**: Wrap `original_driver` with `EventFiringWebDriver(original_driver, listener)` prior to test execution.
+- **BiDi for Protocol Events**: For network or console logs, prefer WebDriver BiDi (`driver.script` · `driver.network`) over legacy event listeners.
 - **Thread Safety**: Ensure listener hooks (`before_click`, `on_exception`) are thread-safe when running tests in parallel.
 - **Non-blocking Operations**: Avoid long-running network or disk operations inside listener callbacks.

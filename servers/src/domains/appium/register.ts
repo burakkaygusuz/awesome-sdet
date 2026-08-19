@@ -1,18 +1,31 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
-import type { safeToolHandler } from '../../server.js';
+import { z } from 'zod';
+import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
 import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
-import {
-  handleAppiumCapabilitiesDocs,
-  handleAppiumLocatorsDocs,
-  handleAppiumGesturesDocs,
-  handleAppiumContextDocs,
-  handleAppiumDeviceDocs,
-  AppiumCapabilitiesDocsSchema,
-  AppiumLocatorsDocsSchema,
-  AppiumGesturesDocsSchema,
-  AppiumContextDocsSchema,
-  AppiumDeviceDocsSchema,
-} from './index.js';
+import { APPIUM_DOMAINS, APPIUM_SUPPORTED_LANGUAGES, readAppiumReferenceDoc } from './common.js';
+
+export const AppiumDocsArgsSchema = z
+  .object({
+    domain: z
+      .enum(APPIUM_DOMAINS)
+      .describe('Appium domain: capabilities, context, device, gestures, locators'),
+    language: z
+      .enum(APPIUM_SUPPORTED_LANGUAGES)
+      .default('typescript')
+      .describe(
+        'Target language: typescript, javascript, python, java, csharp. Defaults to typescript.'
+      ),
+  })
+  .strict();
+
+export type AppiumDocsArgs = z.infer<typeof AppiumDocsArgsSchema>;
+
+export async function handleAppiumDocs(args: AppiumDocsArgs): Promise<ToolExecutionResult> {
+  const text = await readAppiumReferenceDoc(args.domain, args.language);
+  return {
+    content: [{ type: 'text', text }],
+  };
+}
 
 export function registerAppiumTools(
   server: McpServer,
@@ -20,62 +33,14 @@ export function registerAppiumTools(
   annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
 ): void {
   server.registerTool(
-    'read_appium_capabilities_docs',
+    'read_appium_docs',
     {
-      title: 'Appium Driver & Capabilities Docs',
+      title: 'Appium Mobile Documentation & W3C Options',
       description:
-        'Returns Appium 3.6.0+ modular driver options, W3C capabilities (UiAutomator2, XCUITest), and setup guides.',
-      inputSchema: AppiumCapabilitiesDocsSchema,
+        'Returns Appium 3.x API documentation, mobile locators, W3C touch gestures, and WebView context switching.',
+      inputSchema: AppiumDocsArgsSchema,
       annotations,
     },
-    safeHandler((args) => handleAppiumCapabilitiesDocs(args))
-  );
-
-  server.registerTool(
-    'read_appium_locators_docs',
-    {
-      title: 'Appium Locator Strategies & Selectors',
-      description:
-        'Returns mobile locator hierarchy, Accessibility ID, iOS Class Chain, iOS Predicates, and UiAutomator selectors.',
-      inputSchema: AppiumLocatorsDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleAppiumLocatorsDocs(args))
-  );
-
-  server.registerTool(
-    'read_appium_gestures_docs',
-    {
-      title: 'Appium W3C Actions & Mobile Gestures',
-      description:
-        'Returns W3C Actions PointerInput touch gestures (tap, swipe, scroll, drag-drop, pinch) and mobile extensions.',
-      inputSchema: AppiumGesturesDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleAppiumGesturesDocs(args))
-  );
-
-  server.registerTool(
-    'read_appium_context_docs',
-    {
-      title: 'Appium Hybrid Context Switching Docs',
-      description:
-        'Returns Native App vs. WebView context switching, Chromedriver automation, and Safari view controller reference.',
-      inputSchema: AppiumContextDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleAppiumContextDocs(args))
-  );
-
-  server.registerTool(
-    'read_appium_device_docs',
-    {
-      title: 'Appium Device & App Lifecycle Docs',
-      description:
-        'Returns App lifecycle commands (install, activate, terminate), clipboard, keyboard, and device orientation.',
-      inputSchema: AppiumDeviceDocsSchema,
-      annotations,
-    },
-    safeHandler((args) => handleAppiumDeviceDocs(args))
+    safeHandler((args) => handleAppiumDocs(args))
   );
 }

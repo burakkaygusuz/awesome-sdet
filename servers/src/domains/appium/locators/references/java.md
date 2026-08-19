@@ -1,6 +1,6 @@
-# Appium Mobile Locator Strategies — Java API Reference (Appium 3.x+)
+# Appium Mobile Locator Strategies — Java API Reference (Appium 2.x+)
 
-> Official Appium 3.6.0+ Java Client (`AppiumBy`, `AppiumFieldDecorator`) locator strategies and Screen Object Model.
+> Official Appium 2.x Java Client (`AppiumBy`, `AppiumFieldDecorator`) locator strategies and Screen Object Model.
 
 ---
 
@@ -15,29 +15,24 @@ import org.openqa.selenium.WebElement;
 
 public class AppiumLocatorStrategies {
     public static void locateAndInteract(AppiumDriver driver) {
-        // 1. Accessibility ID (Cross-platform)
         WebElement loginButton = driver.findElement(AppiumBy.accessibilityId("login_button"));
         loginButton.click();
 
-        // 2. iOS Class Chain (XCUITest)
         WebElement navTitle = driver.findElement(
             AppiumBy.iOSClassChain("**/XCUIElementTypeNavigationBar/XCUIElementTypeStaticText[`label == \"Profile\"`]")
         );
         System.out.println("Title: " + navTitle.getText());
 
-        // 3. iOS Predicate String (XCUITest)
         WebElement acceptTerms = driver.findElement(
             AppiumBy.iOSNsPredicateString("type == 'XCUIElementTypeButton' AND name == 'Accept' AND visible == 1")
         );
         acceptTerms.click();
 
-        // 4. Android UiAutomator (UiAutomator2)
         WebElement confirmBtn = driver.findElement(
             AppiumBy.androidUIAutomator("new UiSelector().text(\"Confirm\").className(\"android.widget.Button\")")
         );
         confirmBtn.click();
 
-        // 5. Android UiScrollable (Dynamic scroll into view)
         WebElement targetElement = driver.findElement(
             AppiumBy.androidUIAutomator(
                 "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\"Privacy Policy\"))"
@@ -45,7 +40,6 @@ public class AppiumLocatorStrategies {
         );
         targetElement.click();
 
-        // 6. Resource ID
         WebElement inputField = driver.findElement(AppiumBy.id("com.example.app:id/edit_phone"));
         inputField.sendKeys("+15551234567");
     }
@@ -85,7 +79,6 @@ public class LoginScreen {
 
     public LoginScreen(AppiumDriver driver) {
         this.driver = driver;
-        // Initializes proxy elements backed by Selenium PageFactory lazy evaluation
         PageFactory.initElements(new AppiumFieldDecorator(driver, Duration.ofSeconds(10)), this);
     }
 
@@ -104,3 +97,7 @@ public class LoginScreen {
 - **Use `AppiumBy` Methods**: Use static helper methods (`AppiumBy.accessibilityId`, `AppiumBy.iOSClassChain`, `AppiumBy.androidUIAutomator`).
 - **Encapsulate with Screen Objects**: Use `AppiumFieldDecorator` and `PageFactory.initElements` for cross-platform Screen Object encapsulation (see `selenium://pagefactory/java`).
 - **Avoid Fragile XPaths**: Never use full-tree absolute XPaths which cause significant slowdowns on mobile device drivers.
+
+## Image Locator
+
+- Image-based locator for canvas UIs without semantic attributes: `AppiumBy.image("path/to/element.png")` (requires the Appium images plugin).

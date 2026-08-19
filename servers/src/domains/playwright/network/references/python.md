@@ -1,6 +1,6 @@
 # Playwright Network Mocking & API Testing — Python Reference
 
-> Playwright Python provides request interception (`page.route()`), HAR mocking, and headless REST/GraphQL automation with `APIRequestContext`.
+> Official Playwright 1.62+ Python request interception (page.route), HAR mocking, and APIRequestContext.
 
 ---
 
