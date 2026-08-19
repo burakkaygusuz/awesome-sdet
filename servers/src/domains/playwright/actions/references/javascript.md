@@ -4,13 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before an action runs, Playwright waits for the target to be visible, stable, enabled, and able to receive events when those checks apply. Prefer the built-in action waiters over `waitForTimeout`.
-
----
-
-## 2. Common User Interactions
+## 1. Common User Interactions
 
 ```javascript
 import { test } from '@playwright/test';
@@ -29,7 +23,7 @@ test('use standard user interactions', async ({ page }) => {
 
 ---
 
-## 3. Drag and Keyboard Actions
+## 2. Drag and Keyboard Actions
 
 ```javascript
 import { test } from '@playwright/test';
@@ -49,8 +43,8 @@ test('use keyboard navigation', async ({ page }) => {
 
 ---
 
-## 4. Best Practices
+## 3. Best Practices & Action Invariants
 
-- Let Playwright auto-wait for actionability and assertions; do not add fixed sleeps.
-- Prefer `fill` for inputs and `pressSequentially` only when keyboard events are part of the behavior under test.
-- Avoid `{ force: true }` unless the product intentionally requires interaction with a covered element.
+- **Auto-Waiting**: Let Playwright auto-wait for actionability and assertions; do not add fixed sleeps.
+- **Prefer `fill()` over `type()`**: Use `fill()` for inputs and `pressSequentially()` only when keyboard events are part of the behavior under test.
+- **Avoid `{ force: true }`**: Never bypass actionability checks unless testing covered element behavior.

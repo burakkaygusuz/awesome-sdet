@@ -4,19 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before triggering any action, Playwright verifies:
-
-- Element is attached to DOM
-- Element is visible
-- Element is stable (no moving animations)
-- Element receives pointer events
-- Element is enabled and editable (for input actions)
-
----
-
-## 2. Common User Interactions
+## 1. Common User Interactions
 
 ```python
 from playwright.sync_api import Locator, Page
@@ -55,7 +43,7 @@ def demonstrate_actions(page: Page) -> None:
 
 ---
 
-## 3. Drag and Drop & File Uploads with `pathlib`
+## 2. Drag and Drop & File Uploads with `pathlib`
 
 ```python
 from pathlib import Path
@@ -83,3 +71,11 @@ def advanced_actions(page: Page) -> None:
         )
     )
 ```
+
+---
+
+## 3. Best Practices & Action Invariants
+
+- **Auto-Waiting**: Playwright auto-waits for elements to be attached, visible, stable, enabled, and editable. Avoid `time.sleep()`.
+- **Avoid `{ force: True }`**: Bypasses actionability checks and risks masked element flakiness.
+- **Prefer `fill()` over `type()`**: `fill()` atomically clears and writes input values. Use `press_sequentially()` only when testing keydown/keyup event handlers.

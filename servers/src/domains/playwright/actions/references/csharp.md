@@ -4,13 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Before triggering any action, Playwright verifies that the target element is attached, visible, stable, enabled, and ready for pointer events.
-
----
-
-## 2. Common User Interactions
+## 1. Common User Interactions
 
 ```csharp
 using System.Threading.Tasks;
@@ -56,7 +50,7 @@ public class ActionExamples
 
 ---
 
-## 3. Drag and Drop & File Uploads
+## 2. Drag and Drop & File Uploads
 
 ```csharp
 using System.Text;
@@ -87,3 +81,11 @@ public class AdvancedActionExamples
     }
 }
 ```
+
+---
+
+## 3. Best Practices & Action Invariants
+
+- **Auto-Waiting**: Playwright .NET auto-waits on element readiness before performing actions. Avoid `Thread.Sleep()` or manual polling.
+- **Avoid Force Overrides**: Never pass `new LocatorClickOptions { Force = true }` unless testing covered UI states.
+- **Prefer `FillAsync()` over `PressSequentiallyAsync()`**: `FillAsync()` clears existing values and dispatches standard input events deterministically.

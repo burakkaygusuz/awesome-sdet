@@ -4,13 +4,7 @@
 
 ---
 
-## 1. Actionability Guarantees
-
-Playwright Java waits for elements to be attached, visible, stable, enabled, and ready for pointer events before invoking interactions.
-
----
-
-## 2. Common User Interactions
+## 1. Common User Interactions
 
 ```java
 package com.example.playwright;
@@ -59,7 +53,7 @@ public class ActionExamples {
 
 ---
 
-## 3. Drag and Drop & File Uploads
+## 2. Drag and Drop & File Uploads
 
 ```java
 package com.example.playwright;
@@ -86,3 +80,11 @@ public class AdvancedActionExamples {
     }
 }
 ```
+
+---
+
+## 3. Best Practices & Action Invariants
+
+- **Auto-Waiting**: Playwright Java auto-waits on actionability criteria before dispatching interactions. Do not use `Thread.sleep()`.
+- **Avoid Force Overrides**: Do not pass `new Locator.ClickOptions().setForce(true)` unless intentionally testing obscured elements.
+- **Prefer `fill()` over `type()`**: `fill()` provides atomic input clearance and entry without flaky race conditions.
