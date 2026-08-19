@@ -36,7 +36,7 @@ export function registerPrompts(server: McpServer): void {
       title: 'Generate Test Suite',
       description:
         'Generates a production-grade, resilient test suite for a target framework and language',
-      argsSchema: z.object({
+      argsSchema: z.strictObject({
         framework: SupportedFrameworkSchema,
         language: SupportedLanguageSchema,
         featureDescription: z
@@ -81,7 +81,7 @@ Core Quality Invariants:
       title: 'Migrate Test Suite',
       description:
         'Translates test suites between automation frameworks while eliminating anti-patterns',
-      argsSchema: z.object({
+      argsSchema: z.strictObject({
         sourceFramework: SupportedFrameworkSchema.describe(
           'Source framework (selenium, cypress, vibium, appium, playwright)'
         ),
@@ -125,7 +125,7 @@ ${sourceCode}
       title: 'Diagnose Test Flakiness',
       description:
         'Performs systematic root-cause analysis and provides deterministic fixes for flaky tests',
-      argsSchema: z.object({
+      argsSchema: z.strictObject({
         framework: SupportedFrameworkSchema.describe(
           `Testing framework where failure occurred (${frameworkList})`
         ),

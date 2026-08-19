@@ -1,35 +1,26 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
-import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
+import { DocsOutputSchema, extractStructuredDocs, SAFE_READONLY_ANNOTATIONS } from '../shared.js';
 import {
-  PLAYWRIGHT_DOMAINS,
-  PLAYWRIGHT_SUPPORTED_LANGUAGES,
+  PlaywrightDomainSchema,
+  SupportedLanguageSchema,
   readPlaywrightReferenceDoc,
 } from './common.js';
 
-export const PlaywrightDocsArgsSchema = z
-  .object({
-    domain: z
-      .enum(PLAYWRIGHT_DOMAINS)
-      .describe(
-        'Playwright domain: actions, assertions, locators, network, observability, storage'
-      ),
-    language: z
-      .enum(PLAYWRIGHT_SUPPORTED_LANGUAGES)
-      .default('typescript')
-      .describe(
-        'Target language: typescript, javascript, python, java, csharp. Defaults to typescript.'
-      ),
-  })
-  .strict();
+export const PlaywrightDocsArgsSchema = z.strictObject({
+  domain: PlaywrightDomainSchema,
+  language: SupportedLanguageSchema,
+});
 
 export type PlaywrightDocsArgs = z.infer<typeof PlaywrightDocsArgsSchema>;
 
 export async function handlePlaywrightDocs(args: PlaywrightDocsArgs): Promise<ToolExecutionResult> {
   const text = await readPlaywrightReferenceDoc(args.domain, args.language);
+  const structuredContent = extractStructuredDocs('playwright', args.domain, args.language, text);
   return {
     content: [{ type: 'text', text }],
+    structuredContent,
   };
 }
 
@@ -45,6 +36,7 @@ export function registerPlaywrightTools(
       description:
         'Returns Playwright API documentation, locator strategies, auto-waiting actions, assertions, and network patterns.',
       inputSchema: PlaywrightDocsArgsSchema,
+      outputSchema: DocsOutputSchema,
       annotations,
     },
     safeHandler((args) => handlePlaywrightDocs(args))

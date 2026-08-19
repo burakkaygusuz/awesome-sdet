@@ -31,6 +31,7 @@ export interface CacheableResult {
 export interface ToolExecutionResult extends CacheableResult {
   [key: string]: unknown;
   content: Array<{ type: 'text'; text: string }>;
+  structuredContent?: Record<string, unknown>;
   isError?: boolean;
 }
 
@@ -56,11 +57,19 @@ export function safeToolHandler<T>(
         })
       );
 
+      const isClientValidationError =
+        errorMessage.startsWith('Unsupported') ||
+        errorMessage.startsWith('Invalid') ||
+        errorMessage.startsWith('Domain is required') ||
+        errorMessage.startsWith('Language is required');
+
       return {
         content: [
           {
             type: 'text' as const,
-            text: `Tool execution failed. Reference: ${errorId}`,
+            text: isClientValidationError
+              ? errorMessage
+              : `Tool execution failed. Reference: ${errorId}`,
           },
         ],
         isError: true,

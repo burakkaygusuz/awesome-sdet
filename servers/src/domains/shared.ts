@@ -2,6 +2,58 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ToolAnnotations } from '@modelcontextprotocol/server';
+import { z } from 'zod';
+
+export const CodeSnippetSchema = z.strictObject({
+  language: z.string().describe('Programming language of the code block'),
+  code: z.string().describe('Extracted code snippet'),
+});
+
+export const DocsOutputSchema = z.strictObject({
+  framework: z.string().describe('Target test automation framework'),
+  domain: z.string().describe('Capability domain'),
+  language: z.string().describe('Target programming language'),
+  title: z.string().describe('Document title'),
+  codeSnippets: z.array(CodeSnippetSchema).describe('Extracted code snippets'),
+  rawMarkdown: z.string().describe('Complete markdown reference content'),
+});
+
+export type DocsOutput = z.infer<typeof DocsOutputSchema>;
+
+/**
+ * Extracts structured document metadata, title, and code snippets from raw reference markdown.
+ */
+export function extractStructuredDocs(
+  framework: string,
+  domain: string,
+  language: string,
+  markdown: string
+): DocsOutput {
+  const lines = markdown.split('\n');
+  const titleLine = lines.find((line) => line.startsWith('# ')) ?? '';
+  const title = titleLine.replace(/^#\s+/, '').trim() || `${framework} ${domain} (${language})`;
+
+  const codeSnippets: Array<{ language: string; code: string }> = [];
+  const codeBlockRegex = /```([a-zA-Z0-9_-]+)?\r?\n([\s\S]*?)```/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = codeBlockRegex.exec(markdown)) !== null) {
+    const snippetLang = (match[1] || language).trim().toLowerCase();
+    const code = (match[2] || '').trim();
+    if (code.length > 0) {
+      codeSnippets.push({ language: snippetLang, code });
+    }
+  }
+
+  return {
+    framework,
+    domain,
+    language,
+    title,
+    codeSnippets,
+    rawMarkdown: markdown,
+  };
+}
 
 export const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = Object.freeze({
   readOnlyHint: true,

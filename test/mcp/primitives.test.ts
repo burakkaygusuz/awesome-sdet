@@ -62,10 +62,16 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(tool.annotations?.destructiveHint).toBe(false);
         expect.soft(tool.annotations?.idempotentHint).toBe(true);
         expect.soft(tool.annotations?.openWorldHint).toBe(false);
+
+        expect.soft(tool.outputSchema).toBeDefined();
+        const schemaProps = (tool.outputSchema?.properties ?? {}) as Record<string, unknown>;
+        expect.soft(tool.outputSchema?.type).toBe('object');
+        expect.soft(schemaProps.framework).toBeDefined();
+        expect.soft(schemaProps.codeSnippets).toBeDefined();
       }
     });
 
-    it('tools/call returns CacheableResult (ttlMs, cacheScope) for documentation tools', async () => {
+    it('tools/call returns CacheableResult (ttlMs, cacheScope) and dual-output (content + structuredContent) for documentation tools', async () => {
       const listData = await parseMcpResponse(
         await mcpFetch(url, { jsonrpc: '2.0', id: 30, method: 'tools/list' })
       );
@@ -85,9 +91,29 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(data.result?.ttlMs).toBe(3600000);
       expect.soft(data.result?.cacheScope).toBe('public');
       expect.soft(Array.isArray(data.result?.content)).toBe(true);
+      expect.soft((data.result?.content?.[0]?.text || '').length).toBeGreaterThan(0);
+
+      const structured = data.result?.structuredContent as
+        | {
+            framework?: string;
+            domain?: string;
+            language?: string;
+            title?: string;
+            codeSnippets?: Array<{ language: string; code: string }>;
+            rawMarkdown?: string;
+          }
+        | undefined;
+      expect.soft(structured).toBeDefined();
+      expect.soft(typeof structured?.framework).toBe('string');
+      expect.soft(structured?.domain).toBe('locators');
+      expect.soft(structured?.language).toBe('typescript');
+      expect.soft(typeof structured?.title).toBe('string');
+      expect.soft(Array.isArray(structured?.codeSnippets)).toBe(true);
+      expect.soft(structured?.codeSnippets?.length).toBeGreaterThanOrEqual(1);
+      expect.soft(typeof structured?.rawMarkdown).toBe('string');
     });
 
-    it('tools/call returns isError: true for invalid arguments', async () => {
+    it('tools/call returns isError: true and informative self-correction message for invalid arguments (SEP-1303)', async () => {
       const listData = await parseMcpResponse(
         await mcpFetch(url, { jsonrpc: '2.0', id: 50, method: 'tools/list' })
       );
@@ -111,6 +137,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const data = await parseMcpResponse(res);
       expect.soft(data.result?.isError).toBe(true);
       expect.soft((data.result?.content?.[0]?.text || '').length).toBeGreaterThan(0);
+      expect.soft(data.result?.content?.[0]?.text).not.toContain('Reference:');
     });
 
     it('tools/call rejects unrecognized hallucinated arguments via .strict() schema', async () => {

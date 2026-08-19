@@ -1,29 +1,22 @@
 import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { safeToolHandler, ToolExecutionResult } from '../../server.js';
-import { SAFE_READONLY_ANNOTATIONS } from '../shared.js';
-import { CYPRESS_DOMAINS, CYPRESS_SUPPORTED_LANGUAGES, readCypressReferenceDoc } from './common.js';
+import { DocsOutputSchema, extractStructuredDocs, SAFE_READONLY_ANNOTATIONS } from '../shared.js';
+import { CypressDomainSchema, SupportedLanguageSchema, readCypressReferenceDoc } from './common.js';
 
-export const CypressDocsArgsSchema = z
-  .object({
-    domain: z
-      .enum(CYPRESS_DOMAINS)
-      .describe(
-        'Cypress domain: commands, component, fixtures, network, session, shadow, stubs, task'
-      ),
-    language: z
-      .enum(CYPRESS_SUPPORTED_LANGUAGES)
-      .default('typescript')
-      .describe('Target language: typescript or javascript. Defaults to typescript.'),
-  })
-  .strict();
+export const CypressDocsArgsSchema = z.strictObject({
+  domain: CypressDomainSchema,
+  language: SupportedLanguageSchema,
+});
 
 export type CypressDocsArgs = z.infer<typeof CypressDocsArgsSchema>;
 
 export async function handleCypressDocs(args: CypressDocsArgs): Promise<ToolExecutionResult> {
   const text = await readCypressReferenceDoc(args.domain, args.language);
+  const structuredContent = extractStructuredDocs('cypress', args.domain, args.language, text);
   return {
     content: [{ type: 'text', text }],
+    structuredContent,
   };
 }
 
@@ -39,6 +32,7 @@ export function registerCypressTools(
       description:
         'Returns Cypress API documentation, command chaining, network interception, sessions, and component tests.',
       inputSchema: CypressDocsArgsSchema,
+      outputSchema: DocsOutputSchema,
       annotations,
     },
     safeHandler((args) => handleCypressDocs(args))
