@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ToolAnnotations } from '@modelcontextprotocol/server';
+import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
 import { z } from 'zod';
+import type { safeToolHandler, ToolExecutionResult } from '../server.js';
 
 export const CodeSnippetSchema = z.strictObject({
   language: z.string().describe('Programming language of the code block'),
@@ -210,4 +211,84 @@ export async function loadCachedReferenceMarkdown(
   const content = await fs.readFile(filePath, 'utf8');
   referenceCache.set(cacheKey, content);
   return content;
+}
+
+/**
+ * Factory that creates a cached reference markdown loader for sub-domain modules.
+ */
+export function createFrameworkLoader(
+  languages: readonly string[],
+  defaultLanguage: string
+): (importMetaUrl: string, language?: string) => Promise<string> {
+  return async function loadReferenceMarkdown(
+    importMetaUrl: string,
+    language: string = defaultLanguage
+  ): Promise<string> {
+    const safeLang = sanitizeLanguage(language, languages, defaultLanguage);
+    return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
+  };
+}
+
+/**
+ * Factory that creates a strongly-typed reference doc reader for a given framework.
+ * Eliminates the per-domain readXxxReferenceDoc boilerplate pattern.
+ */
+export function createFrameworkReader(
+  frameworkName: string,
+  domains: readonly string[],
+  languages: readonly string[],
+  defaultDomain: string,
+  defaultLanguage: string,
+  importMetaUrl: string
+): (domain: string, language?: string) => Promise<string> {
+  return async function readReferenceDoc(
+    domain: string,
+    language: string = defaultLanguage
+  ): Promise<string> {
+    const safeDomain = sanitizeDomain(domain, domains, defaultDomain, frameworkName);
+    const normLang = sanitizeLanguage(language, languages, defaultLanguage, frameworkName);
+    const baseUrl = new URL(`./${safeDomain}/index.js`, importMetaUrl).href;
+    const safeLang = sanitizeLanguage(normLang, languages, defaultLanguage);
+    return loadCachedReferenceMarkdown(baseUrl, safeLang);
+  };
+}
+
+export interface FrameworkToolConfig<TShape extends z.ZodRawShape> {
+  readonly toolName: string;
+  readonly title: string;
+  readonly description: string;
+  readonly inputSchema: z.ZodObject<TShape>;
+  readonly reader: (domain: string, language?: string) => Promise<string>;
+  readonly frameworkName: string;
+}
+
+/**
+ * Factory that registers a single framework docs tool on an McpServer.
+ * Eliminates the per-framework registerXxxTools() boilerplate pattern.
+ */
+export function registerFrameworkTool<TShape extends z.ZodRawShape>(
+  server: McpServer,
+  safeHandler: typeof safeToolHandler,
+  config: FrameworkToolConfig<TShape>,
+  annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
+): void {
+  server.registerTool(
+    config.toolName,
+    {
+      title: config.title,
+      description: config.description,
+      inputSchema: config.inputSchema,
+      outputSchema: DocsOutputSchema,
+      annotations,
+    },
+    safeHandler(async (args: z.infer<z.ZodObject<TShape>>): Promise<ToolExecutionResult> => {
+      const { domain, language } = args as { domain: string; language: string };
+      const text = await config.reader(domain, language);
+      const structuredContent = extractStructuredDocs(config.frameworkName, domain, language, text);
+      return {
+        content: [{ type: 'text' as const, text }],
+        structuredContent,
+      };
+    })
+  );
 }

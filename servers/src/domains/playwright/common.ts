@@ -1,19 +1,20 @@
 import { z } from 'zod';
-import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const PLAYWRIGHT_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.playwright.languages;
+const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.playwright;
+
+export const PLAYWRIGHT_SUPPORTED_LANGUAGES = languages;
+export const PLAYWRIGHT_DOMAINS = domains;
 
 export const SupportedLanguageSchema = z
   .enum(PLAYWRIGHT_SUPPORTED_LANGUAGES)
-  .default('typescript')
+  .default(defaultLanguage)
   .describe(
     'Target programming language: "typescript", "javascript", "python", "java", or "csharp". Defaults to "typescript".'
   );
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
-
-export const PLAYWRIGHT_DOMAINS = FRAMEWORK_REGISTRY.playwright.domains;
 
 export const PlaywrightDomainSchema = z
   .enum(PLAYWRIGHT_DOMAINS)
@@ -21,25 +22,16 @@ export const PlaywrightDomainSchema = z
 
 export type PlaywrightDomain = z.infer<typeof PlaywrightDomainSchema>;
 
-export async function loadReferenceMarkdown(
-  importMetaUrl: string,
-  language: string = 'typescript'
-): Promise<string> {
-  const safeLang = sanitizeLanguage(language, PLAYWRIGHT_SUPPORTED_LANGUAGES, 'typescript');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
-}
+export const loadReferenceMarkdown = createFrameworkLoader(
+  PLAYWRIGHT_SUPPORTED_LANGUAGES,
+  defaultLanguage
+);
 
-export async function readPlaywrightReferenceDoc(
-  domain: string,
-  language: string = 'typescript'
-): Promise<string> {
-  const safeDomain = sanitizeDomain(domain, PLAYWRIGHT_DOMAINS, 'locators', 'Playwright');
-  const normLang = sanitizeLanguage(
-    language,
-    PLAYWRIGHT_SUPPORTED_LANGUAGES,
-    'typescript',
-    'Playwright'
-  );
-  const baseUrl = new URL(`./${safeDomain}/index.js`, import.meta.url).href;
-  return loadReferenceMarkdown(baseUrl, normLang);
-}
+export const readPlaywrightReferenceDoc = createFrameworkReader(
+  'Playwright',
+  PLAYWRIGHT_DOMAINS,
+  PLAYWRIGHT_SUPPORTED_LANGUAGES,
+  defaultDomain,
+  defaultLanguage,
+  import.meta.url
+);

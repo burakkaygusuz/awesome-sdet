@@ -1,19 +1,20 @@
 import { z } from 'zod';
-import { loadCachedReferenceMarkdown, sanitizeDomain, sanitizeLanguage } from '../shared.js';
+import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
-export const SELENIUM_SUPPORTED_LANGUAGES = FRAMEWORK_REGISTRY.selenium.languages;
+const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.selenium;
+
+export const SELENIUM_SUPPORTED_LANGUAGES = languages;
+export const SELENIUM_DOMAINS = domains;
 
 export const SupportedLanguageSchema = z
   .enum(SELENIUM_SUPPORTED_LANGUAGES)
-  .default('java')
+  .default(defaultLanguage)
   .describe(
     'Target programming language: "java", "python", "typescript", "javascript", "csharp", or "ruby". Defaults to "java".'
   );
 
 export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
-
-export const SELENIUM_DOMAINS = FRAMEWORK_REGISTRY.selenium.domains;
 
 export const SeleniumDomainSchema = z
   .enum(SELENIUM_DOMAINS)
@@ -21,20 +22,16 @@ export const SeleniumDomainSchema = z
 
 export type SeleniumDomain = z.infer<typeof SeleniumDomainSchema>;
 
-export async function loadReferenceMarkdown(
-  importMetaUrl: string,
-  language: string = 'java'
-): Promise<string> {
-  const safeLang = sanitizeLanguage(language, SELENIUM_SUPPORTED_LANGUAGES, 'java');
-  return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
-}
+export const loadReferenceMarkdown = createFrameworkLoader(
+  SELENIUM_SUPPORTED_LANGUAGES,
+  defaultLanguage
+);
 
-export async function readSeleniumReferenceDoc(
-  domain: string,
-  language: string = 'java'
-): Promise<string> {
-  const safeDomain = sanitizeDomain(domain, SELENIUM_DOMAINS, 'actions', 'Selenium');
-  const normLang = sanitizeLanguage(language, SELENIUM_SUPPORTED_LANGUAGES, 'java', 'Selenium');
-  const baseUrl = new URL(`./${safeDomain}/index.js`, import.meta.url).href;
-  return loadReferenceMarkdown(baseUrl, normLang);
-}
+export const readSeleniumReferenceDoc = createFrameworkReader(
+  'Selenium',
+  SELENIUM_DOMAINS,
+  SELENIUM_SUPPORTED_LANGUAGES,
+  defaultDomain,
+  defaultLanguage,
+  import.meta.url
+);

@@ -5,179 +5,80 @@ import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import { readCypressReferenceDoc } from '../domains/cypress/common.js';
 import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
 import { readAppiumReferenceDoc } from '../domains/appium/common.js';
-import { FRAMEWORK_REGISTRY } from '../registry.js';
+import { FRAMEWORK_REGISTRY, type SupportedFramework } from '../registry.js';
 
 const RESOURCE_CACHE_HINT = {
   ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
   cacheScope: PUBLIC_CACHE_SCOPE,
 };
 
+const FRAMEWORK_RESOURCE_CONFIGS: Record<
+  SupportedFramework,
+  {
+    readonly title: string;
+    readonly reader: (domain: string, language?: string) => Promise<string>;
+  }
+> = {
+  playwright: {
+    title: 'Playwright Documentation Reference',
+    reader: readPlaywrightReferenceDoc,
+  },
+  selenium: {
+    title: 'Selenium Documentation Reference',
+    reader: readSeleniumReferenceDoc,
+  },
+  cypress: {
+    title: 'Cypress Documentation Reference',
+    reader: readCypressReferenceDoc,
+  },
+  vibium: {
+    title: 'Vibium Documentation Reference',
+    reader: readVibiumReferenceDoc,
+  },
+  appium: {
+    title: 'Appium Documentation Reference',
+    reader: readAppiumReferenceDoc,
+  },
+};
+
 export function registerResources(server: McpServer): void {
-  const playwright = FRAMEWORK_REGISTRY.playwright;
-  const selenium = FRAMEWORK_REGISTRY.selenium;
-  const cypress = FRAMEWORK_REGISTRY.cypress;
-  const vibium = FRAMEWORK_REGISTRY.vibium;
-  const appium = FRAMEWORK_REGISTRY.appium;
+  for (const [key, meta] of Object.entries(FRAMEWORK_RESOURCE_CONFIGS) as Array<
+    [SupportedFramework, (typeof FRAMEWORK_RESOURCE_CONFIGS)[SupportedFramework]]
+  >) {
+    const fw = FRAMEWORK_REGISTRY[key];
 
-  server.registerResource(
-    'playwright-reference',
-    new ResourceTemplate(playwright.resourceUri, { list: undefined }),
-    {
-      title: 'Playwright Documentation Reference',
-      description: `Dynamic reference documentation for Playwright across supported languages (${playwright.languages.join(', ')}) and domains (${playwright.domains.join(', ')}).`,
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (
-      uri: URL,
-      { domain, language }: { domain?: string | string[]; language?: string | string[] }
-    ) => {
-      const docDomain = String(domain || 'locators');
-      const docLang = String(language || 'typescript');
-      try {
-        const text = await readPlaywrightReferenceDoc(docDomain, docLang);
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
-      } catch {
-        throw new ResourceNotFoundError(uri.href);
+    server.registerResource(
+      `${key}-reference`,
+      new ResourceTemplate(fw.resourceUri, { list: undefined }),
+      {
+        title: meta.title,
+        description: `Dynamic reference documentation for ${key} across supported languages (${fw.languages.join(', ')}) and domains (${fw.domains.join(', ')}).`,
+        mimeType: 'text/markdown',
+        cacheHint: RESOURCE_CACHE_HINT,
+      },
+      async (
+        uri: URL,
+        { domain, language }: { domain?: string | string[]; language?: string | string[] }
+      ) => {
+        const docDomain = String(domain || fw.defaultDomain);
+        const docLang = String(language || fw.defaultLanguage);
+        try {
+          const text = await meta.reader(docDomain, docLang);
+          return {
+            contents: [
+              {
+                uri: uri.href,
+                text,
+                mimeType: 'text/markdown',
+              },
+            ],
+          };
+        } catch {
+          throw new ResourceNotFoundError(uri.href);
+        }
       }
-    }
-  );
-
-  server.registerResource(
-    'selenium-reference',
-    new ResourceTemplate(selenium.resourceUri, { list: undefined }),
-    {
-      title: 'Selenium Documentation Reference',
-      description: `Dynamic reference documentation for Selenium 4 across supported languages (${selenium.languages.join(', ')}) and domains (${selenium.domains.join(', ')}).`,
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (
-      uri: URL,
-      { domain, language }: { domain?: string | string[]; language?: string | string[] }
-    ) => {
-      const docDomain = String(domain || 'actions');
-      const docLang = String(language || 'typescript');
-      try {
-        const text = await readSeleniumReferenceDoc(docDomain, docLang);
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
-      } catch {
-        throw new ResourceNotFoundError(uri.href);
-      }
-    }
-  );
-
-  server.registerResource(
-    'cypress-reference',
-    new ResourceTemplate(cypress.resourceUri, { list: undefined }),
-    {
-      title: 'Cypress Documentation Reference',
-      description: `Dynamic reference documentation for Cypress across supported domains (${cypress.domains.join(', ')}) and languages (${cypress.languages.join(', ')}).`,
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (
-      uri: URL,
-      { domain, language }: { domain?: string | string[]; language?: string | string[] }
-    ) => {
-      const docDomain = String(domain || 'commands');
-      const docLang = String(language || 'typescript');
-      try {
-        const text = await readCypressReferenceDoc(docDomain, docLang);
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
-      } catch {
-        throw new ResourceNotFoundError(uri.href);
-      }
-    }
-  );
-
-  server.registerResource(
-    'vibium-reference',
-    new ResourceTemplate(vibium.resourceUri, { list: undefined }),
-    {
-      title: 'Vibium Documentation Reference',
-      description: `Dynamic reference documentation for Vibium across supported languages (${vibium.languages.join(', ')}) and domains (${vibium.domains.join(', ')}).`,
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (
-      uri: URL,
-      { domain, language }: { domain?: string | string[]; language?: string | string[] }
-    ) => {
-      const docDomain = String(domain || 'core');
-      const docLang = String(language || 'typescript');
-      try {
-        const text = await readVibiumReferenceDoc(docDomain, docLang);
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
-      } catch {
-        throw new ResourceNotFoundError(uri.href);
-      }
-    }
-  );
-
-  server.registerResource(
-    'appium-reference',
-    new ResourceTemplate(appium.resourceUri, { list: undefined }),
-    {
-      title: 'Appium Documentation Reference',
-      description: `Dynamic reference documentation for Appium 3.x mobile automation across supported languages (${appium.languages.join(', ')}) and domains (${appium.domains.join(', ')}).`,
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (
-      uri: URL,
-      { domain, language }: { domain?: string | string[]; language?: string | string[] }
-    ) => {
-      const docDomain = String(domain || 'capabilities');
-      const docLang = String(language || 'typescript');
-      try {
-        const text = await readAppiumReferenceDoc(docDomain, docLang);
-        return {
-          contents: [
-            {
-              uri: uri.href,
-              text,
-              mimeType: 'text/markdown',
-            },
-          ],
-        };
-      } catch {
-        throw new ResourceNotFoundError(uri.href);
-      }
-    }
-  );
+    );
+  }
 
   server.registerResource(
     'sdet-guidelines',
