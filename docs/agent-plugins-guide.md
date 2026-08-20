@@ -207,7 +207,7 @@ The `SKILL.md` body (Level 2) loads in full whenever the skill is triggered:
 Exhaustive lookup tables, full method dictionaries, and multi-language syntax belong at Level 3. In our architecture, `sdet-mcp` serves as the **Single Source of Truth (SSOT)** for polyglot code examples. `SKILL.md` delegates directly to `sdet-mcp` tools and dynamic resources:
 
 ```markdown
-> **Complete Polyglot Reference:** To fetch language-specific code implementations without context pollution, invoke `sdet-mcp` tools (e.g. `read_pw_locators_docs({ language: 'python' })`) or read the corresponding dynamic Resource URI (e.g. `playwright://locators/python`).
+> **Complete Polyglot Reference:** To fetch language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools (e.g. `read_pw_docs({ domain: 'locators', language: 'python' })`) or read the corresponding dynamic Resource URI (e.g. `playwright://locators/python`).
 ```
 
 ---
@@ -218,35 +218,39 @@ Exhaustive lookup tables, full method dictionaries, and multi-language syntax be
 
 The MCP specification defines distinct roles for tool labels and descriptions:
 
-- **`title`**: Display label for client UI and user confirmation dialogs (e.g. `"Selenium Actions API Docs"`).
+- **`title`**: Display label for client UI and user confirmation dialogs (e.g. `"Selenium Documentation & Idioms"`).
 - **`description`**: Semantic guidance read by the LLM context window to determine tool dispatch (target ≤ 120 characters).
 
 ```typescript
-server.registerTool('read_se_locator_docs', {
-  title: 'Selenium Locator Strategy Docs',
-  description:
-    'Returns element location strategies, relative locators, and multi-language code examples.',
-  inputSchema: LocatorDocsSchema,
-  annotations: SAFE_READONLY_ANNOTATIONS,
-});
+server.registerTool(
+  'read_se_docs',
+  {
+    title: 'Selenium Documentation & Idioms',
+    description:
+      'Returns Selenium WebDriver API documentation, locator strategies, BiDi events, and actions.',
+    inputSchema: SeleniumDocsArgsSchema,
+    outputSchema: DocsOutputSchema,
+    annotations: SAFE_READONLY_ANNOTATIONS,
+  },
+  safeHandler((args) => handleSeleniumDocs(args))
+);
 ```
 
 ---
 
 ### 4.2 Structured Output & `outputSchema`
 
-MCP 2026-07-28 tools can declare an `outputSchema` alongside returning `structuredContent` (optional; the sdet-mcp docs tools currently return unstructured markdown via `content` only). Clients supporting structured outputs parse JSON fields directly without markdown regex extraction, falling back to `content[].text` for legacy clients:
+MCP 2026-07-28 tools declare a strict Zod `outputSchema` (`DocsOutputSchema`) and return structured JSON (`structuredContent`) alongside human-readable markdown (`content`). Modern AI clients supporting structured outputs parse JSON fields directly without markdown regex extraction, falling back to `content[].text` for legacy or pure text clients:
 
 ```typescript
-return {
-  content: [{ type: 'text', text: markdown }],
-  structuredContent: {
-    framework,
-    language,
-    codeExample,
-    bestPractices,
-  },
-};
+export async function handlePlaywrightDocs(args: PlaywrightDocsArgs): Promise<ToolExecutionResult> {
+  const text = await readPlaywrightReferenceDoc(args.domain, args.language);
+  const structuredContent = extractStructuredDocs('playwright', args.domain, args.language, text);
+  return {
+    content: [{ type: 'text', text }],
+    structuredContent,
+  };
+}
 ```
 
 ---
