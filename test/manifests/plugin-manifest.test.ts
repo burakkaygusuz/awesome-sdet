@@ -240,7 +240,7 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Zero-Conflict Schema Alignme
       const skillDirs = entries
         .filter((d) => d.isDirectory())
         .map((d) => d.name)
-        .sort();
+        .sort((a, b) => a.localeCompare(b));
 
       const EXPECTED_CAPABILITY_SKILLS = [...CAPABILITY_SKILL_NAMES].sort();
 

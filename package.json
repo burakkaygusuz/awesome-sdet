@@ -46,6 +46,7 @@
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^10.0.1",
+    "@repomix/tree-sitter-wasms": "^0.1.17",
     "@types/node": "^26.2.0",
     "commitizen": "^4.3.2",
     "cz-git": "^1.13.2",
@@ -59,7 +60,8 @@
     "skills-check": "^1.2.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "web-tree-sitter": "^0.26.12"
   },
   "config": {
     "commitizen": {

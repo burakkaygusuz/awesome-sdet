@@ -25,13 +25,13 @@ export function mcpFetch(
   const standardMeta = {
     'io.modelcontextprotocol/protocolVersion': '2026-07-28',
     'io.modelcontextprotocol/clientCapabilities': {},
-    ...((body.params?._meta as Record<string, unknown>) || {}),
+    ...(body.params?._meta as Record<string, unknown>),
   };
 
   const payload = {
     ...body,
     params: {
-      ...(body.params || {}),
+      ...body.params,
       _meta: standardMeta,
     },
   };

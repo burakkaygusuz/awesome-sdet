@@ -43,11 +43,11 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeLanguage(undefined, allowed)).toThrow(/required/i);
     });
 
-    it('rejects path traversal sequences (../, ..\\)', () => {
+    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
       expect(() => sanitizeLanguage('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeLanguage('..\\..\\windows\\win.ini', allowed)).toThrow(
+      expect(() => sanitizeLanguage(String.raw`..\..\windows\win.ini`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
       expect(() => sanitizeLanguage('typescript/../python', allowed)).toThrow(
@@ -59,7 +59,7 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeLanguage('sub/typescript', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeLanguage('sub\\typescript', allowed)).toThrow(
+      expect(() => sanitizeLanguage(String.raw`sub\typescript`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
       expect(() => sanitizeLanguage('/typescript', allowed)).toThrow(
@@ -101,11 +101,11 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeDomain(undefined, allowed)).toThrow(/required/i);
     });
 
-    it('rejects path traversal sequences (../, ..\\)', () => {
+    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
       expect(() => sanitizeDomain('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeDomain('..\\..\\windows\\win.ini', allowed)).toThrow(
+      expect(() => sanitizeDomain(String.raw`..\..\windows\win.ini`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
     });

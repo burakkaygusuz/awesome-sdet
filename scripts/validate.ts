@@ -5,19 +5,22 @@ import { validatePluginManifest } from './validators/plugin-validator.js';
 import { validateMcpManifest } from './validators/mcp-validator.js';
 import { collectAllSkills } from './validators/skills-validator.js';
 import { collectAgents } from './validators/agent-validator.js';
+import { validateSnippets } from './validators/snippets-validator.js';
 
 export async function validate(): Promise<void> {
   const rootDir = process.cwd();
   const skillsDir = path.join(rootDir, 'skills');
 
-  const [pluginValid, mcpValid, agentResult, skillResult] = await Promise.all([
+  const [pluginValid, mcpValid, agentResult, skillResult, snippetsValid] = await Promise.all([
     validatePluginManifest(rootDir),
     validateMcpManifest(rootDir),
     collectAgents(rootDir),
     collectAllSkills(rootDir, skillsDir),
+    validateSnippets(rootDir),
   ]);
 
-  const hasErrors = !pluginValid || !mcpValid || agentResult.hasErrors || skillResult.hasErrors;
+  const hasErrors =
+    !pluginValid || !mcpValid || !snippetsValid || agentResult.hasErrors || skillResult.hasErrors;
 
   if (hasErrors) {
     process.exit(1);
