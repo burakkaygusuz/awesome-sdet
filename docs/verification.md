@@ -68,10 +68,10 @@ To maintain strict technical clarity across the platform:
 
 ```typescript
 export const VerificationRequestSchema = z.strictObject({
-  code: z.string().min(1).describe('The generated or migrated test code to verify'),
-  framework: z.enum(FRAMEWORK_IDS).describe('Target automation framework'),
-  language: z.enum(SUPPORTED_LANGUAGES).default('typescript').describe('Programming language'),
-  context: z.enum(['generation', 'migration', 'repair']).default('generation').optional(),
+  code: z.string().min(1),
+  framework: z.enum(FRAMEWORK_IDS),
+  language: z.enum(SUPPORTED_LANGUAGES).optional(),
+  context: z.string().optional(),
 });
 ```
 
@@ -79,10 +79,10 @@ export const VerificationRequestSchema = z.strictObject({
 
 ```typescript
 export const VerificationResultSchema = z.strictObject({
-  passed: z.boolean().describe('True if all error-severity checks passed'),
-  score: z.number().min(0).max(100).describe('Deterministic compliance score (0-100)'),
-  checks: z.array(VerificationCheckSchema).describe('List of invariant rule evaluations'),
-  actionableHints: z.array(z.string()).describe('Actionable hints for model self-correction'),
+  passed: z.boolean(),
+  score: z.number().min(0).max(100),
+  checks: z.array(VerificationCheckSchema),
+  actionableHints: z.array(z.string()).default([]),
 });
 ```
 
@@ -94,10 +94,12 @@ To eliminate the risk of runaway agent loops and unbounded token consumption whi
 
 1. **Protocol Nature (Agent Execution Policy):** Bounded repair is implemented as a **normative Agent Policy & Protocol Contract** enforced through system directives in [`agents/*.agent.md`](../agents/) and [`skills/*/SKILL.md`](../skills/). The MCP server itself does not run an internal stateful daemon or imperative loop; it acts as a stateless tool provider (`verify_test_artifact`).
 2. **Structured Diagnostic Feedback:** When `verify_test_artifact` returns `passed: false`, the tool provides concise, structured `actionableHints`:
+
    ```text
    [no-arbitrary-waits] Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).
    [resilient-accessibility-locators] Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel).
    ```
+
 3. **Hard Boundary (`MAX_REPAIR_ATTEMPTS = 2`):** The agent is explicitly instructed to attempt at most 2 repair iterations using the actionable hints.
 4. **Deterministic Escalation:** If verification still fails after 2 repair attempts, the agent policy mandates breaking the loop and presenting the artifact with a structured diagnostics report containing the failing checks, evidence, and manual remediation notes.
 
@@ -105,11 +107,11 @@ To eliminate the risk of runaway agent loops and unbounded token consumption whi
 
 ## 6. Offline Evaluation Benchmark Suite (`evals/`)
 
-The evaluation suite runs in CI without external LLM API costs or network latency:
+The evaluation suite runs deterministically in CI (`pnpm run test:evals`) without external LLM API costs or network latency:
 
-- **`evals/routing/framework-routing.eval.ts`:** 28 developer query fixtures verifying 100% accurate framework and skill routing.
-- **`evals/anti-patterns/anti-patterns.eval.ts`:** 30 synthetic fixtures verifying 100% anti-pattern detection (recall: 1.0, precision: 1.0).
-- **`evals/security/prompt-injection.eval.ts`:** 19 attack vectors verifying 100% structural prompt boundary containment (`containmentScore: 1.0`).
+- **`evals/routing/framework-routing.eval.ts`:** 38 diverse developer query fixtures evaluating confident single-framework matching, ambiguous multi-framework detection, and generic test query handling.
+- **`evals/anti-patterns/anti-patterns.eval.ts`:** 32 synthetic test fixtures evaluating rule conformity and anti-pattern detection across the 4 static invariant rules on the benchmark dataset.
+- **`evals/security/prompt-injection.eval.ts`:** 25 attack vectors evaluating structural prompt boundary containment (`containmentScore: 1.0`).
 
 ### 6.1 Two-Layer Prompt Security Model
 

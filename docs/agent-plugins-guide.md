@@ -355,11 +355,11 @@ To avoid turning the stateless MCP server into a heavy, stateful orchestration d
 
 ### 7.1 Offline Deterministic Evaluation Suites (`evals/`)
 
-The repository includes offline eval suites run via `pnpm run test:evals`:
+The repository includes offline eval suites run via `pnpm run test:evals` and integrated directly into the CI quality gate:
 
-1. **`evals/anti-patterns/anti-patterns.eval.ts`**: Evaluates anti-pattern detection across 30+ synthetic fixtures with **100% recall and 100% precision**.
-2. **`evals/routing/framework-routing.eval.ts`**: Evaluates query-to-framework routing across 28+ developer queries with **100% accuracy**.
-3. **`evals/security/prompt-injection.eval.ts`**: Evaluates XML containment across 19+ attack vectors with **100% containment score**.
+1. **`evals/anti-patterns/anti-patterns.eval.ts`**: Evaluates static rule conformity across 32 synthetic test fixtures on the benchmark dataset.
+2. **`evals/routing/framework-routing.eval.ts`**: Evaluates query-to-framework routing and ambiguity detection across 38 developer queries.
+3. **`evals/security/prompt-injection.eval.ts`**: Evaluates XML boundary containment across 25 attack vectors (`containmentScore: 1.0`).
 
 ---
 
