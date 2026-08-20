@@ -240,9 +240,12 @@ export function filterMarkdownSections(
 
 Passing `query: "getByRole"` filters out irrelevant sections, delivering up to **80% token savings**.
 
-### 4.3 Input Sanitization & Prompt Injection Containment
+### 4.3 Two-Layer Prompt Security & Injection Containment
 
-All dynamic inputs (source code, logs, user specifications) passed to MCP prompts are encapsulated within `<untrusted_*>` boundary tags with closing tag neutralization and the `PASSIVE_DATA_INVARIANT`:
+All dynamic inputs (source code, logs, user specifications) passed to MCP prompts are protected across two distinct layers:
+
+1. **Layer 1: Structural Boundary Preservation (Deterministic):** Encapsulates raw input within `<untrusted_*>` tags and escapes tag breakout attempts.
+2. **Layer 2: Model Behavioral Invariant (Behavioral):** Enforces passive data treatment via explicit system directive.
 
 ```typescript
 export const PASSIVE_DATA_INVARIANT =
@@ -253,6 +256,8 @@ export function wrapUntrustedContent(tag: string, content: string): string {
   return `<${tag}>\n${sanitized}\n</${tag}>`;
 }
 ```
+
+_(Note: Layer 1 is 100% verified via deterministic offline string evals; Layer 2 measures foundation model behavioral obedience under adversarial prompts via live inference evaluations)._
 
 ---
 

@@ -108,7 +108,14 @@ The evaluation suite runs in CI without external LLM API costs or network latenc
 
 - **`evals/routing/framework-routing.eval.ts`:** 28 developer query fixtures verifying 100% accurate framework and skill routing.
 - **`evals/anti-patterns/anti-patterns.eval.ts`:** 30 synthetic fixtures verifying 100% anti-pattern detection (recall: 1.0, precision: 1.0).
-- **`evals/security/prompt-injection.eval.ts`:** 19 attack vectors verifying 100% XML boundary containment and prompt injection neutralization.
+- **`evals/security/prompt-injection.eval.ts`:** 19 attack vectors verifying 100% structural prompt boundary containment (`containmentScore: 1.0`).
+
+### 6.1 Two-Layer Prompt Security Model
+
+| Security Layer                                | Mechanism                                            | Evaluation Method                                          | Current Scope & Guarantees                                                                                                     |
+| :-------------------------------------------- | :--------------------------------------------------- | :--------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| **Layer 1: Structural Boundary Preservation** | `wrapUntrustedContent()` with tag neutralization     | Deterministic Offline Regex Benchmarks (`evals/security/`) | **Guaranteed:** Proves that closing tags cannot escape designated `<untrusted_*>` containers.                                  |
+| **Layer 2: Model Behavioral Robustness**      | `PASSIVE_DATA_INVARIANT` behavioral system directive | Probabilistic Live LLM Response Evaluation                 | **Model-Dependent:** Instructs models to treat enclosed text as passive analysis data; measured via live inference benchmarks. |
 
 Run all evals:
 

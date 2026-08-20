@@ -280,7 +280,7 @@ describe('Prompt Injection Deterministic Evaluation Benchmark Suite', () => {
       expect(logContent).toContain('&lt;/untrusted_failure_log&gt;');
     });
 
-    it('achieves 100% containment score across all attack vectors (containmentScore: 1.0)', () => {
+    it('achieves 100% structural boundary containment score across all attack vectors (containmentScore: 1.0)', () => {
       let containedCount = 0;
       for (const attack of PROMPT_INJECTION_BENCHMARK_CASES) {
         const wrapped = wrapUntrustedContent(attack.targetTag, attack.payload);
