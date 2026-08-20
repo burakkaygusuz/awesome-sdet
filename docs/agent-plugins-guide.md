@@ -389,6 +389,18 @@ pnpm run lint && pnpm run format:check
 
 ---
 
+### 7.3 Runtime Matrix Testing vs. Static Consolidation Anti-Pattern
+
+A critical architectural discipline in agent plugin engineering is guarding against:
+
+> **Anti-Pattern:** _Abstraction Consolidation without Runtime Migration Verification_
+> (Consolidating boilerplate code and deleting obsolete files while leaving dynamic path resolution unverified at runtime).
+
+- **The Danger:** TypeScript `tsc` and standard unit tests only check compile-time types; they do not verify dynamic runtime paths (`new URL('./references/', import.meta.url)`).
+- **The Mandatory Invariant:** Whenever consolidating file-backed tools, the test suite (`test/mcp/registry-contract.test.ts`) MUST execute an exhaustive matrix test invoking `tools/call` over JSON-RPC across **100% of registered framework, domain, and language combinations** (all 133 combinations in `FRAMEWORK_REGISTRY`). A consolidation refactor is never considered complete without green end-to-end matrix test execution.
+
+---
+
 ## 8. Universal Authoring & Compliance Checklist
 
 When adding or extending skills, manifests, agents, or MCP tools, ensure all criteria pass:
