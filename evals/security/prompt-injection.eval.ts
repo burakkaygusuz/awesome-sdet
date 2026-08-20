@@ -235,7 +235,9 @@ describe('Prompt Injection Deterministic Evaluation Benchmark Suite', () => {
     it('verifies generate-test prompt contains PASSIVE_DATA_INVARIANT and neutralized payload', async () => {
       const attackCase = PROMPT_INJECTION_BENCHMARK_CASES.find(
         (c) => c.id === 'attack-direct-tag-breakout'
-      )!;
+      );
+      expect(attackCase).toBeDefined();
+      if (!attackCase) return;
 
       const serverInstance = new McpServer({ name: 'eval-server', version: '1.0.0' });
       registerPrompts(serverInstance);
@@ -255,7 +257,9 @@ describe('Prompt Injection Deterministic Evaluation Benchmark Suite', () => {
     it('verifies migrate-test prompt isolates malicious source code', () => {
       const attackCase = PROMPT_INJECTION_BENCHMARK_CASES.find(
         (c) => c.id === 'attack-source-code-breakout'
-      )!;
+      );
+      expect(attackCase).toBeDefined();
+      if (!attackCase) return;
 
       const sourceContent = wrapUntrustedContent('untrusted_source_code', attackCase.payload);
       expect(sourceContent.startsWith('<untrusted_source_code>\n')).toBe(true);
@@ -266,7 +270,9 @@ describe('Prompt Injection Deterministic Evaluation Benchmark Suite', () => {
     it('verifies diagnose-flakiness prompt isolates malicious failure logs and test code', () => {
       const attackCase = PROMPT_INJECTION_BENCHMARK_CASES.find(
         (c) => c.id === 'attack-failure-log-breakout'
-      )!;
+      );
+      expect(attackCase).toBeDefined();
+      if (!attackCase) return;
 
       const logContent = wrapUntrustedContent('untrusted_failure_log', attackCase.payload);
       expect(logContent.startsWith('<untrusted_failure_log>\n')).toBe(true);
