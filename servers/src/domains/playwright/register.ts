@@ -11,6 +11,12 @@ import {
 export const PlaywrightDocsArgsSchema = z.strictObject({
   domain: PlaywrightDomainSchema,
   language: SupportedLanguageSchema,
+  query: z
+    .string()
+    .optional()
+    .describe(
+      'Optional keyword or symbol (e.g. "getByRole", "filter", "mock") to filter specific sections and code blocks'
+    ),
 });
 
 export type PlaywrightDocsArgs = z.infer<typeof PlaywrightDocsArgsSchema>;

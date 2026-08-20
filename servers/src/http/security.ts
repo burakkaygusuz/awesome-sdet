@@ -76,13 +76,14 @@ export function collectBodyWithinLimit(
   res: http.ServerResponse
 ): Promise<string | null> {
   return new Promise((resolve) => {
-    let body = '';
+    const chunks: Buffer[] = [];
     let receivedBytes = 0;
     let exceeded = false;
 
     req.on('data', (chunk: Buffer | string) => {
       if (exceeded) return;
-      receivedBytes += typeof chunk === 'string' ? Buffer.byteLength(chunk) : chunk.length;
+      const buf = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+      receivedBytes += buf.length;
 
       if (receivedBytes > MAX_BODY_BYTES) {
         exceeded = true;
@@ -92,9 +93,9 @@ export function collectBodyWithinLimit(
         return;
       }
 
-      body += chunk;
+      chunks.push(buf);
     });
 
-    req.on('end', () => resolve(body));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
   });
 }

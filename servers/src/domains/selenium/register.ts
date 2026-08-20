@@ -11,6 +11,12 @@ import {
 export const SeleniumDocsArgsSchema = z.strictObject({
   domain: SeleniumDomainSchema,
   language: SupportedLanguageSchema,
+  query: z
+    .string()
+    .optional()
+    .describe(
+      'Optional keyword or symbol (e.g. "By.cssSelector", "BiDi", "WebDriverWait") to filter specific sections and code blocks'
+    ),
 });
 
 export type SeleniumDocsArgs = z.infer<typeof SeleniumDocsArgsSchema>;

@@ -30,13 +30,17 @@ async function collectKnowledgeFiles(): Promise<string[]> {
 }
 
 describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => {
-  it('every MCP tool name and URI domain cited in skills and agents exists in the registry', async () => {
+  it('every MCP tool name and universal resource URI cited in skills and agents exists in the registry', async () => {
     const registeredTools = new Set<string>();
-    const domainsByFramework = new Map<string, Set<string>>();
-    for (const [framework, definition] of Object.entries(FRAMEWORK_REGISTRY)) {
+    for (const definition of Object.values(FRAMEWORK_REGISTRY)) {
       for (const tool of definition.toolNames) registeredTools.add(tool);
-      domainsByFramework.set(framework, new Set(definition.domains));
     }
+
+    const validResourceUris = new Set([
+      'sdet://guidelines',
+      'sdet://invariants',
+      'sdet://migration-matrix',
+    ]);
 
     const files = await collectKnowledgeFiles();
     expect(files.length).toBeGreaterThanOrEqual(13);
@@ -52,11 +56,9 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
         if (!registeredTools.has(tool)) toolOffenders.push(`${rel}: ${tool}`);
       }
 
-      for (const [, framework, domain] of content.matchAll(
-        /\b(playwright|selenium|cypress|vibium|appium):\/\/([a-z]+)\//g
-      )) {
-        if (!domainsByFramework.get(framework)?.has(domain)) {
-          uriOffenders.push(`${rel}: ${framework}://${domain}/`);
+      for (const [uri] of content.matchAll(/\bsdet:\/\/[a-z-]+/g)) {
+        if (!validResourceUris.has(uri)) {
+          uriOffenders.push(`${rel}: ${uri}`);
         }
       }
     }

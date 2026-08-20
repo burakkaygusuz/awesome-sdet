@@ -13,9 +13,48 @@ export const SUPPORTED_LANGUAGES = [
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
+export const SELENIUM_DOMAINS = [
+  'actions',
+  'bidi',
+  'grid',
+  'listeners',
+  'locators',
+  'observability',
+  'pagefactory',
+] as const;
+
+export const CYPRESS_DOMAINS = [
+  'commands',
+  'component',
+  'fixtures',
+  'network',
+  'session',
+  'shadow',
+  'stubs',
+  'task',
+] as const;
+
+export const VIBIUM_DOMAINS = ['bidi', 'core', 'interactions', 'selectors', 'state'] as const;
+
+export const APPIUM_DOMAINS = [
+  'capabilities',
+  'context',
+  'device',
+  'gestures',
+  'locators',
+] as const;
+
+export const PLAYWRIGHT_DOMAINS = [
+  'actions',
+  'assertions',
+  'locators',
+  'network',
+  'observability',
+  'storage',
+] as const;
+
 export interface FrameworkDefinition {
   readonly toolPrefix: string;
-  readonly resourceUri: string;
   readonly domains: readonly string[];
   readonly languages: readonly SupportedLanguage[];
   readonly toolNames: readonly string[];
@@ -26,45 +65,40 @@ export interface FrameworkDefinition {
 export const FRAMEWORK_REGISTRY = {
   selenium: {
     toolPrefix: 'se',
-    resourceUri: 'selenium://{domain}/{language}',
-    domains: ['actions', 'bidi', 'grid', 'listeners', 'locators', 'observability', 'pagefactory'],
-    languages: ['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'],
+    domains: SELENIUM_DOMAINS,
+    languages: ['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'] as const,
     toolNames: ['read_se_docs'],
     defaultDomain: 'actions',
     defaultLanguage: 'java',
   },
   cypress: {
     toolPrefix: 'cy',
-    resourceUri: 'cypress://{domain}/{language}',
-    domains: ['commands', 'component', 'fixtures', 'network', 'session', 'shadow', 'stubs', 'task'],
-    languages: ['typescript', 'javascript'],
+    domains: CYPRESS_DOMAINS,
+    languages: ['typescript', 'javascript'] as const,
     toolNames: ['read_cy_docs'],
     defaultDomain: 'commands',
     defaultLanguage: 'typescript',
   },
   vibium: {
     toolPrefix: 'vibium',
-    resourceUri: 'vibium://{domain}/{language}',
-    domains: ['bidi', 'core', 'interactions', 'selectors', 'state'],
-    languages: ['typescript', 'javascript', 'python', 'java'],
+    domains: VIBIUM_DOMAINS,
+    languages: ['typescript', 'javascript', 'python', 'java'] as const,
     toolNames: ['read_vibium_docs'],
     defaultDomain: 'core',
     defaultLanguage: 'typescript',
   },
   appium: {
     toolPrefix: 'appium',
-    resourceUri: 'appium://{domain}/{language}',
-    domains: ['capabilities', 'context', 'device', 'gestures', 'locators'],
-    languages: ['typescript', 'javascript', 'python', 'java', 'csharp'],
+    domains: APPIUM_DOMAINS,
+    languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
     toolNames: ['read_appium_docs'],
     defaultDomain: 'capabilities',
     defaultLanguage: 'typescript',
   },
   playwright: {
     toolPrefix: 'pw',
-    resourceUri: 'playwright://{domain}/{language}',
-    domains: ['actions', 'assertions', 'locators', 'network', 'observability', 'storage'],
-    languages: ['typescript', 'javascript', 'python', 'java', 'csharp'],
+    domains: PLAYWRIGHT_DOMAINS,
+    languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
     toolNames: ['read_pw_docs'],
     defaultDomain: 'locators',
     defaultLanguage: 'typescript',

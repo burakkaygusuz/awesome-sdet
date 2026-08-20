@@ -1,107 +1,81 @@
-import { McpServer, ResourceNotFoundError, ResourceTemplate } from '@modelcontextprotocol/server';
+import { McpServer, ResourceNotFoundError } from '@modelcontextprotocol/server';
 import { DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE } from '../version.js';
-import { readPlaywrightReferenceDoc } from '../domains/playwright/common.js';
-import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
-import { readCypressReferenceDoc } from '../domains/cypress/common.js';
-import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
-import { readAppiumReferenceDoc } from '../domains/appium/common.js';
-import { FRAMEWORK_REGISTRY, type SupportedFramework } from '../registry.js';
 
 const RESOURCE_CACHE_HINT = {
   ttlMs: DEFAULT_DOCS_CACHE_TTL_MS,
   cacheScope: PUBLIC_CACHE_SCOPE,
 };
 
-const FRAMEWORK_RESOURCE_CONFIGS: Record<
-  SupportedFramework,
-  {
-    readonly title: string;
-    readonly reader: (domain: string, language?: string) => Promise<string>;
-  }
-> = {
-  playwright: {
-    title: 'Playwright Documentation Reference',
-    reader: readPlaywrightReferenceDoc,
-  },
-  selenium: {
-    title: 'Selenium Documentation Reference',
-    reader: readSeleniumReferenceDoc,
-  },
-  cypress: {
-    title: 'Cypress Documentation Reference',
-    reader: readCypressReferenceDoc,
-  },
-  vibium: {
-    title: 'Vibium Documentation Reference',
-    reader: readVibiumReferenceDoc,
-  },
-  appium: {
-    title: 'Appium Documentation Reference',
-    reader: readAppiumReferenceDoc,
-  },
-};
-
-export function registerResources(server: McpServer): void {
-  for (const [key, meta] of Object.entries(FRAMEWORK_RESOURCE_CONFIGS) as Array<
-    [SupportedFramework, (typeof FRAMEWORK_RESOURCE_CONFIGS)[SupportedFramework]]
-  >) {
-    const fw = FRAMEWORK_REGISTRY[key];
-
-    server.registerResource(
-      `${key}-reference`,
-      new ResourceTemplate(fw.resourceUri, { list: undefined }),
-      {
-        title: meta.title,
-        description: `Dynamic reference documentation for ${key} across supported languages (${fw.languages.join(', ')}) and domains (${fw.domains.join(', ')}).`,
-        mimeType: 'text/markdown',
-        cacheHint: RESOURCE_CACHE_HINT,
-      },
-      async (
-        uri: URL,
-        { domain, language }: { domain?: string | string[]; language?: string | string[] }
-      ) => {
-        const docDomain = String(domain || fw.defaultDomain);
-        const docLang = String(language || fw.defaultLanguage);
-        try {
-          const text = await meta.reader(docDomain, docLang);
-          return {
-            contents: [
-              {
-                uri: uri.href,
-                text,
-                mimeType: 'text/markdown',
-              },
-            ],
-          };
-        } catch {
-          throw new ResourceNotFoundError(uri.href);
-        }
-      }
-    );
-  }
-
-  server.registerResource(
-    'sdet-guidelines',
-    'sdet://guidelines',
-    {
-      title: 'Universal SDET Quality Guidelines',
-      description: 'Universal SDET testing standards, assertions, and execution invariants.',
-      mimeType: 'text/markdown',
-      cacheHint: RESOURCE_CACHE_HINT,
-    },
-    async (uri: URL) => ({
-      contents: [
-        {
-          uri: uri.href,
-          text: `# Universal SDET Guidelines & Invariants
+export const UNIVERSAL_SDET_RESOURCES = {
+  guidelines: {
+    name: 'sdet-guidelines',
+    uri: 'sdet://guidelines',
+    title: 'Universal SDET Quality Guidelines',
+    description: 'Universal SDET testing standards, assertions, and execution invariants.',
+    content: `# Universal SDET Guidelines & Invariants
 
 1. **Target Identification:** Prefer user-facing, semantic, or resilient data attributes (\`data-testid\`, \`data-cy\`, role+accessible name). Avoid brittle structural CSS paths.
 2. **Synchronization & Dynamic Waiting:** NEVER use hardcoded arbitrary sleeps (\`Thread.sleep\`, \`time.sleep\`, \`cy.wait(ms)\`). Always wait on explicit conditions or state transitions.
 3. **Execution Context & Isolation:** Maintain strict isolation between parallel test threads. Avoid mutating shared static state.
 4. **Idempotency & Cleanup:** Clean up test data and sessions using API teardowns rather than brittle UI cleanups.`,
-          mimeType: 'text/markdown',
-        },
-      ],
-    })
-  );
+  },
+  invariants: {
+    name: 'sdet-invariants',
+    uri: 'sdet://invariants',
+    title: 'Universal SDET Invariants & Negative Constraints',
+    description:
+      'Negative constraints, forbidden anti-patterns, and deterministic execution rules.',
+    content: `# Universal SDET Invariants & Prohibited Anti-Patterns
+
+1. ❌ **Zero Arbitrary Sleeps:** Never generate hardcoded sleep/pause timeouts (\`Thread.sleep\`, \`cy.wait(ms)\`, \`page.waitForTimeout()\`). Always enforce condition-based polling or event listening.
+2. ❌ **Zero Shared Mutable State:** Never share browser contexts, singletons, or global test state across parallel execution threads.
+3. ❌ **Zero Brittle DOM Selectors:** Never anchor tests to full-tree XPath chains or fragile styling classes that break on redesigns.
+4. ❌ **Zero Repetitive UI Logins:** Cache sessions, cookies, and tokens via storage snapshots and fast API seeding.`,
+  },
+  migrationMatrix: {
+    name: 'sdet-migration-matrix',
+    uri: 'sdet://migration-matrix',
+    title: 'Universal Cross-Framework Migration Architecture Matrix',
+    description:
+      'Universal semantic mapping matrix for migrating test suites across Playwright, Selenium, Cypress, Vibium, and Appium.',
+    content: `# Universal Cross-Framework Migration Matrix
+
+| Universal Testing Primitive | Playwright | Selenium 4 | Cypress | Vibium | Appium |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Target Identification** | \`page.getByRole()\` | \`By.cssSelector()\` | \`cy.get('[data-testid]')\` | \`vibe.find({ role })\` | \`AppiumBy.accessibilityId()\` |
+| **Action Execution** | Auto-waiting actions | WebDriver wire actions | Chained command queue | BiDi Sense-Think-Act loop | W3C Pointer actions |
+| **Dynamic Wait** | Web-first assertions | Explicit \`WebDriverWait\` | Auto-retrying assertions | Event-driven BiDi stream | Explicit condition polling |
+| **Network Control** | \`page.route()\` | BiDi Network intercept | \`cy.intercept()\` | BiDi Route interception | Proxy / Mock server |
+| **Session & State** | \`storageState\` JSON | Injected cookies / tokens | \`cy.session()\` | BiDi state snapshots | App reset / capability seeding |
+| **Execution Model** | Async / Await | Synchronous driver | Chained command subjects | Async BiDi stream | W3C remote client |`,
+  },
+} as const;
+
+export function registerResources(server: McpServer): void {
+  for (const resource of Object.values(UNIVERSAL_SDET_RESOURCES)) {
+    server.registerResource(
+      resource.name,
+      resource.uri,
+      {
+        title: resource.title,
+        description: resource.description,
+        mimeType: 'text/markdown',
+        cacheHint: RESOURCE_CACHE_HINT,
+      },
+      async (uri: URL) => {
+        if (uri.href !== resource.uri) {
+          throw new ResourceNotFoundError(uri.href);
+        }
+        return {
+          contents: [
+            {
+              uri: uri.href,
+              text: resource.content,
+              mimeType: 'text/markdown',
+            },
+          ],
+        };
+      }
+    );
+  }
 }

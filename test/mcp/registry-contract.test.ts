@@ -19,7 +19,7 @@ describe('framework registry contract', () => {
     await closeServer(server);
   });
 
-  it('matches registered tools and resource URI templates', async () => {
+  it('matches registered tools and framework registry contract', async () => {
     const response = await mcpFetch(url, {
       jsonrpc: '2.0',
       id: 1,
@@ -41,8 +41,8 @@ describe('framework registry contract', () => {
 
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
-
-      expect(definition.resourceUri).toBe(`${framework}://{domain}/{language}`);
+      expect(definition.domains.length).toBeGreaterThan(0);
+      expect(definition.languages.length).toBeGreaterThan(0);
       for (const toolName of definition.toolNames) {
         expect(toolNames).toContain(toolName);
       }

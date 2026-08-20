@@ -7,6 +7,12 @@ import { VibiumDomainSchema, SupportedLanguageSchema, readVibiumReferenceDoc } f
 export const VibiumDocsArgsSchema = z.strictObject({
   domain: VibiumDomainSchema,
   language: SupportedLanguageSchema,
+  query: z
+    .string()
+    .optional()
+    .describe(
+      'Optional keyword or symbol (e.g. "vibe.find", "bidi", "state") to filter specific sections and code blocks'
+    ),
 });
 
 export type VibiumDocsArgs = z.infer<typeof VibiumDocsArgsSchema>;

@@ -7,6 +7,12 @@ import { CypressDomainSchema, SupportedLanguageSchema, readCypressReferenceDoc }
 export const CypressDocsArgsSchema = z.strictObject({
   domain: CypressDomainSchema,
   language: SupportedLanguageSchema,
+  query: z
+    .string()
+    .optional()
+    .describe(
+      'Optional keyword or symbol (e.g. "cy.intercept", "cy.origin", "session") to filter specific sections and code blocks'
+    ),
 });
 
 export type CypressDocsArgs = z.infer<typeof CypressDocsArgsSchema>;

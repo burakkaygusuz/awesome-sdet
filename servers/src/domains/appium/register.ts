@@ -7,6 +7,12 @@ import { AppiumDomainSchema, SupportedLanguageSchema, readAppiumReferenceDoc } f
 export const AppiumDocsArgsSchema = z.strictObject({
   domain: AppiumDomainSchema,
   language: SupportedLanguageSchema,
+  query: z
+    .string()
+    .optional()
+    .describe(
+      'Optional keyword or symbol (e.g. "accessibilityId", "gestures", "context") to filter specific sections and code blocks'
+    ),
 });
 
 export type AppiumDocsArgs = z.infer<typeof AppiumDocsArgsSchema>;
