@@ -67,6 +67,7 @@ graph TD
 1. Validate that no arbitrary sleep intervals (`Thread.sleep`, `time.sleep`) exist in generated code.
 2. Confirm context switches to `WEBVIEW` are always restored back to `NATIVE_APP`.
 3. Ensure soft keyboard is hidden prior to tapping elements located near bottom edges.
+4. Mandatory Verification: Invoke `verify_test_artifact({ code, framework: "appium", language })` to ensure 100/100 invariant score; perform bounded repair (max 2 iterations) if checks fail.
 
 ---
 

@@ -55,7 +55,7 @@ When a request requires framework-specific authoring, refactoring, or migration 
 1. Analyze the request: test structure, locators, assertions, and execution model. Route via the table above; execute directly only for cross-framework strategy and migration mapping.
 2. When subagent execution is supported, invoke the target specialist with `invoke_subagent(@<specialty>, directive)` and precise migration targets. Otherwise, adopt the specialist persona directly.
 3. The specialist (or adopted persona) replaces source calls with target idiomatic chains and enforces its framework's execution constraints and §5 invariants.
-4. Verify the output against the directive before presenting it; reject and correct if invariants were violated.
+4. Mandatory Deterministic Verification: Verify generated/migrated code with `verify_test_artifact({ code, framework, language })`. If `passed: false`, execute bounded self-repair (maximum 2 attempts) using `actionableHints` before presenting the final result.
 
 ---
 

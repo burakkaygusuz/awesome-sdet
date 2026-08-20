@@ -58,7 +58,8 @@ graph TD
 
 1. Verify all actions use locator-based calls rather than element handles (`ElementHandle` is discouraged; use `Locator`).
 2. Ensure network mocks use `page.route()` with proper fulfillment or continuation.
-3. Instrument tracing (`context.tracing.start/stop`) for post-mortem debugging.
+3. Mandatory Verification: Invoke `verify_test_artifact({ code, framework: "playwright", language })` to ensure 100/100 invariant score; perform bounded repair (max 2 iterations) if checks fail.
+4. Instrument tracing (`context.tracing.start/stop`) for post-mortem debugging.
 
 ---
 

@@ -57,6 +57,7 @@ graph TD
 
 1. Check for arbitrary `cy.wait(ms)` sleeps. Replace with dynamic assertion retry-ability or `cy.wait('@alias')`.
 2. Verify cross-domain boundaries use `cy.origin()`.
+3. Mandatory Verification: Invoke `verify_test_artifact({ code, framework: "cypress", language })` to ensure 100/100 invariant score; perform bounded repair (max 2 iterations) if checks fail.
 
 ---
 
