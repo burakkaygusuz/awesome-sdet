@@ -18,7 +18,7 @@
 2. [Agent Plugins 1.0.0 Manifest Specification](#2-agent-plugins-100-manifest-specification)
 3. [Agent Skills & Progressive Token Architecture](#3-agent-skills--progressive-token-architecture)
 4. [MCP Server 2026-07-28 Runtime & Hardening](#4-mcp-server-2026-07-28-runtime--hardening)
-5. [Deterministic Verification Engine & Bounded Self-Repair](#5-deterministic-verification-engine--bounded-self-repair)
+5. [Deterministic Static Invariant Scanner & Bounded Self-Repair](#5-deterministic-static-invariant-scanner--bounded-self-repair)
 6. [Hybrid Multi-Agent Orchestration & Closed-Loop Topology](#6-hybrid-multi-agent-orchestration--closed-loop-topology)
 7. [SOLID Verification, Polyglot AST & Deterministic Evals](#7-solid-verification-polyglot-ast--deterministic-evals)
 8. [Universal Authoring & Compliance Checklist](#8-universal-authoring--compliance-checklist)
@@ -29,7 +29,7 @@
 
 An enterprise agent plugin is architected as an **evergreen, multi-domain intelligence platform**. In v2, the primary architectural focus shifts from _adding more open-ended intelligence_ to _enforcing a closed, deterministic feedback loop_:
 
-$$\text{Reliability} = \text{Intent} \to \text{Lean Workflow} \to \text{Grounding (MCP)} \to \text{Deterministic AST Verifier} \to \text{Bounded Repair (}\le 2\text{)}$$
+$$\text{Reliability} = \text{Intent} \to \text{Lean Workflow} \to \text{Grounding (MCP)} \to \text{Static Invariant Scanner} \to \text{Bounded Repair (}\le 2\text{)}$$
 
 ### 1.1 Structural Taxonomy Archetype
 
@@ -54,11 +54,12 @@ $$\text{Reliability} = \text{Intent} \to \text{Lean Workflow} \to \text{Groundin
 │   │   ├── resources/              # Universal domain resources (static standards, invariants)
 │   │   ├── prompts/                # Thin workflow prompt templates (XML untrusted containment)
 │   │   ├── tools/                  # Top-level MCP tools (e.g. verify_test_artifact)
-│   │   ├── verification/           # AST & static invariant verification engine
+│   │   ├── verification/           # Static invariant rules and scanner engine
 │   │   │   ├── rules/              # Modular invariant checkers (waits, assertions, locators, isolation)
 │   │   │   └── schemas.ts          # Zod v4.4.3 data contracts for verification requests/results
 │   │   └── domains/                # Consolidated framework domains (read_*_docs tools & reference loaders)
 │   └── test/                       # Protocol, discovery, transport, and verification test suites
+
 ├── evals/                          # Offline deterministic evaluation benchmark suite
 │   ├── anti-patterns/              # Anti-pattern detection recall & precision evals
 │   ├── routing/                    # Developer query framework routing evals
@@ -239,8 +240,6 @@ export function filterMarkdownSections(
 
 Passing `query: "getByRole"` filters out irrelevant sections, delivering up to **80% token savings**.
 
----
-
 ### 4.3 Input Sanitization & Prompt Injection Containment
 
 All dynamic inputs (source code, logs, user specifications) passed to MCP prompts are encapsulated within `<untrusted_*>` boundary tags with closing tag neutralization and the `PASSIVE_DATA_INVARIANT`:
@@ -257,11 +256,11 @@ export function wrapUntrustedContent(tag: string, content: string): string {
 
 ---
 
-## 5. Deterministic Verification Engine & Bounded Self-Repair
+## 5. Deterministic Static Invariant Scanner & Bounded Self-Repair
 
-### 5.1 Verification Architecture
+### 5.1 Static Invariant Scanner Architecture
 
-Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, the verification engine ([`servers/src/verification/`](file:///Users/burak/Documents/GitHub/awesome-sdet/servers/src/verification)) executes deterministic AST and pattern inspection in <5ms at $0 API cost:
+Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, the scanner ([`servers/src/verification/`](file:///Users/burak/Documents/GitHub/awesome-sdet/servers/src/verification)) executes deterministic lexical and syntactic pattern rules in <5ms at $0 API cost:
 
 ```
                             [ Generated Test Code ]
@@ -293,12 +292,12 @@ Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, t
                                             (Attempts <= 2)
 ```
 
-### 5.2 The 4 Static Invariant Rules
+### 5.2 The 4 Static Invariant Rules & Scope Boundaries
 
-1. **`no-arbitrary-waits`**: Prohibits hardcoded sleeps (`page.waitForTimeout`, `Thread.sleep`, `cy.wait(1000)`). Requires native dynamic condition waiters.
-2. **`meaningful-assertions`**: Flags tests that perform actions without assertions (`expect()`, `Assert.`, `cy.should()`).
-3. **`semantic-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`).
-4. **`state-isolation`**: Flags shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation.
+1. **`no-arbitrary-waits`**: Prohibits explicit hardcoded sleeps (`page.waitForTimeout`, `Thread.sleep`, `cy.wait(1000)`). Requires native dynamic condition waiters. _(Note: Does not evaluate complex runtime network latency)._
+2. **`meaningful-assertions`**: Flags tests that perform actions without assertions (`expect()`, `Assert.`, `cy.should()`). _(Note: Enforces syntactic presence of assertions; does not evaluate semantic business correctness)._
+3. **`semantic-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`). _(Note: Cannot inspect live DOM or detect unstable hashed CSS classes)._
+4. **`state-isolation`**: Flags explicit shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation. _(Note: Does not verify external database sandbox isolation)._
 
 ### 5.3 Bounded Self-Repair Protocol
 

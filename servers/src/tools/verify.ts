@@ -11,9 +11,9 @@ export function registerVerifyTool(server: McpServer): void {
   server.registerTool(
     'verify_test_artifact',
     {
-      title: 'Deterministic Test Artifact Verifier',
+      title: 'Deterministic Test Invariant Scanner',
       description:
-        'Analyzes generated or migrated test code for flakiness, missing assertions, and anti-patterns.',
+        'Scans generated or migrated test code for flakiness, missing assertions, and anti-patterns.',
       inputSchema: VerificationRequestSchema,
       outputSchema: VerificationResultSchema,
       annotations: SAFE_READONLY_ANNOTATIONS,

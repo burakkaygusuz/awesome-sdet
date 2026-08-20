@@ -34,11 +34,11 @@ describe('MCP verify_test_artifact Tool', () => {
       expect.soft(verifyTool?.name).toBe('verify_test_artifact');
       expect
         .soft((verifyTool as { title?: string })?.title)
-        .toBe('Deterministic Test Artifact Verifier');
+        .toBe('Deterministic Test Invariant Scanner');
       expect
         .soft(verifyTool?.description)
         .toBe(
-          'Analyzes generated or migrated test code for flakiness, missing assertions, and anti-patterns.'
+          'Scans generated or migrated test code for flakiness, missing assertions, and anti-patterns.'
         );
 
       expect.soft(verifyTool?.annotations).toBeDefined();
