@@ -88,17 +88,18 @@ export const VerificationResultSchema = z.strictObject({
 
 ---
 
-## 5. Bounded Self-Repair Loop (`MAX_REPAIR_ATTEMPTS = 2`)
+## 5. Bounded Self-Repair: Agent Execution Protocol vs. Runtime Daemon
 
-To eliminate the risk of runaway agent loops and unbounded token consumption:
+To eliminate the risk of runaway agent loops and unbounded token consumption while adhering to the core architectural invariant (**no custom agent orchestrator runtime**):
 
-1. When `verify_test_artifact` returns `passed: false`, the tool provides concise, structured `actionableHints`:
+1. **Protocol Nature (Agent Execution Policy):** Bounded repair is implemented as a **normative Agent Policy & Protocol Contract** enforced through system directives in [`agents/*.agent.md`](../agents/) and [`skills/*/SKILL.md`](../skills/). The MCP server itself does not run an internal stateful daemon or imperative loop; it acts as a stateless tool provider (`verify_test_artifact`).
+2. **Structured Diagnostic Feedback:** When `verify_test_artifact` returns `passed: false`, the tool provides concise, structured `actionableHints`:
    ```text
    [no-arbitrary-waits] Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).
    [resilient-accessibility-locators] Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel).
    ```
-2. The agent operates within a **hard boundary of at most 2 repair iterations**.
-3. If verification still fails after 2 repair attempts, the agent breaks the loop and escalates with a structured diagnostics report containing the failing checks and evidence.
+3. **Hard Boundary (`MAX_REPAIR_ATTEMPTS = 2`):** The agent is explicitly instructed to attempt at most 2 repair iterations using the actionable hints.
+4. **Deterministic Escalation:** If verification still fails after 2 repair attempts, the agent policy mandates breaking the loop and presenting the artifact with a structured diagnostics report containing the failing checks, evidence, and manual remediation notes.
 
 ---
 
