@@ -105,11 +105,21 @@ export const FRAMEWORK_REGISTRY = {
   },
 } satisfies Record<SupportedFramework, FrameworkDefinition>;
 
-export interface FrameworkRoutingMatch {
-  readonly framework: SupportedFramework;
-  readonly matchedKeywords: readonly string[];
-  readonly score: number;
-}
+export type FrameworkRoutingMatch =
+  | {
+      readonly status: 'matched';
+      readonly framework: SupportedFramework;
+      readonly candidates: readonly [SupportedFramework];
+      readonly matchedKeywords: readonly string[];
+      readonly score: number;
+    }
+  | {
+      readonly status: 'ambiguous';
+      readonly framework: null;
+      readonly candidates: readonly SupportedFramework[];
+      readonly matchedKeywords: readonly string[];
+      readonly score: number;
+    };
 
 export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<Record<SupportedFramework, readonly RegExp[]>> =
   Object.freeze({
@@ -169,7 +179,11 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
     return null;
   }
 
-  let bestMatch: FrameworkRoutingMatch | null = null;
+  const results: Array<{
+    framework: SupportedFramework;
+    matchedKeywords: string[];
+    score: number;
+  }> = [];
 
   for (const framework of FRAMEWORK_IDS) {
     const signatures = FRAMEWORK_ROUTING_SIGNATURES[framework];
@@ -183,16 +197,41 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
     }
 
     if (matchedKeywords.length > 0) {
-      const score = matchedKeywords.length;
-      if (!bestMatch || score > bestMatch.score) {
-        bestMatch = {
-          framework,
-          matchedKeywords,
-          score,
-        };
-      }
+      results.push({
+        framework,
+        matchedKeywords,
+        score: matchedKeywords.length,
+      });
     }
   }
 
-  return bestMatch;
+  if (results.length === 0) {
+    return null;
+  }
+
+  results.sort((a, b) => b.score - a.score);
+  const highestScore = results[0].score;
+  const topMatches = results.filter((r) => r.score === highestScore);
+
+  if (topMatches.length === 1) {
+    return {
+      framework: topMatches[0].framework,
+      status: 'matched',
+      candidates: [topMatches[0].framework],
+      matchedKeywords: topMatches[0].matchedKeywords,
+      score: topMatches[0].score,
+    };
+  }
+
+  // Multiple frameworks tied on highest score -> Ambiguous match
+  const allTiedKeywords = topMatches.flatMap((m) => m.matchedKeywords);
+  const candidateFrameworks = topMatches.map((m) => m.framework);
+
+  return {
+    framework: null,
+    status: 'ambiguous',
+    candidates: candidateFrameworks,
+    matchedKeywords: allTiedKeywords,
+    score: highestScore,
+  };
 }
