@@ -125,7 +125,7 @@ export function filterMarkdownSections(
     .split(/\s+/)
     .filter((t) => t.length > 0);
 
-  const matched = sections.filter((section) => {
+  return sections.filter((section) => {
     const headingLower = section.heading.toLowerCase();
     const contentLower = section.content.toLowerCase();
     const codeTextLower = section.codeSnippets.map((c) => c.code.toLowerCase()).join(' ');
@@ -135,9 +135,6 @@ export function filterMarkdownSections(
         headingLower.includes(term) || contentLower.includes(term) || codeTextLower.includes(term)
     );
   });
-
-  // If query yielded no matches, fallback to all sections gracefully
-  return matched.length > 0 ? matched : [...sections];
 }
 
 /**
@@ -164,13 +161,24 @@ export function extractStructuredDocs(
   }
 
   let renderedMarkdown: string;
-  if (query && filteredSections.length < sections.length) {
-    const breadcrumb = `# ${title} [Filtered for: "${query}"]\n\n`;
-    renderedMarkdown =
-      breadcrumb +
-      filteredSections
-        .map((s) => `${'#'.repeat(Math.max(2, s.level))} ${s.heading}\n\n${s.content}`)
-        .join('\n\n---\n\n');
+  if (query) {
+    if (filteredSections.length === 0) {
+      const availableHeadings = sections
+        .map((s) => s.heading)
+        .filter((h) => h && h !== title && !h.startsWith('#'));
+      const headingsList =
+        availableHeadings.length > 0
+          ? `\n\nAvailable sections in this domain:\n${availableHeadings.map((h) => `- ${h}`).join('\n')}`
+          : '';
+      renderedMarkdown = `# ${title} [No matches for: "${query}"]\n\nNo sections found matching query "${query}" in ${framework} ${domain} (${language}).${headingsList}`;
+    } else {
+      const breadcrumb = `# ${title} [Filtered for: "${query}"]\n\n`;
+      renderedMarkdown =
+        breadcrumb +
+        filteredSections
+          .map((s) => `${'#'.repeat(Math.max(2, s.level))} ${s.heading}\n\n${s.content}`)
+          .join('\n\n---\n\n');
+    }
   } else {
     renderedMarkdown = markdown;
   }

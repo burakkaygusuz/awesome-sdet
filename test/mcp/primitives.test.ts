@@ -251,6 +251,33 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         { matchedSections: string[]; query?: string } | undefined;
       expect(fullStructured?.matchedSections.length).toBeGreaterThanOrEqual(4);
       expect(fullStructured?.query).toBeUndefined();
+
+      const noMatchRes = await mcpFetch(url, {
+        jsonrpc: '2.0',
+        id: 72,
+        method: 'tools/call',
+        params: {
+          name: 'read_pw_docs',
+          arguments: {
+            domain: 'locators',
+            language: 'typescript',
+            query: 'non_existent_symbol_xyz123',
+          },
+        },
+      });
+      const noMatchData = await parseMcpResponse(noMatchRes);
+      expect.soft(noMatchData.result?.isError).toBeUndefined();
+      const noMatchStructured = noMatchData.result?.structuredContent as
+        { matchedSections: string[]; codeSnippets: unknown[]; query?: string } | undefined;
+      expect.soft(noMatchStructured?.query).toBe('non_existent_symbol_xyz123');
+      expect.soft(noMatchStructured?.matchedSections).toEqual([]);
+      expect.soft(noMatchStructured?.codeSnippets).toEqual([]);
+      expect
+        .soft(noMatchData.result?.content?.[0]?.text)
+        .toContain('No sections found matching query "non_existent_symbol_xyz123"');
+      expect
+        .soft(noMatchData.result?.content?.[0]?.text)
+        .toContain('Available sections in this domain:');
     });
   });
 
