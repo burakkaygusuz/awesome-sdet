@@ -28,7 +28,14 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
 - **Console Listener Timing**: Attaching `page.on('console')` after `page.goto()` misses console logs emitted during initial page bootstrapping and hydration.
 - **Trace File Size Explosion**: Tracing with full screenshot and snapshot capture on long-running workflows can generate multi-hundred megabyte trace files; scope tracing tightly around critical test steps.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Configure CI Telemetry Policies**: Set tracing and video capture to `retain-on-failure` or `on-first-retry` to avoid storage bloat.
+2. **Attach Console & Error Listeners**: Register `pageerror` and console handlers before navigation to capture hydration issues.
+3. **Mask Volatile Regions**: Mask dynamic timestamps, IDs, and avatars during visual screenshot comparisons.
+4. **Export Structured Artifacts**: Save `.zip` traces or diagnostic reports and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Configuring test tracing, video recording, and screenshot capture in CI/CD pipelines.
@@ -41,7 +48,7 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
   - Mocking network endpoints and handling responses -> Use [sdet-network](../sdet-network/SKILL.md).
   - Designing Page Object Models and test lifecycle suites -> Use [sdet-authoring](../sdet-authoring/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Execution Tracing Engine                     | Visual Regression Engine               | Console & Network Telemetry                                   |
 | :------------------- | :------------------------------------------- | :------------------------------------- | :------------------------------------------------------------ |
@@ -50,7 +57,7 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
 | **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi `driver.script.add_*_handler()` |
 | **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                  |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -60,3 +67,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Vibium State & BiDi Tracing**: When recording action timelines or capturing state in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state" | "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Tracing configured with `retain-on-failure` to prevent CI resource exhaustion.
+- [ ] Volatile dynamic elements masked during visual snapshot assertions.
+- [ ] Uncaught errors monitored via listeners without swallowing exceptions.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

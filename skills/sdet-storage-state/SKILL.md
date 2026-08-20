@@ -28,7 +28,14 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 - **Domain-Scoped Cookies**: Injected cookies must match the exact protocol, domain, and path of the AUT, or the browser will silently ignore them during navigation.
 - **SameSite Cookie Restrictions**: Restoring storage snapshots across different subdomains can fail if authentication cookies are configured with `SameSite=Strict`.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Authenticate in Global Setup or via API**: Perform login once per persona and serialize storage state (`storageState.json`, `cy.session()`).
+2. **Inject Pre-Authenticated Session**: Instantiate isolated browser contexts pre-seeded with target role credentials.
+3. **Validate Session Freshness**: Attach validation callbacks to refresh expired tokens without manual UI login cascades.
+4. **Enforce Storage Immutability**: Treat snapshots as read-only baselines and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Configuring global setup authentication flows for CI/CD test runs.
@@ -41,7 +48,7 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
   - Intercepting HTTP requests or stubbing API responses -> Use [sdet-network](../sdet-network/SKILL.md).
   - Managing mobile device app sessions and capabilities -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Session Caching Strategy                         | Multi-Role Isolation                       | Storage Injection API                                   |
 | :------------------- | :----------------------------------------------- | :----------------------------------------- | :------------------------------------------------------ |
@@ -50,7 +57,7 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 | **Selenium 4**       | Programmatic cookie & localStorage serialization | Separate `WebDriver` session instances     | `driver.manage().addCookie()` & JS localStorage scripts |
 | **Vibium**           | Browser context state snapshots                  | Isolated state pools                       | Native state import/export APIs                         |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -60,3 +67,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Repetitive UI logins replaced with storage snapshots or API auth.
+- [ ] Multi-role tests isolated with separate state files.
+- [ ] Shared state files kept immutable during test execution.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

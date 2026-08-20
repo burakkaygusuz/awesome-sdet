@@ -260,14 +260,14 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Zero-Conflict Schema Alignme
         const topic = skillDir.substring(5);
         expect.soft(CAPABILITY_TOPICS).toContain(topic);
 
-        // Verify Level 1 and Level 2 Progressive Token Structure
+        // Verify Level 1 and Level 2 Progressive Token Structure & Workflow
         expect.soft(content).toContain('## 1. Overview');
         expect.soft(content).toContain('## 2. Core Invariants');
-        expect.soft(content).toContain('## 3. When to Use');
-        expect.soft(content).toContain('## 4. Universal Framework Paradigm Mapping');
-        expect
-          .soft(content)
-          .toMatch(/## 5\. Dynamic MCP (?:Knowledge & Tool|Tool & Resource) Schemas/);
+        expect.soft(content).toMatch(/## \d+\. When to Use/);
+        expect.soft(content).toMatch(/## \d+\. Step-by-Step Workflow/);
+        expect.soft(content).toMatch(/## \d+\. Universal Framework Paradigm Mapping/);
+        expect.soft(content).toMatch(/## \d+\. Dynamic MCP/);
+        expect.soft(content).toMatch(/## \d+\. Verification Checklist/);
       }
     });
 

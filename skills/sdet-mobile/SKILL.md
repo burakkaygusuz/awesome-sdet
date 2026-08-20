@@ -28,7 +28,14 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
 - **Context Handle Naming on Android**: Android WebView context names often include package or process IDs (e.g. `WEBVIEW_org.chromium.webview_shell`), requiring regex or prefix matching rather than static string equality.
 - **Appium 2.0 Base Path**: Appium 2.x servers default to `/` rather than `/wd/hub`; connecting to `/wd/hub` causes 404 errors unless explicitly configured with `--base-path=/wd/hub`.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Configure W3C Capabilities**: Initialize driver with dedicated options class (`UiAutomator2Options` / `XCUITestOptions`).
+2. **Handle Context Transitions**: When testing hybrid apps, poll `getContexts()` before switching and guarantee return to `NATIVE_APP` in `finally`.
+3. **Dispatch W3C Pointer Gestures**: Implement swipes and scrolls strictly via `PointerInput` actions.
+4. **Enforce Clean Teardown**: Call `driver.quit()` or `driver.terminateApp()` and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Automating native mobile applications on iOS (XCUITest) or Android (UiAutomator2).
@@ -41,7 +48,7 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
   - Web-only browser testing (Chrome, Safari, Firefox) -> Use [sdet-actions](../sdet-actions/SKILL.md) / [sdet-authoring](../sdet-authoring/SKILL.md).
   - Intercepting HTTP network traffic on web applications -> Use [sdet-network](../sdet-network/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Mobile Domain / Feature | Appium 2.x W3C Standard                                                | Multi-Platform Strategy                                 |
 | :---------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------ |
@@ -50,7 +57,7 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
 | **Touch & Gestures**    | W3C `PointerInput` / `ActionChains` (tap, scroll, swipe, drag)         | Standard normalized pixel coordinates                   |
 | **Device Lifecycle**    | `driver.installApp()`, `driver.terminateApp()`, `driver.activateApp()` | Idempotent teardown hooks                               |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -60,3 +67,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero deprecated `TouchAction` or non-W3C capabilities used.
+- [ ] Context switching wrapped in `try...finally` returning to `NATIVE_APP`.
+- [ ] Device sessions cleanly terminated in teardown hooks.
+- [ ] Validated via `verify_test_artifact({ code, framework: "appium", language })` with 100/100 score.

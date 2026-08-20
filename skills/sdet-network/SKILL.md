@@ -28,7 +28,14 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 - **Service Worker Interception Bypass**: Browser Service Workers can intercept fetch requests before standard devtools network routing catches them; bypass service workers when comprehensive API stubbing is required.
 - **Missing CORS Headers on Fulfilled Routes**: When stubbing cross-origin responses with `route.fulfill()`, ensure required CORS headers (`access-control-allow-origin: '*'`) are included, otherwise the browser will block the response.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Fast-Seed State via API**: Authenticate and populate required test data using headless HTTP requests rather than UI forms.
+2. **Register Interceptors Before Navigation**: Attach `page.route()`, `cy.intercept()`, or BiDi network handlers prior to initiating `goto()`.
+3. **Synchronize on Network Events**: Explicitly await response completion (`waitForResponse()`, `cy.wait('@alias')`) rather than guessing DOM settling times.
+4. **Clean Up Interceptor Scope**: Unroute stubs in test teardown hooks and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Intercepting, stubbing, or modifying HTTP/HTTPS requests and responses.
@@ -42,7 +49,7 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
   - Verifying UI DOM states and visibility -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
   - Capturing performance traces and console errors -> Use [sdet-observability](../sdet-observability/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Interception & Mocking API                                                 | Request Synchronization                                         | Direct API Testing Engine                                 |
 | :------------------- | :------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------------- |
@@ -51,7 +58,7 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 | **Selenium 4**       | W3C BiDi `Network.addIntercept()` / `driver.network.add_request_handler()` | BiDi `onBeforeRequestSent` / `responseCompleted` event handlers | HTTP client libraries (HttpClient, requests, RestAssured) |
 | **Vibium**           | BiDi network routing and mock response rules                               | BiDi response event subscriptions                               | Integrated BiDi network driver                            |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -61,3 +68,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Network routes registered before navigation calls.
+- [ ] Explicit promise/alias synchronization on network requests.
+- [ ] Network mocks cleanly scoped and torn down per test.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.
