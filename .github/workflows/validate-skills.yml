@@ -55,6 +55,9 @@ jobs:
       - name: Test MCP server build and test suites
         run: pnpm test
 
+      - name: Run Deterministic Evaluation Benchmarks
+        run: pnpm run test:evals
+
   validate-and-audit:
     name: Validate Skills & Security Audit
     runs-on: ubuntu-latest
@@ -88,6 +91,12 @@ jobs:
 
       - name: Run Schema Linter & Validation
         run: pnpm run validate
+
+      - name: Run Deterministic Evaluation Benchmarks
+        run: pnpm run test:evals
+
+      - name: Run Linter and Code Style Check
+        run: pnpm run lint && pnpm run format:check
 
       - name: Run Skills Check CI
         uses: voodootikigod/skills-check@v1.2.1

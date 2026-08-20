@@ -28,7 +28,14 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
 - **Detached vs Hidden Verification**: Elements styled with `opacity: 0` or obscured by overlays remain connected in the DOM; asserting `.not.toBeAttached()` will fail where `.not.toBeVisible()` succeeds.
 - **Cypress `.then()` Retry Break**: Chaining `.should()` after `.then()` blocks breaks Cypress's automatic retry-and-re-query loop for dynamic elements.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Identify Target Verification Criteria**: Determine whether the check is element visibility, text match, state change, or asynchronous polling.
+2. **Apply Web-First Auto-Retrying Assertion**: Write locator-based assertions (e.g. `expect(locator).toBeVisible()`) rather than fetching static text variables.
+3. **Handle Matrix Validations**: Group independent form or grid checks under `expect.soft()` to report all validation failures in a single run.
+4. **Enforce Deterministic Isolation**: Keep assertions in test specs (never inside Page Objects) and verify with `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Verifying UI element visibility, text content, attributes, counts, and form states.
@@ -41,7 +48,7 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
   - Executing user clicks, keyboard typing, or drag-and-drop -> Use [sdet-actions](../sdet-actions/SKILL.md).
   - Awaiting network responses and status codes -> Use [sdet-network](../sdet-network/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Assertion Engine & Auto-Retry                                    | Soft Assertions Support                        | Custom Condition Polling                              |
 | :------------------- | :--------------------------------------------------------------- | :--------------------------------------------- | :---------------------------------------------------- |
@@ -50,7 +57,7 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
 | **Selenium 4**       | `WebDriverWait` + `ExpectedConditions` + AssertJ/JUnit/pytest    | Test runner soft assertions (`SoftAssertions`) | `FluentWait.pollingEvery().ignoring()`                |
 | **Vibium**           | Web-First condition assertions (`assert visible`, `assert text`) | Native soft condition checks                   | Condition polling streams                             |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -60,3 +67,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero arbitrary time delays (`waitForTimeout`, `sleep`) used.
+- [ ] Explicit assertions present in the test spec body.
+- [ ] No assertions placed inside Page Object methods.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

@@ -1,6 +1,6 @@
 # Awesome SDET — Agent Plugin 🚀
 
-Enterprise SDET Agent Plugin for AI coding assistants featuring test automation skills and a secure Model Context Protocol (MCP) server.
+Enterprise SDET Agent Plugin & MCP Server featuring closed-loop deterministic test verification and bounded self-repair.
 
 Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.org/specification) and [MCP Specification (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28).
 
@@ -109,17 +109,19 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
 ## 📦 What's Included?
 
 - **8 Canonical Capability-First Skills (`skills/sdet-*`):**
-  - Universal SDET rules and decision trees following `agentskills.io` standards (`sdet-locators`, `sdet-actions`, `sdet-assertions`, `sdet-network`, `sdet-storage-state`, `sdet-observability`, `sdet-mobile`, and `sdet-authoring`).
-  - Zero token bloat: Level 1 frontmatter, Level 2 lean rulebooks, and Level 3 on-demand polyglot delivery via MCP.
-- **6 SDET Agents (`agents/`):**
-  - Master SDET Orchestrator (`agents/sdet.agent.md`) for cross-framework test strategy, migration, and subagent routing.
+  - Universal SDET workflows, anti-pattern guides, and verification checklists following `agentskills.io` standards (`sdet-locators`, `sdet-actions`, `sdet-assertions`, `sdet-network`, `sdet-storage-state`, `sdet-observability`, `sdet-mobile`, and `sdet-authoring`).
+  - Zero token bloat: Level 1 frontmatter, Level 2 lean rulebooks (<300 lines), and Level 3 on-demand polyglot delivery via MCP.
+- **6 Host-Agnostic SDET Agents (`agents/`):**
+  - Master SDET Orchestrator (`agents/sdet.agent.md`) supporting host-aware execution (subagent delegation vs. inline specialist persona adoption).
   - 5 Autonomous Domain Specialists for **Playwright**, **Cypress**, **Selenium 4**, **Vibium**, and **Appium**.
-- **Enterprise SDET MCP Server (`mcp.json` / `servers/`):**
-  - 32 MCP tools and dynamic resource templates (`playwright://`, `selenium://`, `cypress://`, `vibium://`, `appium://`) as the Single Source of Truth for polyglot code examples.
+- **Enterprise SDET MCP Server (`servers/`):**
+  - 5 Consolidated Framework Reference Tools (`read_pw_docs`, `read_se_docs`, `read_cy_docs`, `read_vibium_docs`, `read_appium_docs`) delivering progressive, section-filtered docs across 5 languages (TypeScript, JavaScript, Python, Java, C#).
+  - **Deterministic Verification Engine (`verify_test_artifact`):** Real-time static invariant scanner enforcing zero-arbitrary-waits, meaningful assertions, accessible locators, and clean state isolation.
   - Strict **MCP 2026-07-28** conformance: Dual `stdio` and `streamable-http` transports.
-  - Zero-backdoor security defenses: Loopback DNS rebinding prevention, 10MB payload limit (DoS protection), prototype pollution prevention, safe error masking (`-32603`), and path-traversal guards (`resolveSafePath`).
-- **Universal Directives (`AGENTS.md`):**
-  - Shift-left state & isolation, deterministic synchronization, zero-flakiness rules.
+  - Hardened security defenses: Loopback DNS rebinding prevention, 10MB payload limits, prototype pollution guards, safe error masking (`-32603`), and XML prompt boundary containment.
+- **Deterministic Evals & Polyglot AST Validation (`evals/`):**
+  - Fast, zero-API-cost offline evaluation benchmark suites covering framework routing, anti-pattern detection, and prompt injection containment.
+  - Build-time tree-sitter AST validation guaranteeing syntax correctness for all documentation code blocks across 8 programming languages.
 
 ---
 
@@ -137,15 +139,17 @@ pnpm run build
 # Run TypeScript typecheck
 pnpm run typecheck
 
-# Run test suites (Manifests, MCP protocol & tool primitives)
+# Run unit & live MCP matrix test suites (133 combinations)
 pnpm test
 
-# Validate Agent Plugin manifest and skills
+# Run deterministic evaluation benchmark suites
+pnpm run test:evals
+
+# Validate Agent Plugin manifest, skills, and polyglot AST snippets
 pnpm run validate
 
 # Lint and format
-pnpm run lint
-pnpm run format:check
+pnpm run lint && pnpm run format:check
 
 # Security audits
 pnpm run audit:all

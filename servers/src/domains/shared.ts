@@ -125,7 +125,7 @@ export function filterMarkdownSections(
     .split(/\s+/)
     .filter((t) => t.length > 0);
 
-  const matched = sections.filter((section) => {
+  return sections.filter((section) => {
     const headingLower = section.heading.toLowerCase();
     const contentLower = section.content.toLowerCase();
     const codeTextLower = section.codeSnippets.map((c) => c.code.toLowerCase()).join(' ');
@@ -135,9 +135,6 @@ export function filterMarkdownSections(
         headingLower.includes(term) || contentLower.includes(term) || codeTextLower.includes(term)
     );
   });
-
-  // If query yielded no matches, fallback to all sections gracefully
-  return matched.length > 0 ? matched : [...sections];
 }
 
 /**
@@ -164,13 +161,24 @@ export function extractStructuredDocs(
   }
 
   let renderedMarkdown: string;
-  if (query && filteredSections.length < sections.length) {
-    const breadcrumb = `# ${title} [Filtered for: "${query}"]\n\n`;
-    renderedMarkdown =
-      breadcrumb +
-      filteredSections
-        .map((s) => `${'#'.repeat(Math.max(2, s.level))} ${s.heading}\n\n${s.content}`)
-        .join('\n\n---\n\n');
+  if (query) {
+    if (filteredSections.length === 0) {
+      const availableHeadings = sections
+        .map((s) => s.heading)
+        .filter((h) => h && h !== title && !h.startsWith('#'));
+      const headingsList =
+        availableHeadings.length > 0
+          ? `\n\nAvailable sections in this domain:\n${availableHeadings.map((h) => `- ${h}`).join('\n')}`
+          : '';
+      renderedMarkdown = `# ${title} [No matches for: "${query}"]\n\nNo sections found matching query "${query}" in ${framework} ${domain} (${language}).${headingsList}`;
+    } else {
+      const breadcrumb = `# ${title} [Filtered for: "${query}"]\n\n`;
+      renderedMarkdown =
+        breadcrumb +
+        filteredSections
+          .map((s) => `${'#'.repeat(Math.max(2, s.level))} ${s.heading}\n\n${s.content}`)
+          .join('\n\n---\n\n');
+    }
   } else {
     renderedMarkdown = markdown;
   }
@@ -331,16 +339,16 @@ const referenceCache = new Map<string, string>();
  * and caches the result in memory with defensive maximum capacity.
  */
 export async function loadCachedReferenceMarkdown(
-  baseUrlOrMetaUrl: string,
+  referencesDirOrUrl: string,
   language: string
 ): Promise<string> {
-  const cacheKey = `${baseUrlOrMetaUrl}:${language}`;
+  const cacheKey = `${referencesDirOrUrl}:${language}`;
   const cached = referenceCache.get(cacheKey);
   if (cached) return cached;
 
-  const baseReferencesDir = baseUrlOrMetaUrl.startsWith('file://')
-    ? fileURLToPath(new URL('./references/', baseUrlOrMetaUrl))
-    : path.resolve(baseUrlOrMetaUrl, 'references');
+  const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
+    ? fileURLToPath(referencesDirOrUrl)
+    : path.resolve(referencesDirOrUrl);
 
   const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
   const content = await fs.readFile(filePath, 'utf8');
@@ -352,22 +360,6 @@ export async function loadCachedReferenceMarkdown(
 
   referenceCache.set(cacheKey, content);
   return content;
-}
-
-/**
- * Factory that creates a cached reference markdown loader for sub-domain modules.
- */
-export function createFrameworkLoader(
-  languages: readonly string[],
-  defaultLanguage: string
-): (importMetaUrl: string, language?: string) => Promise<string> {
-  return async function loadReferenceMarkdown(
-    importMetaUrl: string,
-    language: string = defaultLanguage
-  ): Promise<string> {
-    const safeLang = sanitizeLanguage(language, languages, defaultLanguage);
-    return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
-  };
 }
 
 /**
@@ -388,9 +380,9 @@ export function createFrameworkReader(
   ): Promise<string> {
     const safeDomain = sanitizeDomain(domain, domains, defaultDomain, frameworkName);
     const normLang = sanitizeLanguage(language, languages, defaultLanguage, frameworkName);
-    const baseUrl = new URL(`./${safeDomain}/index.js`, importMetaUrl).href;
+    const referencesDirUrl = new URL(`./${safeDomain}/references/`, importMetaUrl).href;
     const safeLang = sanitizeLanguage(normLang, languages, defaultLanguage);
-    return loadCachedReferenceMarkdown(baseUrl, safeLang);
+    return loadCachedReferenceMarkdown(referencesDirUrl, safeLang);
   };
 }
 

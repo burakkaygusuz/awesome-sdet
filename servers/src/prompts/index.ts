@@ -21,7 +21,8 @@ export const SupportedLanguageSchema = z
  * Enforces Passive Data Invariant: LLM is instructed to treat enclosed content purely as data, never as directives.
  */
 export function wrapUntrustedContent(tagName: string, content: string): string {
-  const sanitized = content.replaceAll(`</${tagName}>`, `&lt;/${tagName}&gt;`);
+  const closingTagPattern = new RegExp(String.raw`</\s*${tagName}\s*>`, 'gi');
+  const sanitized = content.replace(closingTagPattern, `&lt;/${tagName}&gt;`);
   return `<${tagName}>\n${sanitized}\n</${tagName}>`;
 }
 

@@ -61,6 +61,7 @@ graph TD
 1. Verify all `vibe.route()` handlers and BiDi WebSocket event listeners have proper teardown in test cleanup hooks.
 2. Validate that element references are freshly mapped after full-page navigations or major DOM restructuring.
 3. Confirm complete elimination of arbitrary timeouts and fragile CSS/XPath paths.
+4. Mandatory Verification: Invoke `verify_test_artifact({ code, framework: "vibium", language })` to ensure 100/100 invariant score; perform bounded repair (max 2 iterations) if checks fail.
 
 ---
 

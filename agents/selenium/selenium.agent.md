@@ -56,6 +56,7 @@ graph TD
 
 1. Review generated code against W3C WebDriver specification compliance.
 2. Ensure locators prioritize semantic resilience (IDs, data-* test attributes) over brittle absolute XPath/CSS paths.
+3. Mandatory Verification: Invoke `verify_test_artifact({ code, framework: "selenium", language })` to ensure 100/100 invariant score; perform bounded repair (max 2 iterations) if checks fail.
 
 ---
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
+import { createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
 const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.selenium;
@@ -21,11 +21,6 @@ export const SeleniumDomainSchema = z
   .describe('Supported Selenium documentation domain');
 
 export type SeleniumDomain = z.infer<typeof SeleniumDomainSchema>;
-
-export const loadReferenceMarkdown = createFrameworkLoader(
-  SELENIUM_SUPPORTED_LANGUAGES,
-  defaultLanguage
-);
 
 export const readSeleniumReferenceDoc = createFrameworkReader(
   'Selenium',

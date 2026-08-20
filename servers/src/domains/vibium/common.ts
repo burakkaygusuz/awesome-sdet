@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
+import { createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
 const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.vibium;
@@ -21,11 +21,6 @@ export const VibiumDomainSchema = z
   .describe('Supported Vibium documentation domain');
 
 export type VibiumDomain = z.infer<typeof VibiumDomainSchema>;
-
-export const loadReferenceMarkdown = createFrameworkLoader(
-  VIBIUM_SUPPORTED_LANGUAGES,
-  defaultLanguage
-);
 
 export const readVibiumReferenceDoc = createFrameworkReader(
   'Vibium',

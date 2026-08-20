@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
+import { createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
 const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.cypress;
@@ -19,11 +19,6 @@ export const CypressDomainSchema = z
   .describe('Supported Cypress documentation domain');
 
 export type CypressDomain = z.infer<typeof CypressDomainSchema>;
-
-export const loadReferenceMarkdown = createFrameworkLoader(
-  CYPRESS_SUPPORTED_LANGUAGES,
-  defaultLanguage
-);
 
 export const readCypressReferenceDoc = createFrameworkReader(
   'Cypress',

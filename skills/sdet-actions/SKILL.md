@@ -27,7 +27,14 @@ Simulating genuine user interactions requires strict actionability verification 
 - **Framework Synthetic Events**: Modifying input values directly via script evaluation does not trigger React/Vue `onChange` state updates; use native framework fill/type methods.
 - **Hover Menus in Headless CI**: Mouse hover states can reset between actions in headless runners if subsequent commands lack pointer coordinate continuity.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Resolve Target Element**: Query element using semantic accessible locators from [sdet-locators](../sdet-locators/SKILL.md).
+2. **Ensure Actionability**: Rely on native framework auto-waiting or explicit condition waiters (`toBeVisible`, `elementToBeClickable`).
+3. **Dispatch Interaction**: Execute atomic actions (`fill()`, `click()`, `selectOption()`) without force overrides.
+4. **Trigger Verification**: Hand off to [sdet-assertions](../sdet-assertions/SKILL.md) and run `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Automating user interactions: clicks, double-clicks, right-clicks, and hover states.
@@ -40,7 +47,7 @@ Simulating genuine user interactions requires strict actionability verification 
   - Verifying state, text, or DOM conditions after interactions -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
   - Managing mobile device app lifecycle or permissions -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Action Pipeline & Synchronization                             | Text Input Strategy                                  | Gestures & Pointer Chains                                           |
 | :------------------- | :------------------------------------------------------------ | :--------------------------------------------------- | :------------------------------------------------------------------ |
@@ -50,7 +57,7 @@ Simulating genuine user interactions requires strict actionability verification 
 | **Vibium**           | Built-in auto-waiting action pipeline                         | `element.type()`, `element.fill()`                   | Pointer gestures and drag operations                                |
 | **Appium**           | `WebDriverWait` + `ExpectedConditions`                        | `element.sendKeys()`                                 | W3C `ActionChains` (`PointerInput` swipe, scroll, tap)              |
 
-## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
 To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
@@ -61,3 +68,10 @@ To fetch complete, language-specific code implementations without context pollut
 - **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero arbitrary time delays (`waitForTimeout`, `sleep`) used.
+- [ ] No `{ force: true }` or synthetic JS `element.click()` bypasses.
+- [ ] Atomic `fill()` chosen over character-by-character loops.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.
