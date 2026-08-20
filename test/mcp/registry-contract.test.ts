@@ -28,7 +28,7 @@ describe('framework registry contract', () => {
     const data = await parseMcpResponse(response);
     const toolNames = new Set((data.result?.tools ?? []).map((tool) => tool.name));
 
-    expect(toolNames.size).toBe(5);
+    expect(toolNames.size).toBe(6);
     expect(toolNames).toEqual(
       new Set([
         'read_pw_docs',
@@ -36,6 +36,7 @@ describe('framework registry contract', () => {
         'read_cy_docs',
         'read_vibium_docs',
         'read_appium_docs',
+        'verify_test_artifact',
       ])
     );
 

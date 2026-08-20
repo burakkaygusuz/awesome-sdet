@@ -66,8 +66,13 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(tool.outputSchema).toBeDefined();
         const schemaProps = (tool.outputSchema?.properties ?? {}) as Record<string, unknown>;
         expect.soft(tool.outputSchema?.type).toBe('object');
-        expect.soft(schemaProps.framework).toBeDefined();
-        expect.soft(schemaProps.codeSnippets).toBeDefined();
+        if (tool.name.startsWith('read_')) {
+          expect.soft(schemaProps.framework).toBeDefined();
+          expect.soft(schemaProps.codeSnippets).toBeDefined();
+        } else if (tool.name === 'verify_test_artifact') {
+          expect.soft(schemaProps.passed).toBeDefined();
+          expect.soft(schemaProps.score).toBeDefined();
+        }
       }
     });
 
