@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
+import { createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
 const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.playwright;
@@ -21,11 +21,6 @@ export const PlaywrightDomainSchema = z
   .describe('Supported Playwright documentation domain');
 
 export type PlaywrightDomain = z.infer<typeof PlaywrightDomainSchema>;
-
-export const loadReferenceMarkdown = createFrameworkLoader(
-  PLAYWRIGHT_SUPPORTED_LANGUAGES,
-  defaultLanguage
-);
 
 export const readPlaywrightReferenceDoc = createFrameworkReader(
   'Playwright',

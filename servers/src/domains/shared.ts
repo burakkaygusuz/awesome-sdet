@@ -331,16 +331,16 @@ const referenceCache = new Map<string, string>();
  * and caches the result in memory with defensive maximum capacity.
  */
 export async function loadCachedReferenceMarkdown(
-  baseUrlOrMetaUrl: string,
+  referencesDirOrUrl: string,
   language: string
 ): Promise<string> {
-  const cacheKey = `${baseUrlOrMetaUrl}:${language}`;
+  const cacheKey = `${referencesDirOrUrl}:${language}`;
   const cached = referenceCache.get(cacheKey);
   if (cached) return cached;
 
-  const baseReferencesDir = baseUrlOrMetaUrl.startsWith('file://')
-    ? fileURLToPath(new URL('./references/', baseUrlOrMetaUrl))
-    : path.resolve(baseUrlOrMetaUrl, 'references');
+  const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
+    ? fileURLToPath(referencesDirOrUrl)
+    : path.resolve(referencesDirOrUrl);
 
   const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
   const content = await fs.readFile(filePath, 'utf8');
@@ -352,22 +352,6 @@ export async function loadCachedReferenceMarkdown(
 
   referenceCache.set(cacheKey, content);
   return content;
-}
-
-/**
- * Factory that creates a cached reference markdown loader for sub-domain modules.
- */
-export function createFrameworkLoader(
-  languages: readonly string[],
-  defaultLanguage: string
-): (importMetaUrl: string, language?: string) => Promise<string> {
-  return async function loadReferenceMarkdown(
-    importMetaUrl: string,
-    language: string = defaultLanguage
-  ): Promise<string> {
-    const safeLang = sanitizeLanguage(language, languages, defaultLanguage);
-    return loadCachedReferenceMarkdown(importMetaUrl, safeLang);
-  };
 }
 
 /**
@@ -388,9 +372,9 @@ export function createFrameworkReader(
   ): Promise<string> {
     const safeDomain = sanitizeDomain(domain, domains, defaultDomain, frameworkName);
     const normLang = sanitizeLanguage(language, languages, defaultLanguage, frameworkName);
-    const baseUrl = new URL(`./${safeDomain}/index.js`, importMetaUrl).href;
+    const referencesDirUrl = new URL(`./${safeDomain}/references/`, importMetaUrl).href;
     const safeLang = sanitizeLanguage(normLang, languages, defaultLanguage);
-    return loadCachedReferenceMarkdown(baseUrl, safeLang);
+    return loadCachedReferenceMarkdown(referencesDirUrl, safeLang);
   };
 }
 

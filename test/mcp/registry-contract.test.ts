@@ -65,4 +65,52 @@ describe('framework registry contract', () => {
 
     expect(offenders).toEqual([]);
   });
+
+  it('successfully loads reference docs for all registered framework, domain, and language combinations', async () => {
+    let callId = 100;
+    for (const framework of FRAMEWORK_IDS) {
+      const definition = FRAMEWORK_REGISTRY[framework];
+      const toolName = definition.toolNames[0];
+
+      for (const domain of definition.domains) {
+        for (const language of definition.languages) {
+          callId++;
+          const response = await mcpFetch(url, {
+            jsonrpc: '2.0',
+            id: callId,
+            method: 'tools/call',
+            params: {
+              name: toolName,
+              arguments: { domain, language },
+            },
+          });
+
+          const data = await parseMcpResponse(response);
+          expect.soft(data.error).toBeUndefined();
+          expect.soft(data.result?.isError).toBeFalsy();
+
+          const content = data.result?.content?.[0]?.text;
+          expect.soft(content).toBeDefined();
+          expect.soft(typeof content).toBe('string');
+          expect.soft(content?.length).toBeGreaterThan(50);
+
+          const structured = data.result?.structuredContent as
+            | {
+                framework: string;
+                domain: string;
+                language: string;
+                title: string;
+                codeSnippets: unknown[];
+              }
+            | undefined;
+
+          expect.soft(structured).toBeDefined();
+          expect.soft(structured?.framework).toBe(framework);
+          expect.soft(structured?.domain).toBe(domain);
+          expect.soft(structured?.language).toBe(language);
+          expect.soft(structured?.codeSnippets.length).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
 });

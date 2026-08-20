@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createFrameworkLoader, createFrameworkReader } from '../shared.js';
+import { createFrameworkReader } from '../shared.js';
 import { FRAMEWORK_REGISTRY } from '../../registry.js';
 
 const { languages, domains, defaultDomain, defaultLanguage } = FRAMEWORK_REGISTRY.appium;
@@ -21,11 +21,6 @@ export const AppiumDomainSchema = z
   .describe('Supported Appium documentation domain');
 
 export type AppiumDomain = z.infer<typeof AppiumDomainSchema>;
-
-export const loadReferenceMarkdown = createFrameworkLoader(
-  APPIUM_SUPPORTED_LANGUAGES,
-  defaultLanguage
-);
 
 export const readAppiumReferenceDoc = createFrameworkReader(
   'Appium',
