@@ -27,6 +27,7 @@
     "typecheck": "tsc --noEmit",
     "validate": "node dist/scripts/validate.js",
     "test": "pnpm run build && vitest run",
+    "test:evals": "vitest run evals",
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
