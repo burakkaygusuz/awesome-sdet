@@ -265,7 +265,9 @@ describe('Agent Plugins 1.0.0 Manifest Compliance & Zero-Conflict Schema Alignme
         expect.soft(content).toContain('## 2. Core Invariants');
         expect.soft(content).toContain('## 3. When to Use');
         expect.soft(content).toContain('## 4. Universal Framework Paradigm Mapping');
-        expect.soft(content).toContain('## 5. Dynamic MCP Tool & Resource Schemas');
+        expect
+          .soft(content)
+          .toMatch(/## 5\. Dynamic MCP (?:Knowledge & Tool|Tool & Resource) Schemas/);
       }
     });
 

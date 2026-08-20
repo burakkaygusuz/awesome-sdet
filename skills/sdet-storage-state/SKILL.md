@@ -37,9 +37,9 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
   - Ensuring multi-worker parallel test isolation across distributed test runners.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Testing the login UI flow itself (invalid passwords, MFA form validation) -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md) and [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Intercepting HTTP requests or stubbing API responses -> Use [sdet-network](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-network/SKILL.md).
-  - Managing mobile device app sessions and capabilities -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Testing the login UI flow itself (invalid passwords, MFA form validation) -> Use [sdet-actions](../sdet-actions/SKILL.md) and [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Intercepting HTTP requests or stubbing API responses -> Use [sdet-network](../sdet-network/SKILL.md).
+  - Managing mobile device app sessions and capabilities -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -50,11 +50,13 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 | **Selenium 4**       | Programmatic cookie & localStorage serialization | Separate `WebDriver` session instances     | `driver.manage().addCookie()` & JS localStorage scripts |
 | **Vibium**           | Browser context state snapshots                  | Isolated state pools                       | Native state import/export APIs                         |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing session state:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
-- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
-- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`
+- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`).
+- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
+- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

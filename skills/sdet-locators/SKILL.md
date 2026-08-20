@@ -37,9 +37,9 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
   - Defining locators within Page Object Models (POM) or Screen Object Models (SOM).
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Performing clicks, fills, drag-and-drop, or gestures -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
-  - Asserting element visibility, state, or text values -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Mobile-specific device lifecycle or driver capabilities -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Performing clicks, fills, drag-and-drop, or gestures -> Use [sdet-actions](../sdet-actions/SKILL.md).
+  - Asserting element visibility, state, or text values -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Mobile-specific device lifecycle or driver capabilities -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -51,12 +51,14 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
 | **Vibium**           | `vibe.find({ role: '...' })`, `{ label }`, `{ testid }` | Subtree chaining (`el.find(...)`)               | `>>` (one boundary), `>>>` (any depth)            |
 | **Appium**           | `driver.findElement(AppiumBy.accessibilityId(...))`     | iOS Class Chains, Android `UiScrollable`        | Native context switching (`WEBVIEW`/`NATIVE_APP`) |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when querying elements:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Locators**: When selecting elements in Playwright, invoke `read_pw_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://locators/{language}`
-- **Cypress Locators & Shadow DOM**: When selecting elements in Cypress or piercing Shadow DOM, invoke `read_cy_docs` (Parameters: `domain: "commands" | "shadow"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://commands/{language}`, `cypress://shadow/{language}`
-- **Selenium Locators**: When authoring Selenium By queries or Relative Locators, invoke `read_se_docs` (Parameters: `domain: "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
-- **Vibium Selectors**: When querying elements with semantic or piercing selectors in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "selectors"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://selectors/{language}`
-- **Appium Locators**: When authoring mobile selectors across Android and iOS, invoke `read_appium_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://locators/{language}`
+- **Playwright Locators**: When selecting elements in Playwright, invoke `read_pw_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Locators & Shadow DOM**: When selecting elements in Cypress or piercing Shadow DOM, invoke `read_cy_docs` (Parameters: `domain: "commands" | "shadow"`, `language: "typescript" | "javascript"`).
+- **Selenium Locators**: When authoring Selenium By queries or Relative Locators, invoke `read_se_docs` (Parameters: `domain: "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
+- **Vibium Selectors**: When querying elements with semantic or piercing selectors in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "selectors"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- **Appium Locators**: When authoring mobile selectors across Android and iOS, invoke `read_appium_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

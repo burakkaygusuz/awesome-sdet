@@ -18,7 +18,7 @@ Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mc
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, session, and authoring invariants.
 - **Dynamic MCP Knowledge:** Invoke `read_vibium_docs` with `domain` (`bidi`, `core`, `interactions`, `selectors`, `state`) and target `language` (`typescript`, `javascript`, `python`, `java`).
-- **Resource Templates:** Read full framework references via `vibium://{domain}/{language}`.
+- **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
 ---
 

@@ -64,6 +64,11 @@ export async function validateSkillFile(
     hasError = true;
   }
 
+  if (/file:\/\/\/[a-zA-Z]:|\/Users\/|\/home\/|[a-zA-Z]:\\/i.test(content)) {
+    console.error(`Error: ${relPath}: Contains hardcoded absolute or user-specific file path(s)`);
+    hasError = true;
+  }
+
   const frontmatterEnd = content.indexOf('---', 3);
   const body = content.substring(frontmatterEnd + 3).trim();
   const bodyLineCount = body ? body.split('\n').length : 0;

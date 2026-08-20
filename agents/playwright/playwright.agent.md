@@ -18,7 +18,7 @@ Always consult the repository skills and dedicated `sdet-mcp` server tools befor
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, storage, and authoring invariants.
 - **Dynamic MCP Knowledge:** Invoke `read_pw_docs` with `domain` (`locators`, `actions`, `assertions`, `network`, `storage`, `observability`) and target `language` (`typescript`, `javascript`, `python`, `java`, `csharp`).
-- **Resource Templates:** Read full framework references via `playwright://{domain}/{language}`.
+- **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
 ---
 

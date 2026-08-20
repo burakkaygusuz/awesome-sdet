@@ -37,9 +37,9 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
   - Capturing browser console logs, network error telemetry, and uncaught exceptions.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Performing assertion checks on element visibility and state -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Mocking network endpoints and handling responses -> Use [sdet-network](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-network/SKILL.md).
-  - Designing Page Object Models and test lifecycle suites -> Use [sdet-authoring](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-authoring/SKILL.md).
+  - Performing assertion checks on element visibility and state -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Mocking network endpoints and handling responses -> Use [sdet-network](../sdet-network/SKILL.md).
+  - Designing Page Object Models and test lifecycle suites -> Use [sdet-authoring](../sdet-authoring/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -50,11 +50,13 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
 | **Selenium 4**       | OpenTelemetry spans (W3C tracing)            | AShot / Eyes / Selenium screenshot API | `EventFiringDecorator` & BiDi `driver.script.add_*_handler()` |
 | **Vibium**           | BiDi action timeline recording               | Visual state comparison snapshots      | BiDi log/event subscriptions                                  |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when configuring observability:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Observability**: When capturing traces, screenshots, or console logs in Playwright, invoke `read_pw_docs` (Parameters: `domain: "observability"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://observability/{language}`
-- **Cypress Observability**: When configuring Cypress screenshots, logs, or error hooks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium Observability**: When configuring OpenTelemetry spans, WebDriver listeners, or BiDi logging in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "observability" | "listeners"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://observability/{language}`, `selenium://listeners/{language}`
-- **Vibium State & BiDi Tracing**: When recording action timelines or capturing state in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state" | "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URIs: `vibium://state/{language}`, `vibium://bidi/{language}`
+- **Playwright Observability**: When capturing traces, screenshots, or console logs in Playwright, invoke `read_pw_docs` (Parameters: `domain: "observability"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Observability**: When configuring Cypress screenshots, logs, or error hooks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`).
+- **Selenium Observability**: When configuring OpenTelemetry spans, WebDriver listeners, or BiDi logging in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "observability" | "listeners"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
+- **Vibium State & BiDi Tracing**: When recording action timelines or capturing state in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state" | "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

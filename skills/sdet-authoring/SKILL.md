@@ -37,9 +37,9 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
   - Setting up Component Testing / Storybook test mount harnesses.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Querying element selectors -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Executing user actions and inputs -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
-  - Setting up session state snapshots and cookies -> Use [sdet-storage-state](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-storage-state/SKILL.md).
+  - Querying element selectors -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Executing user actions and inputs -> Use [sdet-actions](../sdet-actions/SKILL.md).
+  - Setting up session state snapshots and cookies -> Use [sdet-storage-state](../sdet-storage-state/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -51,12 +51,14 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
 | **Vibium**           | Declarative workflows & SDK page helpers               | Environment configuration fixtures       | Isolated browser contexts                           |
 | **Appium**           | Screen Object Model (SOM)                              | Multi-platform driver factory            | Parallel mobile execution via unique system ports   |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when structuring test suites:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Architecture**: When structuring Playwright POM, fixtures, or component tests, invoke `read_pw_docs` (Parameters: `domain: "locators" | "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `playwright://locators/{language}`, `playwright://actions/{language}`
-- **Cypress Architecture**: When structuring Cypress component tests, commands, or tasks, invoke `read_cy_docs` (Parameters: `domain: "component" | "commands" | "task"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://component/{language}`, `cypress://commands/{language}`, `cypress://task/{language}`
-- **Selenium POM & PageFactory**: When structuring Selenium Page Object Models or PageFactory patterns, invoke `read_se_docs` (Parameters: `domain: "pagefactory" | "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
-- **Vibium Architecture**: When structuring Vibium workflows and page helpers, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
-- **Appium Screen Objects**: When structuring Appium Screen Object Models or multi-platform factories, invoke `read_appium_docs` (Parameters: `domain: "capabilities" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://locators/{language}`
+- **Playwright Architecture**: When structuring Playwright POM, fixtures, or component tests, invoke `read_pw_docs` (Parameters: `domain: "locators" | "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Architecture**: When structuring Cypress component tests, commands, or tasks, invoke `read_cy_docs` (Parameters: `domain: "component" | "commands" | "task"`, `language: "typescript" | "javascript"`).
+- **Selenium POM & PageFactory**: When structuring Selenium Page Object Models or PageFactory patterns, invoke `read_se_docs` (Parameters: `domain: "pagefactory" | "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
+- **Vibium Architecture**: When structuring Vibium workflows and page helpers, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- **Appium Screen Objects**: When structuring Appium Screen Object Models or multi-platform factories, invoke `read_appium_docs` (Parameters: `domain: "capabilities" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

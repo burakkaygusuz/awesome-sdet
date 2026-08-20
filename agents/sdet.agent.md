@@ -34,23 +34,28 @@ The `sdet` orchestrator owns strategy, routing, and migration mapping; the AI ho
 3. For cross-framework migration, the orchestrator performs the semantic mapping directly, then delegates code execution to the **target** framework's specialist.
 4. API & contract testing routes to the suite's specialist for Playwright and Cypress (native `APIRequestContext` / `cy.request()` clients); Selenium and Vibium are interception-only (BiDi), so execute directly and pair the suite with a dedicated HTTP client library.
 
-### Subagent Invocation Protocol (`invoke_subagent`)
+### Universal Subagent & Execution Protocol
 
-When a request requires framework-specific authoring, refactoring, or migration execution, delegate it to the matching specialist instead of executing it yourself:
+When a request requires framework-specific authoring, refactoring, or migration execution, delegate or adapt to the matching specialist:
 
-```
-invoke_subagent(@<specialty>, directive)
-```
+1. **Subagent-Enabled Host Environments (e.g. Antigravity, Multi-Agent Platforms):**
+   - If the host environment provides subagent dispatch tools (e.g. `invoke_subagent`), dispatch to `@<specialty>` with a self-contained task directive:
+     ```
+     invoke_subagent(@<specialty>, directive)
+     ```
+   - **`@<specialty>`**: one of `@playwright`, `@selenium`, `@cypress`, `@vibium`, `@appium`, resolved from `agents/<specialty>/<specialty>.agent.md`.
+   - **`directive`**: a self-contained task containing the source artifacts, the exact migration or authoring targets, and the quality invariants from §5 the specialist must enforce.
 
-- **`@<specialty>`**: one of `@playwright`, `@selenium`, `@cypress`, `@vibium`, `@appium`, resolved from `agents/<specialty>/<specialty>.agent.md`.
-- **`directive`**: a self-contained task containing the source artifacts, the exact migration or authoring targets, and the quality invariants from §5 the specialist must enforce.
+2. **Standard / Single-Agent Hosts (e.g. Cursor, VS Code Copilot, CLI):**
+   - If subagent dispatch tools are unavailable in the host runtime, adopt the persona, execution constraints, and tool bindings of the target specialist directly within your execution context.
+   - Read the specialist's specification (`agents/<specialty>/<specialty>.agent.md`), query the matching `sdet-mcp` tool (`read_pw_docs`, `read_se_docs`, etc.), and generate code adhering strictly to that framework's execution invariants.
 
 **Delegation workflow:**
 
 1. Analyze the request: test structure, locators, assertions, and execution model. Route via the table above; execute directly only for cross-framework strategy and migration mapping.
-2. Invoke the target specialist with `invoke_subagent(@<specialty>, directive)` and precise migration targets — never partial or ambiguous scopes.
-3. The specialist replaces source calls with target idiomatic chains and enforces its framework's execution constraints and the §5 invariants.
-4. Verify the returned output against the directive before presenting it; reject and re-invoke with corrections if invariants were violated.
+2. When subagent execution is supported, invoke the target specialist with `invoke_subagent(@<specialty>, directive)` and precise migration targets. Otherwise, adopt the specialist persona directly.
+3. The specialist (or adopted persona) replaces source calls with target idiomatic chains and enforces its framework's execution constraints and §5 invariants.
+4. Verify the output against the directive before presenting it; reject and correct if invariants were violated.
 
 ---
 

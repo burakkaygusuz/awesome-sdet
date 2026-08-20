@@ -18,9 +18,9 @@ Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mc
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, session, and authoring invariants.
 - **Dynamic MCP Knowledge:** Invoke `read_appium_docs` with `domain` (`capabilities`, `context`, `device`, `gestures`, `locators`) and target `language` (`typescript`, `javascript`, `python`, `java`, `csharp`).
-- **Resource Templates:** Read full framework references via `appium://{domain}/{language}`.
+- **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
-> **Cross-Framework Interoperability:** When automating Hybrid WebViews (`WEBVIEW`), consult `skills/sdet-locators` and `skills/sdet-assertions` (along with `read_se_docs` / `selenium://locators/{language}`) for DOM locator strategies and explicit wait assertions.
+> **Cross-Framework Interoperability:** When automating Hybrid WebViews (`WEBVIEW`), consult `skills/sdet-locators` and `skills/sdet-assertions` (along with `read_se_docs`) for DOM locator strategies and explicit wait assertions.
 
 ---
 

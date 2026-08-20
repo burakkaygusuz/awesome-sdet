@@ -37,9 +37,9 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
   - Configuring Appium server capabilities and cross-device test execution grids.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Querying mobile element selectors -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Web-only browser testing (Chrome, Safari, Firefox) -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md) / [sdet-authoring](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-authoring/SKILL.md).
-  - Intercepting HTTP network traffic on web applications -> Use [sdet-network](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-network/SKILL.md).
+  - Querying mobile element selectors -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Web-only browser testing (Chrome, Safari, Firefox) -> Use [sdet-actions](../sdet-actions/SKILL.md) / [sdet-authoring](../sdet-authoring/SKILL.md).
+  - Intercepting HTTP network traffic on web applications -> Use [sdet-network](../sdet-network/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -50,11 +50,13 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
 | **Touch & Gestures**    | W3C `PointerInput` / `ActionChains` (tap, scroll, swipe, drag)         | Standard normalized pixel coordinates                   |
 | **Device Lifecycle**    | `driver.installApp()`, `driver.terminateApp()`, `driver.activateApp()` | Idempotent teardown hooks                               |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when configuring mobile automation:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_appium_docs` (Parameters: `domain: "capabilities"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://capabilities/{language}`
-- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_appium_docs` (Parameters: `domain: "context"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://context/{language}`
-- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_appium_docs` (Parameters: `domain: "device"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://device/{language}`
-- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`
+- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_appium_docs` (Parameters: `domain: "capabilities"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_appium_docs` (Parameters: `domain: "context"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_appium_docs` (Parameters: `domain: "device"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

@@ -18,7 +18,7 @@ Always consult the repository skills and `sdet-mcp` server tools before generati
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, session, and authoring invariants.
 - **Dynamic MCP Knowledge:** Invoke `read_se_docs` with `domain` (`actions`, `bidi`, `grid`, `listeners`, `locators`, `observability`, `pagefactory`) and target `language` (`typescript`, `javascript`, `python`, `java`, `csharp`, `ruby`).
-- **Resource Templates:** Read full framework references via `selenium://{domain}/{language}`.
+- **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
 ---
 

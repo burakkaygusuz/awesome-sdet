@@ -18,7 +18,7 @@ Always consult the repository skills and dedicated `sdet-mcp` server tools befor
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, session, and authoring invariants.
 - **Dynamic MCP Knowledge:** Invoke `read_cy_docs` with `domain` (`commands`, `component`, `fixtures`, `network`, `session`, `shadow`, `stubs`, `task`) and target `language` (`typescript`, `javascript`).
-- **Resource Templates:** Read full framework references via `cypress://{domain}/{language}`.
+- **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
 ---
 

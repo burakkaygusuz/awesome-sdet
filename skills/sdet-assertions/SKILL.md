@@ -37,9 +37,9 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
   - Polling non-DOM asynchronous backend jobs, responses, or storage mutations.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Defining element selectors and locators -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Executing user clicks, keyboard typing, or drag-and-drop -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
-  - Awaiting network responses and status codes -> Use [sdet-network](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-network/SKILL.md).
+  - Defining element selectors and locators -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Executing user clicks, keyboard typing, or drag-and-drop -> Use [sdet-actions](../sdet-actions/SKILL.md).
+  - Awaiting network responses and status codes -> Use [sdet-network](../sdet-network/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -50,11 +50,13 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
 | **Selenium 4**       | `WebDriverWait` + `ExpectedConditions` + AssertJ/JUnit/pytest    | Test runner soft assertions (`SoftAssertions`) | `FluentWait.pollingEvery().ignoring()`                |
 | **Vibium**           | Web-First condition assertions (`assert visible`, `assert text`) | Native soft condition checks                   | Condition polling streams                             |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when implementing assertions:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_pw_docs` (Parameters: `domain: "assertions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://assertions/{language}`
-- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `read_se_docs` (Parameters: `domain: "actions" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp" | "ruby"`) -> URIs: `selenium://actions/{language}`, `selenium://locators/{language}`
-- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
+- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_pw_docs` (Parameters: `domain: "assertions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`).
+- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `read_se_docs` (Parameters: `domain: "actions" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp" | "ruby"`).
+- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.

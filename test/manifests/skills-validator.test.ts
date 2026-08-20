@@ -89,4 +89,11 @@ describe('skills validator guide enforcement (§3.2/§3.3)', () => {
     const result = await validate(skillFile('# Heading\n\nBody.\n', longDescription));
     expect(result.hasError).toBe(true);
   });
+
+  it('rejects hardcoded absolute or user-specific file paths in body', async () => {
+    const result = await validate(
+      skillFile('# Heading\n\n- Link: [other](file:///Users/burak/repo/skills/sdet/SKILL.md)\n')
+    );
+    expect(result.hasError).toBe(true);
+  });
 });

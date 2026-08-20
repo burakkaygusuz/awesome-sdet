@@ -36,9 +36,9 @@ Simulating genuine user interactions requires strict actionability verification 
   - Uploading or downloading files through standard browser dialogues.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Locating elements and writing selectors -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Verifying state, text, or DOM conditions after interactions -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Managing mobile device app lifecycle or permissions -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Locating elements and writing selectors -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Verifying state, text, or DOM conditions after interactions -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Managing mobile device app lifecycle or permissions -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
 ## 4. Universal Framework Paradigm Mapping
 
@@ -50,12 +50,14 @@ Simulating genuine user interactions requires strict actionability verification 
 | **Vibium**           | Built-in auto-waiting action pipeline                         | `element.type()`, `element.fill()`                   | Pointer gestures and drag operations                                |
 | **Appium**           | `WebDriverWait` + `ExpectedConditions`                        | `element.sendKeys()`                                 | W3C `ActionChains` (`PointerInput` swipe, scroll, tap)              |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 5. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when implementing actions:
+To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
 
-- **Playwright Actions**: When implementing Playwright clicks, fills, or drag-and-drop, invoke `read_pw_docs` (Parameters: `domain: "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://actions/{language}`
-- **Cypress Commands**: When implementing Cypress click, type, or custom commands, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium Actions**: When implementing Selenium 4 W3C action chains or keyboard events, invoke `read_se_docs` (Parameters: `domain: "actions"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://actions/{language}`
-- **Vibium Interactions**: When implementing Vibium clicks, fills, or auto-waiting interactions, invoke `read_vibium_docs` (Parameters: `domain: "interactions"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://interactions/{language}`
-- **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`
+- **Playwright Actions**: When implementing Playwright clicks, fills, or drag-and-drop, invoke `read_pw_docs` (Parameters: `domain: "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Cypress Commands**: When implementing Cypress click, type, or custom commands, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`).
+- **Selenium Actions**: When implementing Selenium 4 W3C action chains or keyboard events, invoke `read_se_docs` (Parameters: `domain: "actions"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
+- **Vibium Interactions**: When implementing Vibium clicks, fills, or auto-waiting interactions, invoke `read_vibium_docs` (Parameters: `domain: "interactions"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+
+Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
