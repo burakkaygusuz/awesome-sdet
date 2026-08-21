@@ -57,18 +57,13 @@ const CALL_NODE_TYPES = new Set([
   'method_invocation',
 ]);
 
-let initPromise: Promise<Parser> | null = null;
-let parserInstance: Parser | null = null;
+let initPromise: Promise<void> | null = null;
 const loadedLanguages = new Map<SupportedGrammar, Language>();
 const inFlightGrammarLoads = new Map<SupportedGrammar, Promise<Language>>();
 
-async function getInitializedParser(): Promise<Parser> {
-  if (parserInstance) return parserInstance;
+async function ensureParserInitialized(): Promise<void> {
   if (!initPromise) {
-    initPromise = Parser.init().then(() => {
-      parserInstance = new Parser();
-      return parserInstance;
-    });
+    initPromise = Parser.init();
   }
   return initPromise;
 }
@@ -95,10 +90,11 @@ export async function getTreeSitterParser(languageName?: string): Promise<{
   parser: Parser;
   language: Language | null;
 }> {
-  const parser = await getInitializedParser();
+  await ensureParserInitialized();
   const grammarKey = languageName ? (GRAMMAR_BY_LANG[languageName.toLowerCase()] ?? 'tsx') : 'tsx';
   const lang = await loadGrammarLanguage(grammarKey);
 
+  const parser = new Parser();
   if (lang) {
     parser.setLanguage(lang);
   }

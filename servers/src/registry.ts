@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const FRAMEWORK_IDS = ['selenium', 'cypress', 'vibium', 'appium', 'playwright'] as const;
 
 export type SupportedFramework = (typeof FRAMEWORK_IDS)[number];
@@ -12,6 +14,27 @@ export const SUPPORTED_LANGUAGES = [
 ] as const;
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+export const INTENT_TYPES = [
+  'author_test',
+  'migrate_test',
+  'diagnose_flakiness',
+  'lookup_docs',
+  'verify_artifact',
+] as const;
+
+export type IntentType = (typeof INTENT_TYPES)[number];
+
+export const IntentResultSchema = z.strictObject({
+  intent: z.enum(INTENT_TYPES),
+  framework: z.enum(FRAMEWORK_IDS).nullable(),
+  domain: z.string().optional(),
+  language: z.enum(SUPPORTED_LANGUAGES).optional(),
+  confidence: z.number().min(0).max(1),
+  matchedKeywords: z.array(z.string()),
+});
+
+export type IntentResult = z.infer<typeof IntentResultSchema>;
 
 export const SELENIUM_DOMAINS = [
   'actions',
@@ -257,5 +280,124 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
     candidates: candidateFrameworks,
     matchedKeywords: allTiedKeywords,
     score: highestScore,
+  };
+}
+
+const INTENT_SIGNATURES: Array<{ intent: IntentType; patterns: readonly RegExp[] }> = [
+  {
+    intent: 'verify_artifact',
+    patterns: [
+      /\b(?:verify_test_artifact|verification|verify\s+test|scan\s+test|audit\s+test)\b/i,
+      /^\s*verify\b/i,
+    ],
+  },
+  {
+    intent: 'migrate_test',
+    patterns: [/\b(?:migrate|migration|migrating|convert|converting|transform|port|porting)\b/i],
+  },
+  {
+    intent: 'diagnose_flakiness',
+    patterns: [
+      /\b(?:flaky|flakiness|intermittent|race\s+condition|diagnose|diagnosing|debug|debugging|timeout\s+issue)\b/i,
+    ],
+  },
+  {
+    intent: 'lookup_docs',
+    patterns: [/\b(?:lookup|look\s*up|read_sdet_docs|documentation|reference|api\s+docs|guide)\b/i],
+  },
+  {
+    intent: 'author_test',
+    patterns: [
+      /\b(?:generate|generating|write|writing|author|authoring|create|creating|test|spec|suite)\b/i,
+    ],
+  },
+];
+
+const LANGUAGE_SIGNATURES: Record<SupportedLanguage, readonly RegExp[]> = {
+  typescript: [/\b(?:typescript|ts|tsx)\b/i],
+  javascript: [/\b(?:javascript|js|jsx|node)\b/i],
+  python: [/\b(?:python|py|pytest)\b/i],
+  java: [/\b(?:java|junit|testng)\b/i],
+  csharp: [/\b(?:csharp|c#|\.net|dotnet|nunit)\b/i],
+  ruby: [/\b(?:ruby|rb|rspec)\b/i],
+};
+
+const DOMAIN_SIGNATURES: Record<string, readonly RegExp[]> = {
+  gestures: [/\b(?:gesture|gestures|swipe|pinch|tap|scroll)\b/i],
+  locators: [
+    /\b(?:locator|locators|selector|selectors|getByRole|getByLabel|getByText|By\.\w+|accessibilityId)\b/i,
+  ],
+  actions: [/\b(?:action|actions|click|fill|type|navigate|goto|interaction)\b/i],
+  assertions: [/\b(?:assert|assertion|assertions|expect|should|toBeVisible|assertEquals)\b/i],
+  network: [/\b(?:network|route|intercept|mock|stub|graphql|rest\s+api|http\s+response)\b/i],
+  storage: [/\b(?:storage|storage-state|session|cookies|localStorage|sessionStorage|auth)\b/i],
+  capabilities: [/\b(?:capabilities|capability|caps|device|desiredCapabilities)\b/i],
+  bidi: [/\b(?:bidi|cdp|websocket|devtools)\b/i],
+  observability: [/\b(?:observability|tracing|trace|video|screenshot|logs)\b/i],
+};
+
+export function classifyIntent(query: string): IntentResult | null {
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    return null;
+  }
+
+  let detectedIntent: IntentType = 'author_test';
+
+  for (const group of INTENT_SIGNATURES) {
+    if (group.patterns.some((p) => p.test(query))) {
+      detectedIntent = group.intent;
+      break;
+    }
+  }
+
+  let framework: SupportedFramework | null = null;
+
+  if (detectedIntent === 'migrate_test') {
+    const targetMatch = /\bto\s+(playwright|selenium|cypress|vibium|appium)\b/i.exec(query);
+    if (targetMatch) {
+      framework = targetMatch[1].toLowerCase() as SupportedFramework;
+    }
+  }
+
+  if (!framework) {
+    const routingMatch = routeFrameworkQuery(query);
+    framework = routingMatch?.status === 'matched' ? routingMatch.framework : null;
+  }
+
+  let detectedLanguage: SupportedLanguage | undefined;
+  for (const [lang, patterns] of Object.entries(LANGUAGE_SIGNATURES) as Array<
+    [SupportedLanguage, readonly RegExp[]]
+  >) {
+    if (patterns.some((p) => p.test(query))) {
+      detectedLanguage = lang;
+      break;
+    }
+  }
+
+  let detectedDomain: string | undefined;
+  for (const [domain, patterns] of Object.entries(DOMAIN_SIGNATURES)) {
+    if (patterns.some((p) => p.test(query))) {
+      detectedDomain = domain;
+      break;
+    }
+  }
+
+  const routingMatch = routeFrameworkQuery(query);
+  const matchedKeywords = routingMatch?.matchedKeywords ? [...routingMatch.matchedKeywords] : [];
+  let confidence = 0.5;
+
+  if (framework) confidence += 0.25;
+  if (detectedLanguage) confidence += 0.15;
+  if (detectedDomain) confidence += 0.1;
+
+  confidence = Math.min(1, Math.max(0, confidence));
+
+  return {
+    intent: detectedIntent,
+    framework,
+    domain: detectedDomain,
+    language: detectedLanguage,
+    confidence: Number(confidence.toFixed(2)),
+    matchedKeywords,
   };
 }

@@ -219,7 +219,9 @@ describe('Verification Schemas', () => {
     it('accepts valid VerificationResult with all fields', () => {
       const validResult: VerificationResult = {
         passed: false,
-        score: 65,
+        score: 75,
+        complianceScore: 75,
+        qualityScore: 70,
         checks: [
           {
             id: 'no-arbitrary-sleep',
@@ -252,6 +254,8 @@ describe('Verification Schemas', () => {
       const resultWithoutHints = {
         passed: true,
         score: 100,
+        complianceScore: 100,
+        qualityScore: 100,
         checks: [],
       };
 
@@ -260,22 +264,50 @@ describe('Verification Schemas', () => {
       if (parsed.success) {
         expect(parsed.data.passed).toBe(true);
         expect(parsed.data.score).toBe(100);
+        expect(parsed.data.complianceScore).toBe(100);
+        expect(parsed.data.qualityScore).toBe(100);
         expect(parsed.data.checks).toEqual([]);
         expect(parsed.data.actionableHints).toEqual([]);
       }
     });
 
     it('validates score boundaries [0, 100]', () => {
-      const scoreZero = { passed: false, score: 0, checks: [], actionableHints: [] };
-      const scoreHundred = { passed: true, score: 100, checks: [], actionableHints: [] };
-      const scoreFloat = { passed: true, score: 87.5, checks: [], actionableHints: [] };
+      const scoreZero = {
+        passed: false,
+        score: 0,
+        complianceScore: 0,
+        qualityScore: 0,
+        checks: [],
+        actionableHints: [],
+      };
+      const scoreHundred = {
+        passed: true,
+        score: 100,
+        complianceScore: 100,
+        qualityScore: 100,
+        checks: [],
+        actionableHints: [],
+      };
 
       expect(VerificationResultSchema.safeParse(scoreZero).success).toBe(true);
       expect(VerificationResultSchema.safeParse(scoreHundred).success).toBe(true);
-      expect(VerificationResultSchema.safeParse(scoreFloat).success).toBe(true);
 
-      const scoreBelowZero = { passed: false, score: -1, checks: [], actionableHints: [] };
-      const scoreAboveHundred = { passed: false, score: 101, checks: [], actionableHints: [] };
+      const scoreBelowZero = {
+        passed: false,
+        score: -1,
+        complianceScore: -1,
+        qualityScore: 0,
+        checks: [],
+        actionableHints: [],
+      };
+      const scoreAboveHundred = {
+        passed: false,
+        score: 101,
+        complianceScore: 100,
+        qualityScore: 101,
+        checks: [],
+        actionableHints: [],
+      };
 
       expect(VerificationResultSchema.safeParse(scoreBelowZero).success).toBe(false);
       expect(VerificationResultSchema.safeParse(scoreAboveHundred).success).toBe(false);

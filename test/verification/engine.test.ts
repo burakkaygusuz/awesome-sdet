@@ -289,8 +289,32 @@ describe('Unified Verification Engine', () => {
 
       expect(result.passed).toBe(false);
       expect(result.score).toBe(0);
+      expect(result.complianceScore).toBe(0);
+      expect(result.qualityScore).toBe(0);
       expect(result.actionableHints).toHaveLength(4);
       expect(result.checks.every((c) => !c.passed)).toBe(true);
+    });
+
+    it('decouples complianceScore from qualityScore for oversized test with clean invariants', async () => {
+      const longCleanCode = `
+        import { test, expect } from '@playwright/test';
+
+        test('long scenario', async ({ page }) => {
+          await page.goto('/login');
+          ${'await expect(page.getByRole("button")).toBeVisible();\n'.repeat(55)}
+        });
+      `;
+      const request: VerificationRequest = {
+        framework: 'playwright',
+        code: longCleanCode,
+      };
+
+      const result = await verifyTestArtifact(request);
+
+      expect(result.passed).toBe(true);
+      expect(result.complianceScore).toBe(100);
+      expect(result.qualityScore).toBe(90);
+      expect(result.score).toBe(100);
     });
   });
 

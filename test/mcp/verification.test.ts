@@ -70,6 +70,8 @@ describe('MCP verify_test_artifact Tool', () => {
       expect.soft(outputSchema.type).toBe('object');
       expect.soft(outputSchema.properties?.passed).toBeDefined();
       expect.soft(outputSchema.properties?.score).toBeDefined();
+      expect.soft(outputSchema.properties?.complianceScore).toBeDefined();
+      expect.soft(outputSchema.properties?.qualityScore).toBeDefined();
       expect.soft(outputSchema.properties?.checks).toBeDefined();
       expect.soft(outputSchema.properties?.actionableHints).toBeDefined();
     });
