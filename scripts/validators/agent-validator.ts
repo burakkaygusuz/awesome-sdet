@@ -1,9 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import YAML from 'yaml';
 import {
   AgentFrontmatterSchema,
   AgentInfoSchema,
   CAPABILITY_SKILL_NAMES,
+  type AgentFrontmatter,
   type AgentInfo,
 } from '../schemas.js';
 
@@ -23,55 +25,57 @@ const LEGACY_TOOL_PATTERNS = [
 
 const VALID_FRAMEWORKS = new Set(['playwright', 'selenium', 'cypress', 'vibium', 'appium']);
 
-function parseFrontmatterFields(
+function parseFrontmatter(
   content: string,
   relPath: string
 ): {
-  fields: Record<string, string>;
+  frontmatter: AgentFrontmatter | null;
   hasError: boolean;
 } {
   if (!content.startsWith('---')) {
     console.error(`Error: ${relPath}: Missing frontmatter start delimiter '---'`);
-    return { fields: {}, hasError: true };
+    return { frontmatter: null, hasError: true };
   }
 
   const frontmatterEnd = content.indexOf('---', 3);
   if (frontmatterEnd === -1) {
     console.error(`Error: ${relPath}: Missing frontmatter end delimiter '---'`);
-    return { fields: {}, hasError: true };
+    return { frontmatter: null, hasError: true };
   }
 
   const frontmatter = content.substring(3, frontmatterEnd);
-  const fields: Record<string, string> = {};
-
-  for (const line of frontmatter.split('\n')) {
-    const match = /^([a-zA-Z0-9_-]+):\s*(.*)$/.exec(line.trim());
-    if (match) {
-      fields[match[1]] = match[2].trim().replace(/^["']|["']$/g, '');
-    }
+  let parsedYaml: unknown;
+  try {
+    parsedYaml = YAML.parse(frontmatter);
+  } catch (err) {
+    console.error(`Error: ${relPath}: Failed to parse YAML frontmatter: ${String(err)}`);
+    return { frontmatter: null, hasError: true };
   }
 
-  return { fields, hasError: false };
+  if (typeof parsedYaml !== 'object' || parsedYaml === null) {
+    console.error(`Error: ${relPath}: Frontmatter must be a valid YAML dictionary`);
+    return { frontmatter: null, hasError: true };
+  }
+
+  const parsed = AgentFrontmatterSchema.safeParse(parsedYaml);
+  if (!parsed.success) {
+    console.error(
+      `Error: ${relPath}: Agent frontmatter validation failed:`,
+      parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+    );
+    return { frontmatter: null, hasError: true };
+  }
+
+  return { frontmatter: parsed.data, hasError: false };
 }
 
 function validateAgentMetadata(
-  fields: Record<string, string>,
+  frontmatter: AgentFrontmatter,
   filePath: string,
   relPath: string
 ): boolean {
   let hasError = false;
-
-  const parsedFrontmatter = AgentFrontmatterSchema.safeParse(fields);
-  if (!parsedFrontmatter.success) {
-    console.error(
-      `Error: ${relPath}: Agent frontmatter validation failed:`,
-      parsedFrontmatter.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
-    );
-    hasError = true;
-  }
-
-  const name = fields['name'] || '';
-  const description = fields['description'] || '';
+  const { name, description } = frontmatter;
 
   const fileName = path.basename(filePath).replace(/\.agent\.md$|\.md$/, '');
   const dirName = path.basename(path.dirname(filePath));
@@ -175,20 +179,20 @@ export async function validateAgentFile(
   const relPath = path.relative(rootDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
 
-  const { fields, hasError: parseError } = parseFrontmatterFields(content, relPath);
-  if (parseError) {
+  const { frontmatter, hasError: parseError } = parseFrontmatter(content, relPath);
+  if (parseError || !frontmatter) {
     return { agent: null, hasError: true };
   }
 
-  const metaError = validateAgentMetadata(fields, filePath, relPath);
+  const metaError = validateAgentMetadata(frontmatter, filePath, relPath);
   const bansError = validateAgentContentBans(content, relPath);
   const refsError = validateAgentReferences(content, relPath);
   const directivesError = validateAgentDirectives(content, relPath);
 
   const hasValidationErrors = metaError || bansError || refsError || directivesError;
 
-  const name = fields['name'] || '';
-  const description = fields['description'] || '';
+  const name = frontmatter.name;
+  const description = frontmatter.description;
   const framework = VALID_FRAMEWORKS.has(name) ? name : undefined;
 
   const rawAgent: AgentInfo = {

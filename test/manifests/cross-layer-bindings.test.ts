@@ -83,4 +83,30 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
 
     expect(pathOffenders).toEqual([]);
   });
+
+  it('portable core MCP server has zero host-specific client dependencies', async () => {
+    const serversPkgRaw = await fs.readFile(path.join(rootDir, 'servers/package.json'), 'utf8');
+    const serversPkg = JSON.parse(serversPkgRaw) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+
+    const forbiddenClientDeps = ['vscode', '@types/vscode', 'electron', 'claude-code'];
+    for (const dep of forbiddenClientDeps) {
+      expect(serversPkg.dependencies?.[dep]).toBeUndefined();
+      expect(serversPkg.devDependencies?.[dep]).toBeUndefined();
+    }
+  });
+
+  it('root plugin.json cleanly exposes portable core and skills without leaking client bindings', async () => {
+    const pluginRaw = await fs.readFile(path.join(rootDir, 'plugin.json'), 'utf8');
+    const pluginJson = JSON.parse(pluginRaw) as {
+      $schema: string;
+      name: string;
+      version?: string;
+    };
+
+    expect(pluginJson.$schema).toBe('https://agent-plugins.org/schemas/1.0.0/plugin.schema.json');
+    expect(pluginJson.name).toBe('awesome-sdet');
+  });
 });
