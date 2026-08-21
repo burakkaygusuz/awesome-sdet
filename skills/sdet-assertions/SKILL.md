@@ -59,14 +59,11 @@ Web-first auto-retrying assertions poll the DOM continuously until expectations 
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Assertions**: When implementing Playwright web-first expectations or polling, invoke `read_sdet_docs({ framework: "playwright", domain: "assertions", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Cypress Assertions**: When implementing Cypress assertions or retry blocks, invoke `read_sdet_docs({ framework: "cypress", domain: "commands", language: "typescript" | "javascript" })`.
-- **Selenium Waits**: When implementing Selenium 4 explicit waits and condition polling, invoke `read_sdet_docs({ framework: "selenium", domain: "actions" | "locators", language: "typescript" | "javascript" | "python" | "java" | "csharp" | "ruby" })`.
-- **Vibium Core Assertions**: When implementing Vibium web-first assertions or polling streams, invoke `read_sdet_docs({ framework: "vibium", domain: "core", language: "typescript" | "javascript" | "python" | "java" })`.
+- Playwright `assertions` · Cypress `commands` · Selenium `locators` · Vibium `core`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

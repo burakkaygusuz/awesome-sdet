@@ -60,15 +60,11 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Architecture**: When structuring Playwright POM, fixtures, or component tests, invoke `read_sdet_docs({ framework: "playwright", domain: "locators" | "actions", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Cypress Architecture**: When structuring Cypress component tests, commands, or tasks, invoke `read_sdet_docs({ framework: "cypress", domain: "component" | "commands" | "task", language: "typescript" | "javascript" })`.
-- **Selenium POM & PageFactory**: When structuring Selenium Page Object Models or PageFactory patterns, invoke `read_sdet_docs({ framework: "selenium", domain: "pagefactory" | "locators", language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby" })`.
-- **Vibium Architecture**: When structuring Vibium workflows and page helpers, invoke `read_sdet_docs({ framework: "vibium", domain: "core", language: "typescript" | "javascript" | "python" | "java" })`.
-- **Appium Screen Objects**: When structuring Appium Screen Object Models or multi-platform factories, invoke `read_sdet_docs({ framework: "appium", domain: "capabilities" | "locators", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
+- Playwright `locators` · Cypress `component` | `commands` · Selenium `pagefactory` | `locators` · Vibium `core` · Appium `capabilities` | `locators`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

@@ -59,14 +59,11 @@ Observability treats test diagnostics (DOM snapshots, network logs, video record
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Observability**: When capturing traces, screenshots, or console logs in Playwright, invoke `read_sdet_docs({ framework: "playwright", domain: "observability", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Cypress Observability**: When configuring Cypress screenshots, logs, or error hooks, invoke `read_sdet_docs({ framework: "cypress", domain: "commands", language: "typescript" | "javascript" })`.
-- **Selenium Observability**: When configuring OpenTelemetry spans, WebDriver listeners, or BiDi logging in Selenium 4, invoke `read_sdet_docs({ framework: "selenium", domain: "observability" | "listeners", language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby" })`.
-- **Vibium State & BiDi Tracing**: When recording action timelines or capturing state in Vibium, invoke `read_sdet_docs({ framework: "vibium", domain: "state" | "bidi", language: "typescript" | "javascript" | "python" | "java" })`.
+- Playwright `observability` · Cypress `commands` · Selenium `observability` | `listeners` · Vibium `state` | `bidi`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

@@ -60,15 +60,11 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Locators**: When selecting elements in Playwright, invoke `read_sdet_docs({ framework: "playwright", domain: "locators", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Cypress Locators & Shadow DOM**: When selecting elements in Cypress or piercing Shadow DOM, invoke `read_sdet_docs({ framework: "cypress", domain: "commands" | "shadow", language: "typescript" | "javascript" })`.
-- **Selenium Locators**: When authoring Selenium By queries or Relative Locators, invoke `read_sdet_docs({ framework: "selenium", domain: "locators", language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby" })`.
-- **Vibium Selectors**: When querying elements with semantic or piercing selectors in Vibium, invoke `read_sdet_docs({ framework: "vibium", domain: "selectors", language: "typescript" | "javascript" | "python" | "java" })`.
-- **Appium Locators**: When authoring mobile selectors across Android and iOS, invoke `read_sdet_docs({ framework: "appium", domain: "locators", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
+- Playwright `locators` · Cypress `commands` | `shadow` · Selenium `locators` · Vibium `selectors` · Appium `locators`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

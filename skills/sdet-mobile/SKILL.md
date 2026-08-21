@@ -59,14 +59,11 @@ Mobile automation standardizes iOS (XCUITest) and Android (UiAutomator2) testing
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Appium Capabilities**: When configuring driver options and capabilities, invoke `read_sdet_docs({ framework: "appium", domain: "capabilities", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Appium Context**: When managing hybrid WebView switching and context polling, invoke `read_sdet_docs({ framework: "appium", domain: "context", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Appium Device**: When managing app lifecycle, orientation, or hardware keys, invoke `read_sdet_docs({ framework: "appium", domain: "device", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
-- **Appium Gestures**: When composing touch gestures, swipes, or scroll actions, invoke `read_sdet_docs({ framework: "appium", domain: "gestures", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
+- Appium `capabilities` · `context` · `device` · `gestures`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 
