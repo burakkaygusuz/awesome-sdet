@@ -176,99 +176,28 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
   });
 
   describe('Domain Reference Loaders Hardening', () => {
-    describe('Playwright', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readFrameworkReferenceDoc('playwright', 'locators', 'typescript');
-        expect(text).toContain('Playwright');
-      });
+    const frameworks = [
+      { framework: 'playwright', domain: 'locators', lang: 'typescript', name: 'Playwright' },
+      { framework: 'selenium', domain: 'actions', lang: 'java', name: 'Selenium' },
+      { framework: 'cypress', domain: 'commands', lang: 'typescript', name: 'Cypress' },
+      { framework: 'vibium', domain: 'core', lang: 'typescript', name: 'Vibium' },
+      { framework: 'appium', domain: 'capabilities', lang: 'typescript', name: 'Appium' },
+    ] as const;
 
-      it('rejects path traversal in domain', async () => {
+    it.each(frameworks)(
+      'loads valid markdown and rejects path traversal for $name',
+      async ({ framework, domain, lang, name }) => {
+        const text = await readFrameworkReferenceDoc(framework, domain, lang);
+        expect(text).toContain(name);
+
         await expect(
-          readFrameworkReferenceDoc('playwright', '../../../etc/passwd', 'typescript')
+          readFrameworkReferenceDoc(framework, '../../../etc/passwd', lang)
         ).rejects.toThrow();
-      });
 
-      it('rejects path traversal in language', async () => {
         await expect(
-          readFrameworkReferenceDoc('playwright', 'locators', '../../etc/passwd')
+          readFrameworkReferenceDoc(framework, domain, '../../etc/passwd')
         ).rejects.toThrow();
-      });
-    });
-
-    describe('Selenium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readFrameworkReferenceDoc('selenium', 'actions', 'java');
-        expect(text).toContain('Selenium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(
-          readFrameworkReferenceDoc('selenium', '../../../etc/passwd', 'java')
-        ).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(
-          readFrameworkReferenceDoc('selenium', 'actions', '../../etc/passwd')
-        ).rejects.toThrow();
-      });
-    });
-
-    describe('Cypress', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readFrameworkReferenceDoc('cypress', 'commands', 'typescript');
-        expect(text).toContain('Cypress');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(
-          readFrameworkReferenceDoc('cypress', '../../../etc/passwd', 'typescript')
-        ).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(
-          readFrameworkReferenceDoc('cypress', 'commands', '../../etc/passwd')
-        ).rejects.toThrow();
-      });
-    });
-
-    describe('Vibium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readFrameworkReferenceDoc('vibium', 'core', 'typescript');
-        expect(text).toContain('Vibium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(
-          readFrameworkReferenceDoc('vibium', '../../../etc/passwd', 'typescript')
-        ).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(
-          readFrameworkReferenceDoc('vibium', 'core', '../../etc/passwd')
-        ).rejects.toThrow();
-      });
-    });
-
-    describe('Appium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readFrameworkReferenceDoc('appium', 'capabilities', 'typescript');
-        expect(text).toContain('Appium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(
-          readFrameworkReferenceDoc('appium', '../../../etc/passwd', 'typescript')
-        ).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(
-          readFrameworkReferenceDoc('appium', 'capabilities', '../../etc/passwd')
-        ).rejects.toThrow();
-      });
-    });
+      }
+    );
   });
 });
