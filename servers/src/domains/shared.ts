@@ -165,9 +165,10 @@ export function extractStructuredDocs(
       const availableHeadings = sections
         .map((s) => s.heading)
         .filter((h) => h && h !== title && !h.startsWith('#'));
+      const formattedHeadings = availableHeadings.map((h) => '- ' + h).join('\n');
       const headingsList =
         availableHeadings.length > 0
-          ? `\n\nAvailable sections in this domain:\n${availableHeadings.map((h) => `- ${h}`).join('\n')}`
+          ? `\n\nAvailable sections in this domain:\n${formattedHeadings}`
           : '';
       renderedMarkdown = `# ${title} [No matches for: "${query}"]\n\nNo sections found matching query "${query}" in ${framework} ${domain} (${language}).${headingsList}`;
     } else {

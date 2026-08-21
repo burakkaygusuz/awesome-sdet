@@ -20,9 +20,10 @@ export function registerVerifyTool(server: McpServer): void {
     },
     safeToolHandler(async (args) => {
       const result = await verifyTestArtifact(args);
+      const formattedHints = result.actionableHints.map((h) => '- ' + h).join('\n');
       const summaryText = result.passed
         ? `✅ Test artifact verification PASSED (Score: ${result.score}/100)`
-        : `❌ Test artifact verification FAILED (Score: ${result.score}/100)\n\nActionable Hints:\n${result.actionableHints.map((h) => `- ${h}`).join('\n')}`;
+        : `❌ Test artifact verification FAILED (Score: ${result.score}/100)\n\nActionable Hints:\n${formattedHints}`;
 
       return {
         content: [{ type: 'text', text: summaryText }],
