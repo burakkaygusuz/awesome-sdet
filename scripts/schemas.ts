@@ -129,10 +129,26 @@ export const SkillSchema = z.strictObject({
 
 export type Skill = z.infer<typeof SkillSchema>;
 
+export const AgentFrontmatterSchema = z.strictObject({
+  name: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)?$/),
+  description: z.string().min(1),
+  'user-invocable': z.union([z.boolean(), z.literal('true'), z.literal('false')]).optional(),
+  tools: z.array(z.string()).optional(),
+  skills: z.array(z.string()).optional(),
+  model: z.string().optional(),
+});
+
+export type AgentFrontmatter = z.infer<typeof AgentFrontmatterSchema>;
+
 export const AgentInfoSchema = z.strictObject({
   name: z.string().min(1),
+  canonicalName: z.string().min(1).optional(),
   description: z.string().min(1),
   filePath: z.string().min(1),
+  framework: z.string().optional(),
 });
 
 export type AgentInfo = z.infer<typeof AgentInfoSchema>;
