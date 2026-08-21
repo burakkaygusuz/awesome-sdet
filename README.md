@@ -8,17 +8,32 @@ Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.
 
 ## ⚡ Quick Start & Installation
 
-Install `awesome-sdet` into your AI assistant of choice:
+Install `awesome-sdet` into your AI assistant or agentic coding environment:
+
+| Platform / Host         | Installation Command / Method                                                            | Standard                                         |
+| :---------------------- | :--------------------------------------------------------------------------------------- | :----------------------------------------------- |
+| **Claude Code**         | `claude plugin add github:burakkaygusuz/awesome-sdet`                                    | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **OpenCode**            | `opencode plugin install github:burakkaygusuz/awesome-sdet`                              | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **VS Code & Copilot**   | `Chat: Install Plugin From Source` (`https://github.com/burakkaygusuz/awesome-sdet.git`) | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **Antigravity & Codex** | Add to `.agents/plugins/awesome-sdet` or `~/.gemini/config/plugins/`                     | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+
+---
 
 ### 1. Claude Code
 
-Add the plugin directly:
+Install directly via the Claude Code CLI:
 
 ```bash
 claude plugin add github:burakkaygusuz/awesome-sdet
 ```
 
-Or add to your project's `.claude/settings.json`:
+Or from inside an active Claude Code session:
+
+```text
+/plugin install github:burakkaygusuz/awesome-sdet
+```
+
+Or declare in your project's `.claude/settings.json`:
 
 ```json
 {
@@ -47,31 +62,7 @@ Or declare in `opencode.json`:
 
 ---
 
-### 3. Cursor
-
-Install via Cursor Plugins or clone into local plugins:
-
-```bash
-# Clone into Cursor local plugins
-git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.cursor/plugins/local/awesome-sdet
-```
-
-Or configure the SDET MCP server in `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "sdet-mcp": {
-      "command": "node",
-      "args": ["<path-to-awesome-sdet>/servers/dist/index.js", "--stdio"]
-    }
-  }
-}
-```
-
----
-
-### 4. VS Code & GitHub Copilot
+### 3. VS Code & GitHub Copilot
 
 Install from source via the Command Palette (`Chat: Install Plugin From Source`) with:
 
@@ -79,7 +70,7 @@ Install from source via the Command Palette (`Chat: Install Plugin From Source`)
 https://github.com/burakkaygusuz/awesome-sdet.git
 ```
 
-Or register the plugin path in `.vscode/settings.json`:
+Or register the local plugin path in `.vscode/settings.json`:
 
 ```json
 {
@@ -92,9 +83,9 @@ Or register the plugin path in `.vscode/settings.json`:
 
 ---
 
-### 5. Codex & Antigravity (Workspace / Global Plugin)
+### 4. Google Antigravity & Codex
 
-Clone or add as submodule into your agent plugins directory:
+Add the plugin into your workspace or global agent plugins directory:
 
 ```bash
 # Workspace level
@@ -103,6 +94,20 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awes
 # Global level
 git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
 ```
+
+---
+
+### 5. Local Development & Contributing
+
+To develop, customize, or contribute to `awesome-sdet`:
+
+```bash
+git clone https://github.com/burakkaygusuz/awesome-sdet.git
+cd awesome-sdet
+pnpm install
+```
+
+`pnpm install` automatically triggers the build lifecycle hook (`prepare`) to build the MCP server and compile TypeScript sources.
 
 ---
 

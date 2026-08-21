@@ -210,7 +210,6 @@ export type SupportedFramework = (typeof FRAMEWORK_IDS)[number];
 
 export const FRAMEWORK_REGISTRY = {
   playwright: {
-    toolPrefix: 'pw',
     domains: PLAYWRIGHT_DOMAINS,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'],
     defaultDomain: 'locators',
