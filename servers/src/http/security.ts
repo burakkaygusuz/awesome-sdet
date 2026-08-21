@@ -79,9 +79,17 @@ export function collectBodyWithinLimit(
     const chunks: Buffer[] = [];
     let receivedBytes = 0;
     let exceeded = false;
+    let settled = false;
+
+    const finalize = (result: string | null) => {
+      if (!settled) {
+        settled = true;
+        resolve(result);
+      }
+    };
 
     req.on('data', (chunk: Buffer | string) => {
-      if (exceeded) return;
+      if (exceeded || settled) return;
       const buf = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
       receivedBytes += buf.length;
 
@@ -89,13 +97,24 @@ export function collectBodyWithinLimit(
         exceeded = true;
         if (!res.headersSent) writeJsonRpcError(res, payloadTooLargeReply());
         req.resume();
-        resolve(null);
+        finalize(null);
         return;
       }
 
       chunks.push(buf);
     });
 
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('end', () => {
+      if (!exceeded) {
+        finalize(Buffer.concat(chunks).toString('utf8'));
+      }
+    });
+
+    req.on('error', () => finalize(null));
+    req.on('close', () => {
+      if (!req.complete) {
+        finalize(null);
+      }
+    });
   });
 }

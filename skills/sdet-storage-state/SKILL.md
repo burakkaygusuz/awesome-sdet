@@ -59,14 +59,11 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
-- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`).
-- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
-- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- Playwright `storage` · Cypress `session` · Selenium `bidi` · Vibium `state`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

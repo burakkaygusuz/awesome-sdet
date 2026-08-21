@@ -1,14 +1,5 @@
+import { type SyntaxNode, walkAst } from '../ast.js';
 import type { VerificationCheck } from '../schemas.js';
-
-const BRITTLE_LOCATOR_PATTERNS: RegExp[] = [
-  /\/\/(?:html|body)/i,
-  /\/(?:html|body)\//i,
-  /\/\/(?:html|body|div|table|tbody|tr|td|span|ul|li|p|section|article|main|header|footer)\[\d+\]/i,
-  /\/\/[a-zA-Z0-9_-]+\[\d+\](?:\/[a-zA-Z0-9_-]+\[\d+\])+/i,
-  /(?:locator|By\.xpath|cy\.xpath|xpath)\(['"](?:\/|\/\/)[^'"]*\[\d+\][^'"]*['"]\)/i,
-  /(?:locator|By\.xpath|cy\.xpath)\(['"](?:\/|\/\/)(?:html|body)/i,
-  /cy\.xpath\(['"]\/\//i,
-];
 
 const SUGGESTIONS: Record<string, string> = {
   playwright:
@@ -23,27 +14,85 @@ const SUGGESTIONS: Record<string, string> = {
     'Replace brittle XPath/DOM index paths with accessible semantic locators (e.g. vibium.findByRole or semantic selectors).',
 };
 
-export function checkLocators(code: string, framework: string): VerificationCheck {
-  for (const pattern of BRITTLE_LOCATOR_PATTERNS) {
-    const match = pattern.exec(code);
-    if (match) {
-      return {
-        id: 'resilient-accessibility-locators',
-        rule: 'Anchor element targets to accessible semantics (role, label, test ID) rather than brittle DOM paths',
-        passed: false,
-        severity: 'error',
-        evidence: match[0],
-        suggestion:
-          SUGGESTIONS[framework] ??
-          'Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel, or By.name).',
-      };
-    }
+function isBrittleXpath(raw: string): boolean {
+  const clean = raw.replace(/^['"`]|['"`]$/g, '').trim();
+  if (
+    clean.startsWith('//html') ||
+    clean.startsWith('/html') ||
+    clean.startsWith('//body') ||
+    clean.startsWith('/body')
+  ) {
+    return true;
   }
+  if (clean.startsWith('//') || clean.startsWith('/')) {
+    const parts = clean.split('/').filter(Boolean);
+    return parts.length >= 3 || parts.some((p) => p.includes('[') && p.includes(']'));
+  }
+  return false;
+}
+
+function isHashedCss(raw: string): boolean {
+  const clean = raw.replace(/^['"`]|['"`]$/g, '').trim();
+  if (clean.includes('.css-') || clean.includes('.sc-') || clean.includes('.styled-')) {
+    return true;
+  }
+  if (clean.includes('__') && clean.includes('_')) {
+    return true;
+  }
+  return clean.split(':nth-child').length > 2 || clean.split(':nth-of-type').length > 2;
+}
+
+function inspectStringNode(node: SyntaxNode): string | null {
+  const isString =
+    node.type === 'string' || node.type === 'string_literal' || node.type === 'template_string';
+  if (!isString) return null;
+
+  const text = node.text;
+  if (isHashedCss(text) || isBrittleXpath(text)) {
+    return text;
+  }
+  return null;
+}
+
+export function checkLocators(
+  code: string,
+  framework: string,
+  rootNode?: SyntaxNode
+): VerificationCheck {
+  if (!rootNode) {
+    const isBrittle = isBrittleXpath(code) || isHashedCss(code);
+    return {
+      id: 'resilient-accessibility-locators',
+      rule: 'Anchor element targets to accessible semantics (role, label, test ID) rather than brittle DOM paths',
+      passed: !isBrittle,
+      severity: 'error',
+      evidence: isBrittle ? 'brittle locator string' : undefined,
+      suggestion: isBrittle
+        ? (SUGGESTIONS[framework] ??
+          'Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel, or By.name).')
+        : undefined,
+    };
+  }
+
+  let evidence: string | null = null;
+
+  walkAst(rootNode, (node) => {
+    const match = inspectStringNode(node);
+    if (match) {
+      evidence = match;
+      return false;
+    }
+  });
 
   return {
     id: 'resilient-accessibility-locators',
     rule: 'Anchor element targets to accessible semantics (role, label, test ID) rather than brittle DOM paths',
-    passed: true,
+    passed: !evidence,
     severity: 'error',
+    evidence: evidence ?? undefined,
+    suggestion: evidence
+      ? (SUGGESTIONS[framework] ??
+        'Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel, or By.name).')
+      : undefined,
   };
 }

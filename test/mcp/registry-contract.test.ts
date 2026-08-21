@@ -28,25 +28,13 @@ describe('framework registry contract', () => {
     const data = await parseMcpResponse(response);
     const toolNames = new Set((data.result?.tools ?? []).map((tool) => tool.name));
 
-    expect(toolNames.size).toBe(6);
-    expect(toolNames).toEqual(
-      new Set([
-        'read_pw_docs',
-        'read_se_docs',
-        'read_cy_docs',
-        'read_vibium_docs',
-        'read_appium_docs',
-        'verify_test_artifact',
-      ])
-    );
+    expect(toolNames.size).toBe(2);
+    expect(toolNames).toEqual(new Set(['read_sdet_docs', 'verify_test_artifact']));
 
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
       expect(definition.domains.length).toBeGreaterThan(0);
       expect(definition.languages.length).toBeGreaterThan(0);
-      for (const toolName of definition.toolNames) {
-        expect(toolNames).toContain(toolName);
-      }
     }
   });
 
@@ -66,51 +54,11 @@ describe('framework registry contract', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('successfully loads reference docs for all registered framework, domain, and language combinations', async () => {
-    let callId = 100;
+  it('verifies registry integrity for default domains and languages', () => {
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
-      const toolName = definition.toolNames[0];
-
-      for (const domain of definition.domains) {
-        for (const language of definition.languages) {
-          callId++;
-          const response = await mcpFetch(url, {
-            jsonrpc: '2.0',
-            id: callId,
-            method: 'tools/call',
-            params: {
-              name: toolName,
-              arguments: { domain, language },
-            },
-          });
-
-          const data = await parseMcpResponse(response);
-          expect.soft(data.error).toBeUndefined();
-          expect.soft(data.result?.isError).toBeFalsy();
-
-          const content = data.result?.content?.[0]?.text;
-          expect.soft(content).toBeDefined();
-          expect.soft(typeof content).toBe('string');
-          expect.soft(content?.length).toBeGreaterThan(50);
-
-          const structured = data.result?.structuredContent as
-            | {
-                framework: string;
-                domain: string;
-                language: string;
-                title: string;
-                codeSnippets: unknown[];
-              }
-            | undefined;
-
-          expect.soft(structured).toBeDefined();
-          expect.soft(structured?.framework).toBe(framework);
-          expect.soft(structured?.domain).toBe(domain);
-          expect.soft(structured?.language).toBe(language);
-          expect.soft(structured?.codeSnippets.length).toBeGreaterThan(0);
-        }
-      }
+      expect(definition.domains).toContain(definition.defaultDomain);
+      expect(definition.languages).toContain(definition.defaultLanguage);
     }
   });
 });

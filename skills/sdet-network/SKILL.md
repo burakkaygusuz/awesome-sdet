@@ -60,14 +60,11 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Network**: When stubbing routes or mocking responses in Playwright, invoke `read_pw_docs` (Parameters: `domain: "network"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
-- **Cypress Network & Fixtures**: When intercepting requests or loading fixture stubs in Cypress, invoke `read_cy_docs` (Parameters: `domain: "network" | "stubs" | "fixtures"`, `language: "typescript" | "javascript"`).
-- **Selenium BiDi Network**: When managing network interception via Selenium 4 BiDi, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
-- **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- Playwright `network` · Cypress `network` | `stubs` | `fixtures` · Selenium `bidi` · Vibium `bidi`
 
-Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
 
 ## 7. Verification Checklist
 

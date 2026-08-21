@@ -1,14 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/server';
-import { registerPlaywrightTools } from './domains/playwright/index.js';
-import { registerSeleniumTools } from './domains/selenium/index.js';
-import { registerCypressTools } from './domains/cypress/index.js';
-import { registerVibiumTools } from './domains/vibium/index.js';
-import { registerAppiumTools } from './domains/appium/index.js';
-import { registerResources } from './resources/index.js';
 import { registerPrompts } from './prompts/index.js';
+import { registerResources } from './resources/index.js';
+import { registerUniversalDocsGateway } from './tools/docs-gateway.js';
 import { registerVerifyTool } from './tools/verify.js';
-import { SAFE_READONLY_ANNOTATIONS } from './domains/shared.js';
+
 import {
   SERVER_NAME,
   SERVER_VERSION,
@@ -17,12 +13,7 @@ import {
   PUBLIC_CACHE_SCOPE,
 } from './version.js';
 
-export {
-  PROTOCOL_VERSION_2026_07_28,
-  DEFAULT_DOCS_CACHE_TTL_MS,
-  PUBLIC_CACHE_SCOPE,
-  SAFE_READONLY_ANNOTATIONS,
-};
+export { PROTOCOL_VERSION_2026_07_28, DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE };
 
 export interface CacheableResult {
   ttlMs?: number;
@@ -101,15 +92,12 @@ export function createMcpServer(): McpServer {
         tools: { listChanged: false },
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
+        logging: {},
       },
     }
   );
 
-  registerPlaywrightTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerVibiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerAppiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
+  registerUniversalDocsGateway(server);
   registerVerifyTool(server);
 
   registerResources(server);
@@ -117,5 +105,3 @@ export function createMcpServer(): McpServer {
 
   return server;
 }
-
-export { PUBLIC_CACHE_SCOPE as GLOBAL_CACHE_SCOPE } from './version.js';

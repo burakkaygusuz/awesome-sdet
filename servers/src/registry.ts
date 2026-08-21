@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const FRAMEWORK_IDS = ['selenium', 'cypress', 'vibium', 'appium', 'playwright'] as const;
 
 export type SupportedFramework = (typeof FRAMEWORK_IDS)[number];
@@ -13,93 +15,79 @@ export const SUPPORTED_LANGUAGES = [
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const SELENIUM_DOMAINS = [
-  'actions',
-  'bidi',
-  'grid',
-  'listeners',
-  'locators',
-  'observability',
-  'pagefactory',
+export const INTENT_TYPES = [
+  'author_test',
+  'migrate_test',
+  'diagnose_flakiness',
+  'lookup_docs',
+  'verify_artifact',
 ] as const;
 
-export const CYPRESS_DOMAINS = [
-  'commands',
-  'component',
-  'fixtures',
-  'network',
-  'session',
-  'shadow',
-  'stubs',
-  'task',
-] as const;
+export type IntentType = (typeof INTENT_TYPES)[number];
 
-export const VIBIUM_DOMAINS = ['bidi', 'core', 'interactions', 'selectors', 'state'] as const;
+export const IntentResultSchema = z.strictObject({
+  intent: z.enum(INTENT_TYPES),
+  framework: z.enum(FRAMEWORK_IDS).nullable(),
+  domain: z.string().optional(),
+  language: z.enum(SUPPORTED_LANGUAGES).optional(),
+  confidence: z.number().min(0).max(1),
+  matchedKeywords: z.array(z.string()),
+});
 
-export const APPIUM_DOMAINS = [
-  'capabilities',
-  'context',
-  'device',
-  'gestures',
-  'locators',
-] as const;
-
-export const PLAYWRIGHT_DOMAINS = [
-  'actions',
-  'assertions',
-  'locators',
-  'network',
-  'observability',
-  'storage',
-] as const;
+export type IntentResult = z.infer<typeof IntentResultSchema>;
 
 export interface FrameworkDefinition {
-  readonly toolPrefix: string;
   readonly domains: readonly string[];
   readonly languages: readonly SupportedLanguage[];
-  readonly toolNames: readonly string[];
   readonly defaultDomain: string;
   readonly defaultLanguage: SupportedLanguage;
 }
 
 export const FRAMEWORK_REGISTRY = {
   selenium: {
-    toolPrefix: 'se',
-    domains: SELENIUM_DOMAINS,
+    domains: [
+      'actions',
+      'bidi',
+      'grid',
+      'listeners',
+      'locators',
+      'observability',
+      'pagefactory',
+    ] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'] as const,
-    toolNames: ['read_se_docs'],
     defaultDomain: 'actions',
     defaultLanguage: 'java',
   },
   cypress: {
-    toolPrefix: 'cy',
-    domains: CYPRESS_DOMAINS,
+    domains: [
+      'commands',
+      'component',
+      'fixtures',
+      'network',
+      'session',
+      'shadow',
+      'stubs',
+      'task',
+    ] as const,
     languages: ['typescript', 'javascript'] as const,
-    toolNames: ['read_cy_docs'],
     defaultDomain: 'commands',
     defaultLanguage: 'typescript',
   },
   vibium: {
-    toolPrefix: 'vibium',
-    domains: VIBIUM_DOMAINS,
+    domains: ['bidi', 'core', 'interactions', 'selectors', 'state'] as const,
     languages: ['typescript', 'javascript', 'python', 'java'] as const,
-    toolNames: ['read_vibium_docs'],
     defaultDomain: 'core',
     defaultLanguage: 'typescript',
   },
   appium: {
-    toolPrefix: 'appium',
-    domains: APPIUM_DOMAINS,
+    domains: ['capabilities', 'context', 'device', 'gestures', 'locators'] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
-    toolNames: ['read_appium_docs'],
     defaultDomain: 'capabilities',
     defaultLanguage: 'typescript',
   },
   playwright: {
-    toolPrefix: 'pw',
-    domains: PLAYWRIGHT_DOMAINS,
+    domains: ['actions', 'assertions', 'locators', 'network', 'observability', 'storage'] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
-    toolNames: ['read_pw_docs'],
     defaultDomain: 'locators',
     defaultLanguage: 'typescript',
   },
@@ -121,58 +109,98 @@ export type FrameworkRoutingMatch =
       readonly score: number;
     };
 
-export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<Record<SupportedFramework, readonly RegExp[]>> =
-  Object.freeze({
-    playwright: Object.freeze([
+interface FrameworkSignatureGroup {
+  readonly primary: readonly RegExp[];
+  readonly secondary: readonly RegExp[];
+  readonly context: readonly RegExp[];
+}
+
+const ROUTING_WEIGHTS = {
+  primary: 5,
+  secondary: 2,
+  context: 1,
+} as const;
+
+export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<
+  Record<SupportedFramework, FrameworkSignatureGroup>
+> = Object.freeze({
+  playwright: Object.freeze({
+    primary: Object.freeze([
       /\bplaywright\b/i,
       /\b@playwright\/test\b/i,
-      /\bread_pw_docs\b/i,
+      /\bplaywright\.config\b/i,
+      /\bpw\b/i,
+    ]),
+    secondary: Object.freeze([
       /\bpage\.(?:getByRole|getByLabel|getByText|getByTestId|getByPlaceholder|getByAltText|getByTitle|locator|goto|waitForURL|route|unroute)\b/i,
       /\bexpect\s*\(\s*(?:page|locator)\b/i,
       /\bbrowserContext\b/i,
-      /\bplaywright\.config\b/i,
     ]),
-    selenium: Object.freeze([
-      /\bselenium\b/i,
-      /\bread_se_docs\b/i,
+    context: Object.freeze([/\btrace\.playwright\.dev\b/i, /\bplaywright\s+codegen\b/i]),
+  }),
+  selenium: Object.freeze({
+    primary: Object.freeze([
+      /\bselenium(?:\s*4)?\b/i,
       /\bwebdriver\b/i,
       /\bremotewebdriver\b/i,
+      /\bselenium\s+grid\b/i,
+    ]),
+    secondary: Object.freeze([
       /\bchromedriver\b/i,
       /\bgeckodriver\b/i,
       /\bedgedriver\b/i,
-      /\bselenium\s+grid\b/i,
       /\bBy\.(?:id|name|xpath|cssSelector|className|tagName|linkText)\b/i,
       /\bWebDriverWait\b/i,
       /\bPageFactory\b/i,
       /\bThreadLocal<WebDriver>\b/i,
     ]),
-    cypress: Object.freeze([
-      /\bcypress\b/i,
-      /\bread_cy_docs\b/i,
+    context: Object.freeze([/\bchromeoptions\b/i, /\bw3c\s+webdriver\b/i]),
+  }),
+  cypress: Object.freeze({
+    primary: Object.freeze([/\bcypress\b/i, /\bcypress\.config\b/i]),
+    secondary: Object.freeze([
       /\bcy\.(?:visit|get|contains|intercept|origin|session|mount|request|wrap|fixture|wait|xpath)\b/i,
-      /\bcypress\.config\b/i,
     ]),
-    vibium: Object.freeze([
-      /\bvibium\b/i,
-      /\bread_vibium_docs\b/i,
-      /\bsense-think-act\b/i,
-      /\bvibium\.(?:find|findByRole|click|type)\b/i,
-    ]),
-    appium: Object.freeze([
-      /\bappium\b/i,
-      /\bread_appium_docs\b/i,
-      /\bAppiumBy\b/i,
+    context: Object.freeze([/\be2e\s+support\s+files\b/i, /\bcypress\s+studio\b/i]),
+  }),
+  vibium: Object.freeze({
+    primary: Object.freeze([/\bvibium\b/i, /\bsense-think-act\b/i]),
+    secondary: Object.freeze([/\bvibium\.(?:find|findByRole|click|type)\b/i]),
+    context: Object.freeze([/\bvisual\s+snapshot\s+diffing\b/i, /\bai-assisted\s+element\b/i]),
+  }),
+  appium: Object.freeze({
+    primary: Object.freeze([/\bappium\b/i, /\bAppiumBy\b/i, /\bUiAutomator2\b/i, /\bXCUITest\b/i]),
+    secondary: Object.freeze([
       /\bAndroidDriver\b/i,
       /\bIOSDriver\b/i,
       /\bAppiumDriver\b/i,
-      /\bUiAutomator2\b/i,
-      /\bXCUITest\b/i,
       /\baccessibilityId\b/i,
-      /\bThreadLocal<AppiumDriver>\b/i,
-      /\bThreadLocal<AndroidDriver>\b/i,
-      /\bThreadLocal<IOSDriver>\b/i,
+      /\bThreadLocal<(?:AppiumDriver|AndroidDriver|IOSDriver)>\b/i,
     ]),
-  });
+    context: Object.freeze([
+      /\bnative_app\b/i,
+      /\bwebview\s+contexts\b/i,
+      /\bmobile\s+touch\s+action\b/i,
+    ]),
+  }),
+});
+
+function scorePatterns(
+  patterns: readonly RegExp[],
+  query: string,
+  weight: number,
+  matchedKeywords: string[]
+): number {
+  let score = 0;
+  for (const pattern of patterns) {
+    const match = pattern.exec(query);
+    if (match) {
+      matchedKeywords.push(match[0]);
+      score += weight;
+    }
+  }
+  return score;
+}
 
 export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null {
   if (!query || typeof query !== 'string') {
@@ -186,22 +214,15 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
   }> = [];
 
   for (const framework of FRAMEWORK_IDS) {
-    const signatures = FRAMEWORK_ROUTING_SIGNATURES[framework];
+    const group = FRAMEWORK_ROUTING_SIGNATURES[framework];
     const matchedKeywords: string[] = [];
-
-    for (const signature of signatures) {
-      const match = signature.exec(query);
-      if (match) {
-        matchedKeywords.push(match[0]);
-      }
-    }
+    const score =
+      scorePatterns(group.primary, query, ROUTING_WEIGHTS.primary, matchedKeywords) +
+      scorePatterns(group.secondary, query, ROUTING_WEIGHTS.secondary, matchedKeywords) +
+      scorePatterns(group.context, query, ROUTING_WEIGHTS.context, matchedKeywords);
 
     if (matchedKeywords.length > 0) {
-      results.push({
-        framework,
-        matchedKeywords,
-        score: matchedKeywords.length,
-      });
+      results.push({ framework, matchedKeywords, score });
     }
   }
 
@@ -223,7 +244,6 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
     };
   }
 
-  // Multiple frameworks tied on highest score -> Ambiguous match
   const allTiedKeywords = topMatches.flatMap((m) => m.matchedKeywords);
   const candidateFrameworks = topMatches.map((m) => m.framework);
 
@@ -233,5 +253,114 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
     candidates: candidateFrameworks,
     matchedKeywords: allTiedKeywords,
     score: highestScore,
+  };
+}
+
+const INTENT_SIGNATURES: Array<{ intent: IntentType; patterns: readonly RegExp[] }> = [
+  {
+    intent: 'verify_artifact',
+    patterns: [
+      /\b(?:verify_test_artifact|verification|verify\s+test|scan\s+test|audit\s+test)\b/i,
+      /^\s*verify\b/i,
+    ],
+  },
+  {
+    intent: 'migrate_test',
+    patterns: [/\b(?:migrate|migration|migrating|convert|converting|transform|port|porting)\b/i],
+  },
+  {
+    intent: 'diagnose_flakiness',
+    patterns: [
+      /\b(?:flaky|flakiness|intermittent|race\s+condition|diagnose|diagnosing|debug|debugging|timeout\s+issue)\b/i,
+    ],
+  },
+  {
+    intent: 'lookup_docs',
+    patterns: [/\b(?:lookup|look\s*up|read_sdet_docs|documentation|reference|api\s+docs|guide)\b/i],
+  },
+  {
+    intent: 'author_test',
+    patterns: [
+      /\b(?:generate|generating|write|writing|author|authoring|create|creating|test|spec|suite)\b/i,
+    ],
+  },
+];
+
+const LANGUAGE_SIGNATURES: Record<SupportedLanguage, readonly RegExp[]> = {
+  typescript: [/\b(?:typescript|ts|tsx)\b/i],
+  javascript: [/\b(?:javascript|js|jsx|node)\b/i],
+  python: [/\b(?:python|py|pytest)\b/i],
+  java: [/\b(?:java|junit|testng)\b/i],
+  csharp: [/\b(?:csharp|c#|\.net|dotnet|nunit)\b/i],
+  ruby: [/\b(?:ruby|rb|rspec)\b/i],
+};
+
+const DOMAIN_SIGNATURES: Record<string, readonly RegExp[]> = {
+  gestures: [/\b(?:gesture|gestures|swipe|pinch|tap|scroll)\b/i],
+  locators: [
+    /\b(?:locator|locators|selector|selectors|getByRole|getByLabel|getByText|By\.\w+|accessibilityId)\b/i,
+  ],
+  actions: [/\b(?:action|actions|click|fill|type|navigate|goto|interaction)\b/i],
+  assertions: [/\b(?:assert|assertion|assertions|expect|should|toBeVisible|assertEquals)\b/i],
+  network: [/\b(?:network|route|intercept|mock|stub|graphql|rest\s+api|http\s+response)\b/i],
+  storage: [/\b(?:storage|storage-state|session|cookies|localStorage|sessionStorage|auth)\b/i],
+  capabilities: [/\b(?:capabilities|capability|caps|device|desiredCapabilities)\b/i],
+  bidi: [/\b(?:bidi|cdp|websocket|devtools)\b/i],
+  observability: [/\b(?:observability|tracing|trace|video|screenshot|logs)\b/i],
+};
+
+export function classifyIntent(query: string): IntentResult | null {
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    return null;
+  }
+
+  let detectedIntent: IntentType = 'author_test';
+
+  for (const group of INTENT_SIGNATURES) {
+    if (group.patterns.some((p) => p.test(query))) {
+      detectedIntent = group.intent;
+      break;
+    }
+  }
+
+  let framework: SupportedFramework | null = null;
+
+  if (detectedIntent === 'migrate_test') {
+    const targetMatch = /\bto\s+(playwright|selenium|cypress|vibium|appium)\b/i.exec(query);
+    if (targetMatch) {
+      framework = targetMatch[1].toLowerCase() as SupportedFramework;
+    }
+  }
+
+  if (!framework) {
+    const routingMatch = routeFrameworkQuery(query);
+    framework = routingMatch?.status === 'matched' ? routingMatch.framework : null;
+  }
+
+  const detectedLanguage = (
+    Object.entries(LANGUAGE_SIGNATURES) as Array<[SupportedLanguage, readonly RegExp[]]>
+  ).find(([, patterns]) => patterns.some((p) => p.test(query)))?.[0];
+
+  const detectedDomain = Object.entries(DOMAIN_SIGNATURES).find(([, patterns]) =>
+    patterns.some((p) => p.test(query))
+  )?.[0];
+
+  const routingMatch = routeFrameworkQuery(query);
+  const matchedKeywords = routingMatch?.matchedKeywords ? [...routingMatch.matchedKeywords] : [];
+  let confidence = 0.5;
+
+  if (framework) confidence += 0.25;
+  if (detectedLanguage) confidence += 0.15;
+  if (detectedDomain) confidence += 0.1;
+
+  confidence = Math.min(1, Math.max(0, confidence));
+
+  return {
+    intent: detectedIntent,
+    framework,
+    domain: detectedDomain,
+    language: detectedLanguage,
+    confidence: Number(confidence.toFixed(2)),
+    matchedKeywords,
   };
 }

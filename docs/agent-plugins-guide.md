@@ -53,11 +53,11 @@ $$\text{Reliability} = \text{Intent} \to \text{Lean Workflow} \to \text{Groundin
 │   │   ├── http/                   # Streamable HTTP wire layer (JSON-RPC, request guards, security)
 │   │   ├── resources/              # Universal domain resources (static standards, invariants)
 │   │   ├── prompts/                # Thin workflow prompt templates (XML untrusted containment)
-│   │   ├── tools/                  # Top-level MCP tools (e.g. verify_test_artifact)
+│   │   ├── tools/                  # Top-level MCP tools (read_sdet_docs gateway, verify_test_artifact)
 │   │   ├── verification/           # Static invariant rules and scanner engine
 │   │   │   ├── rules/              # Modular invariant checkers (waits, assertions, locators, isolation)
 │   │   │   └── schemas.ts          # Zod v4.4.3 data contracts for verification requests/results
-│   │   └── domains/                # Consolidated framework domains (read_*_docs tools & reference loaders)
+│   │   └── domains/                # Framework reference doc readers and AST extractors
 │   └── test/                       # Protocol, discovery, transport, and verification test suites
 
 ├── evals/                          # Offline deterministic evaluation benchmark suite
@@ -137,11 +137,11 @@ The `mcp.json` manifest configures Model Context Protocol endpoints provided by 
 
 Skills are organized hierarchically per the `agentskills.io` standard to protect the LLM context window while maintaining deep technical accuracy:
 
-|    Level    | Content                                       | When Loaded                                                 | Token Impact |
-| :---------: | :-------------------------------------------- | :---------------------------------------------------------- | :----------: |
-| **Level 1** | `name` + `description` (Frontmatter)          | Injected in system prompt on every turn for intent matching | **Highest**  |
-| **Level 2** | `SKILL.md` body (Workflow & Checklists)       | Loaded only when the skill is explicitly triggered          |  **Medium**  |
-| **Level 3** | Dynamic MCP tools (`read_*_docs`) & Resources | Retrieved on-demand via AST section filtering (`query`)     |  **Lowest**  |
+|    Level    | Content                                            | When Loaded                                                 | Token Impact |
+| :---------: | :------------------------------------------------- | :---------------------------------------------------------- | :----------: |
+| **Level 1** | `name` + `description` (Frontmatter)               | Injected in system prompt on every turn for intent matching | **Highest**  |
+| **Level 2** | `SKILL.md` body (Workflow & Checklists)            | Loaded only when the skill is explicitly triggered          |  **Medium**  |
+| **Level 3** | Dynamic MCP Gateway (`read_sdet_docs`) & Resources | Retrieved on-demand via AST section filtering (`query`)     |  **Lowest**  |
 
 ---
 
@@ -184,7 +184,7 @@ Cross-framework comparison table mapping universal concepts to concrete APIs.
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas
 
-Level 3 on-demand tool pointers (e.g. read_pw_docs with domain/language params).
+Level 3 on-demand tool pointers (e.g. read_sdet_docs({ framework, domain, language })).
 
 ## 7. Verification Checklist
 
@@ -195,28 +195,31 @@ Strict actionable checklist to confirm before artifact delivery.
 
 ## 4. MCP Server 2026-07-28 Runtime & Hardening
 
-### 4.1 Single Source of Truth: Canonical Registry (`servers/src/registry.ts`)
+### 4.1 Universal 2-Tool Architecture & Canonical Registry (`servers/src/registry.ts`)
+
+In v2, the MCP server consolidates all documentation and verification capabilities into strictly **2 high-performance tools**:
+
+1. **`read_sdet_docs` (Universal Documentation Gateway):** An $O(1)$ tool footprint gateway that dynamically routes documentation requests across any number of frameworks (Playwright, Cypress, Selenium, Vibium, Appium, and future additions) with runtime domain/language validation, heading AST extraction, and SEP-1303 error guidance.
+2. **`verify_test_artifact` (Deterministic Invariant Engine):** Real-time static invariant scanner executing 4 core rules (`no-arbitrary-waits`, `meaningful-assertions`, `semantic-locators`, `state-isolation`) in <5ms.
 
 Metadata drift across tools, skills, and agents is eliminated by defining a single source of truth:
 
 ```typescript
 export const FRAMEWORK_IDS = ['playwright', 'cypress', 'selenium', 'vibium', 'appium'] as const;
-export type FrameworkId = (typeof FRAMEWORK_IDS)[number];
+export type SupportedFramework = (typeof FRAMEWORK_IDS)[number];
 
-export const FRAMEWORK_REGISTRY = [
-  {
-    id: 'playwright',
-    displayName: 'Playwright',
-    agentName: 'playwright',
-    toolName: 'read_pw_docs',
-    supportedLanguages: ['typescript', 'javascript', 'python', 'java', 'csharp'],
-    domains: ['actions', 'assertions', 'locators', 'network', 'observability', 'storage'],
+export const FRAMEWORK_REGISTRY = {
+  playwright: {
+    domains: PLAYWRIGHT_DOMAINS,
+    languages: ['typescript', 'javascript', 'python', 'java', 'csharp'],
+    defaultDomain: 'locators',
+    defaultLanguage: 'typescript',
   },
   // ...
-] as const;
+} as const;
 ```
 
-All Zod schemas (`z.enum(FRAMEWORK_IDS)`), tool registrations, and routing evaluators derive directly from this registry.
+All Zod schemas (`DocsGatewayInputSchema`), tool routing, and evaluation benchmarks derive directly from this registry.
 
 ---
 
@@ -304,13 +307,13 @@ Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, t
 3. **`semantic-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`). _(Note: Cannot inspect live DOM or detect unstable hashed CSS classes)._
 4. **`state-isolation`**: Flags explicit shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation. _(Note: Does not verify external database sandbox isolation)._
 
-### 5.3 Bounded Self-Repair: Agent Execution Protocol vs. Runtime Daemon
+### 5.3 Bounded Repair: Agent Workflow Policy vs. Stateless MCP Server
 
-To avoid turning the stateless MCP server into a heavy, stateful orchestration daemon (conforming to the core rule: **no custom runtime orchestrator**), bounded repair is designed as an **Agent Execution Protocol**:
+To avoid turning the stateless MCP server into a heavy, stateful orchestration daemon (conforming to the core rule: **no custom runtime orchestrator**), bounded repair is designed as an **Agent Execution Policy**:
 
-- **Stateless MCP Tool Role:** The MCP server provides the `verify_test_artifact` tool which evaluates code against static invariants and outputs structured `actionableHints`.
+- **Stateless MCP Tool Role:** The MCP server provides the `verify_test_artifact` tool which evaluates code against static invariants and outputs structured `actionableHints` without maintaining session state.
 - **Agent Policy Contract:** The agent prompt mandates a **hard limit of 2 repair iterations** (`MAX_REPAIR_ATTEMPTS = 2`) using the provided actionable hints.
-- **Deterministic Escalation:** If verification still fails after 2 repair attempts, the agent breaks the loop and escalates with a structured diagnostics report containing the failing checks, evidence, and manual remediation notes.
+- **Host Non-Compliance & Escalation:** If the host does not run multi-turn feedback loops, verification diagnostics are delivered directly to the user. If an agent fails after 2 attempts, the policy commands immediate escalation with diagnostics.
 
 ---
 
@@ -334,8 +337,8 @@ To avoid turning the stateless MCP server into a heavy, stateful orchestration d
                         (Playwright / Cypress / etc.)
                                        │
                                        ▼
-                             [ Query MCP Tool ]
-                         (read_*_docs?query=...)
+                              [ Query MCP Gateway ]
+                          (read_sdet_docs?query=...)
                                        │
                                        ▼
                            [ Generate Test Code ]
@@ -417,7 +420,7 @@ Skills Authoring (agentskills.io)
 ☐ description ≤ 100 words, quoted ('...'), imperative and trigger-accurate
 ☐ SKILL.md body conforms to the 7-Section Workflow Standard (< 300 lines)
 ☐ Zero hardcoded absolute paths (use relative ../<sibling-skill>/SKILL.md)
-☐ Exhaustive code tables delegated to Level 3 MCP tools (read_*_docs)
+☐ Exhaustive code tables delegated to Level 3 MCP gateway (read_sdet_docs)
 
 Agent & Verification Architecture
 ☐ Master orchestrator defines host-agnostic fallback (subagents vs. persona adoption)

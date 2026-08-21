@@ -1,6 +1,6 @@
 # Awesome SDET — Agent Plugin 🚀
 
-Enterprise SDET Agent Plugin & MCP Server featuring closed-loop deterministic test verification and bounded self-repair.
+Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.
 
 Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.org/specification) and [MCP Specification (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28).
 
@@ -8,17 +8,32 @@ Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.
 
 ## ⚡ Quick Start & Installation
 
-Install `awesome-sdet` into your AI assistant of choice:
+Install `awesome-sdet` into your AI assistant or agentic coding environment:
+
+| Platform / Host         | Installation Command / Method                                                            | Standard                                         |
+| :---------------------- | :--------------------------------------------------------------------------------------- | :----------------------------------------------- |
+| **Claude Code**         | `claude plugin add github:burakkaygusuz/awesome-sdet`                                    | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **OpenCode**            | `opencode plugin install github:burakkaygusuz/awesome-sdet`                              | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **VS Code & Copilot**   | `Chat: Install Plugin From Source` (`https://github.com/burakkaygusuz/awesome-sdet.git`) | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| **Antigravity & Codex** | Add to `.agents/plugins/awesome-sdet` or `~/.gemini/config/plugins/`                     | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+
+---
 
 ### 1. Claude Code
 
-Add the plugin directly:
+Install directly via the Claude Code CLI:
 
 ```bash
 claude plugin add github:burakkaygusuz/awesome-sdet
 ```
 
-Or add to your project's `.claude/settings.json`:
+Or from inside an active Claude Code session:
+
+```text
+/plugin install github:burakkaygusuz/awesome-sdet
+```
+
+Or declare in your project's `.claude/settings.json`:
 
 ```json
 {
@@ -47,31 +62,7 @@ Or declare in `opencode.json`:
 
 ---
 
-### 3. Cursor
-
-Install via Cursor Plugins or clone into local plugins:
-
-```bash
-# Clone into Cursor local plugins
-git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.cursor/plugins/local/awesome-sdet
-```
-
-Or configure the SDET MCP server in `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "sdet-mcp": {
-      "command": "node",
-      "args": ["<path-to-awesome-sdet>/servers/dist/index.js", "--stdio"]
-    }
-  }
-}
-```
-
----
-
-### 4. VS Code & GitHub Copilot
+### 3. VS Code & GitHub Copilot
 
 Install from source via the Command Palette (`Chat: Install Plugin From Source`) with:
 
@@ -79,7 +70,7 @@ Install from source via the Command Palette (`Chat: Install Plugin From Source`)
 https://github.com/burakkaygusuz/awesome-sdet.git
 ```
 
-Or register the plugin path in `.vscode/settings.json`:
+Or register the local plugin path in `.vscode/settings.json`:
 
 ```json
 {
@@ -92,9 +83,9 @@ Or register the plugin path in `.vscode/settings.json`:
 
 ---
 
-### 5. Codex & Antigravity (Workspace / Global Plugin)
+### 4. Google Antigravity & Codex
 
-Clone or add as submodule into your agent plugins directory:
+Add the plugin into your workspace or global agent plugins directory:
 
 ```bash
 # Workspace level
@@ -103,6 +94,20 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awes
 # Global level
 git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
 ```
+
+---
+
+### 5. Local Development & Contributing
+
+To develop, customize, or contribute to `awesome-sdet`:
+
+```bash
+git clone https://github.com/burakkaygusuz/awesome-sdet.git
+cd awesome-sdet
+pnpm install
+```
+
+`pnpm install` automatically triggers the build lifecycle hook (`prepare`) to build the MCP server and compile TypeScript sources.
 
 ---
 
@@ -115,7 +120,7 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
   - Master SDET Orchestrator (`agents/sdet.agent.md`) supporting host-aware execution (subagent delegation vs. inline specialist persona adoption).
   - 5 Autonomous Domain Specialists for **Playwright**, **Cypress**, **Selenium 4**, **Vibium**, and **Appium**.
 - **Enterprise SDET MCP Server (`servers/`):**
-  - 5 Consolidated Framework Reference Tools (`read_pw_docs`, `read_se_docs`, `read_cy_docs`, `read_vibium_docs`, `read_appium_docs`) delivering progressive, section-filtered docs across 5 languages (TypeScript, JavaScript, Python, Java, C#).
+  - **Universal SDET Docs Gateway (`read_sdet_docs`):** Single high-performance documentation gateway dynamically delivering progressive, section-filtered docs across all supported frameworks (Playwright, Cypress, Selenium, Vibium, Appium) and 5 languages (TypeScript, JavaScript, Python, Java, C#) with an $O(1)$ tool footprint.
   - **Deterministic Verification Engine (`verify_test_artifact`):** Real-time static invariant scanner enforcing zero-arbitrary-waits, meaningful assertions, accessible locators, and clean state isolation.
   - Strict **MCP 2026-07-28** conformance: Dual `stdio` and `streamable-http` transports.
   - Hardened security defenses: Loopback DNS rebinding prevention, 10MB payload limits, prototype pollution guards, safe error masking (`-32603`), and XML prompt boundary containment.
