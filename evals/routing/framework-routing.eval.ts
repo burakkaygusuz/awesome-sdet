@@ -56,6 +56,21 @@ export const ROUTING_BENCHMARK_CASES: readonly FrameworkRoutingBenchmarkCase[] =
     expectedFramework: 'playwright',
     description: 'Playwright TypeScript test generation referencing read_sdet_docs',
   },
+  {
+    id: 'pw-query-collision-resilience',
+    query: 'Writing Playwright test with By.id selector and expect assertions',
+    expectedStatus: 'matched',
+    expectedFramework: 'playwright',
+    description:
+      'Playwright query with secondary Selenium keyword collision resolved by primary weight',
+  },
+  {
+    id: 'pw-query-alias-shorthand',
+    query: 'Setup pw parallel execution with browserContext',
+    expectedStatus: 'matched',
+    expectedFramework: 'playwright',
+    description: 'Playwright query using shorthand alias pw and secondary keyword',
+  },
 
   // ==========================================
   // SELENIUM QUERIES (CONFIDENT MATCH)

@@ -308,13 +308,13 @@ Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, t
 3. **`semantic-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`). _(Note: Cannot inspect live DOM or detect unstable hashed CSS classes)._
 4. **`state-isolation`**: Flags explicit shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation. _(Note: Does not verify external database sandbox isolation)._
 
-### 5.3 Bounded Self-Repair: Agent Execution Protocol vs. Runtime Daemon
+### 5.3 Bounded Repair: Agent Workflow Policy vs. Stateless MCP Server
 
-To avoid turning the stateless MCP server into a heavy, stateful orchestration daemon (conforming to the core rule: **no custom runtime orchestrator**), bounded repair is designed as an **Agent Execution Protocol**:
+To avoid turning the stateless MCP server into a heavy, stateful orchestration daemon (conforming to the core rule: **no custom runtime orchestrator**), bounded repair is designed as an **Agent Execution Policy**:
 
-- **Stateless MCP Tool Role:** The MCP server provides the `verify_test_artifact` tool which evaluates code against static invariants and outputs structured `actionableHints`.
+- **Stateless MCP Tool Role:** The MCP server provides the `verify_test_artifact` tool which evaluates code against static invariants and outputs structured `actionableHints` without maintaining session state.
 - **Agent Policy Contract:** The agent prompt mandates a **hard limit of 2 repair iterations** (`MAX_REPAIR_ATTEMPTS = 2`) using the provided actionable hints.
-- **Deterministic Escalation:** If verification still fails after 2 repair attempts, the agent breaks the loop and escalates with a structured diagnostics report containing the failing checks, evidence, and manual remediation notes.
+- **Host Non-Compliance & Escalation:** If the host does not run multi-turn feedback loops, verification diagnostics are delivered directly to the user. If an agent fails after 2 attempts, the policy commands immediate escalation with diagnostics.
 
 ---
 

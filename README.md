@@ -1,6 +1,6 @@
 # Awesome SDET — Agent Plugin 🚀
 
-Enterprise SDET Agent Plugin & MCP Server featuring closed-loop deterministic test verification and bounded self-repair.
+Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.
 
 Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.org/specification) and [MCP Specification (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28).
 

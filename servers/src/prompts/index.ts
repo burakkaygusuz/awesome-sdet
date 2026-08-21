@@ -60,6 +60,7 @@ Context & Directives:
 - Adhere strictly to universal SDET guidelines at \`sdet://guidelines\` and prohibited anti-patterns at \`sdet://invariants\`.
 - Query \`read_sdet_docs\` with \`{ framework: "${framework}", domain: "...", language: "${language}" }\` to retrieve up-to-date API code examples.
 - Consult relevant capability skills in \`skills/sdet-*\` for domain-specific architectural patterns.
+- Verify generated code with \`verify_test_artifact({ code, framework: "${framework}", language: "${language}" })\`. If verification fails, execute bounded repair (maximum 2 attempts) using \`actionableHints\` before delivering the final code.
 
 Feature Specifications:
 ${wrapUntrustedContent('untrusted_feature_specifications', featureDescription)}`,
@@ -101,6 +102,7 @@ Context & Directives:
 - Apply the universal cross-framework semantic mapping defined at \`sdet://migration-matrix\`.
 - Refactor legacy anti-patterns into ${targetFramework} native condition-polling and accessible locators using \`read_sdet_docs({ framework: "${targetFramework}", domain: "...", language: "..." })\`.
 - Ensure strict adherence to \`sdet://guidelines\` and \`sdet://invariants\`.
+- Verify migrated code with \`verify_test_artifact({ code, framework: "${targetFramework}", language: "..." })\`. If verification fails, execute bounded repair (maximum 2 attempts) using \`actionableHints\`.
 
 Source Test Code (${sourceFramework}):
 ${wrapUntrustedContent('untrusted_source_code', sourceCode)}`,

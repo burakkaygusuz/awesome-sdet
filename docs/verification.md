@@ -88,20 +88,22 @@ export const VerificationResultSchema = z.strictObject({
 
 ---
 
-## 5. Bounded Self-Repair: Agent Execution Protocol vs. Runtime Daemon
+## 5. Bounded Repair: Agent Workflow Policy vs. Stateless MCP Server
 
 To eliminate the risk of runaway agent loops and unbounded token consumption while adhering to the core architectural invariant (**no custom agent orchestrator runtime**):
 
-1. **Protocol Nature (Agent Execution Policy):** Bounded repair is implemented as a **normative Agent Policy & Protocol Contract** enforced through system directives in [`agents/*.agent.md`](../agents/) and [`skills/*/SKILL.md`](../skills/). The MCP server itself does not run an internal stateful daemon or imperative loop; it acts as a stateless tool provider (`verify_test_artifact`).
-2. **Structured Diagnostic Feedback:** When `verify_test_artifact` returns `passed: false`, the tool provides concise, structured `actionableHints`:
+1. **Policy Loop vs. Runtime Daemon:** Bounded repair is strictly a **client/agent-side workflow policy (Prompt Contract)** defined in [`agents/*.agent.md`](../agents/), [`skills/*/SKILL.md`](../skills/), and MCP prompt templates. The MCP server is a **stateless, passive verification scanner** (`verify_test_artifact`) and does not maintain internal sessions, iteration counters, or autonomous execution threads.
+2. **Deterministic Diagnostic Feedback:** When `verify_test_artifact` returns `passed: false`, the tool provides structured, machine-readable `actionableHints` alongside explicit rule violation evidence:
 
    ```text
    [no-arbitrary-waits] Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).
    [resilient-accessibility-locators] Replace brittle XPath/DOM index paths with accessible locators (e.g. getByRole, getByLabel).
    ```
 
-3. **Hard Boundary (`MAX_REPAIR_ATTEMPTS = 2`):** The agent is explicitly instructed to attempt at most 2 repair iterations using the actionable hints.
-4. **Deterministic Escalation:** If verification still fails after 2 repair attempts, the agent policy mandates breaking the loop and presenting the artifact with a structured diagnostics report containing the failing checks, evidence, and manual remediation notes.
+3. **Hard Policy Boundary (`MAX_REPAIR_ATTEMPTS = 2`):** The agent prompt explicitly restricts self-repair to at most 2 iterations using the structured hints.
+4. **Host Non-Compliance & Fallback Semantics:**
+   - **One-Shot / Stateless Hosts:** If the LLM host or caller does not support multi-turn agent feedback loops, `verify_test_artifact` results (score, checks, actionableHints) are surfaced directly to the developer for manual remediation without silent failure.
+   - **Loop Escalation:** If a model fails verification after 2 repair iterations, the prompt contract mandates immediately breaking the loop and returning a structured diagnostics report rather than thrashing tokens.
 
 ---
 

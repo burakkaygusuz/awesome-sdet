@@ -2,7 +2,7 @@
   "name": "awesome-sdet",
   "version": "1.3.0",
   "private": true,
-  "description": "Enterprise SDET Agent Plugin & MCP Server featuring closed-loop deterministic test verification and bounded self-repair.",
+  "description": "Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.",
   "files": [
     "dist",
     "skills",
