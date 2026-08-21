@@ -104,6 +104,10 @@ function detectGlobalAssignment(node: SyntaxNode): string | null {
   return null;
 }
 
+function detectUnsafeStateNode(node: SyntaxNode): string | null {
+  return detectUnsafeStaticField(node) ?? detectGlobalAssignment(node);
+}
+
 export function checkStateIsolation(
   code: string,
   framework: string,
@@ -125,19 +129,10 @@ export function checkStateIsolation(
   }
 
   let evidence = detectTopLevelVariable(rootNode);
-
   if (!evidence) {
     walkAst(rootNode, (node) => {
-      const staticField = detectUnsafeStaticField(node);
-      if (staticField) {
-        evidence = staticField;
-        return false;
-      }
-      const globalAssign = detectGlobalAssignment(node);
-      if (globalAssign) {
-        evidence = globalAssign;
-        return false;
-      }
+      evidence = detectUnsafeStateNode(node);
+      return !evidence;
     });
   }
 

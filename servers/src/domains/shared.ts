@@ -233,6 +233,46 @@ export function resolveSafePath(baseDir: string, relativeTarget: string): string
   return absTarget;
 }
 
+function validateSafeParam(raw: unknown, paramType: 'language' | 'domain'): void {
+  if (raw === undefined || raw === null) return;
+  if (typeof raw !== 'string') {
+    throw new TypeError(`Invalid ${paramType}: expected string, received ${typeof raw}`);
+  }
+  if (raw.includes('\0') || raw.includes('..') || raw.includes('/') || raw.includes('\\')) {
+    throw new Error(
+      `Invalid ${paramType}: path traversal or illegal characters detected in '${raw}'`
+    );
+  }
+}
+
+function resolveSafeOption<const T extends readonly string[]>(
+  raw: string | undefined | null,
+  allowed: T,
+  paramType: 'language' | 'domain',
+  defaultVal?: T[number],
+  frameworkName?: string,
+  aliasMap?: Readonly<Record<string, string>>
+): T[number] {
+  validateSafeParam(raw, paramType);
+  const normalized = (raw || '').toLowerCase().trim();
+  if (!normalized) {
+    if (defaultVal !== undefined) return defaultVal;
+    const typeLabel = paramType === 'language' ? 'Language' : 'Domain';
+    throw new Error(`${typeLabel} is required. Allowed ${paramType}s: ${allowed.join(', ')}.`);
+  }
+
+  const canonical = (aliasMap?.[normalized] ?? normalized) as T[number];
+  if ((allowed as readonly string[]).includes(canonical)) {
+    return canonical;
+  }
+
+  const prefix = frameworkName
+    ? `Unsupported ${frameworkName} ${paramType}:`
+    : `Unsupported ${paramType}:`;
+  const listLabel = frameworkName ? `Supported ${paramType}s:` : `Allowed ${paramType}s:`;
+  throw new Error(`${prefix} '${raw}'. ${listLabel} ${allowed.join(', ')}.`);
+}
+
 /**
  * Validates and normalizes target programming language,
  * rejecting path traversal sequences and unsupported values.
@@ -243,38 +283,14 @@ export function sanitizeLanguage<const T extends readonly string[]>(
   defaultLanguage?: T[number],
   frameworkName?: string
 ): T[number] {
-  if (rawLanguage !== undefined && rawLanguage !== null) {
-    if (typeof rawLanguage !== 'string') {
-      throw new TypeError(`Invalid language: expected string, received ${typeof rawLanguage}`);
-    }
-    if (
-      rawLanguage.includes('\0') ||
-      rawLanguage.includes('..') ||
-      rawLanguage.includes('/') ||
-      rawLanguage.includes('\\')
-    ) {
-      throw new Error(
-        `Invalid language: path traversal or illegal characters detected in '${rawLanguage}'`
-      );
-    }
-  }
-
-  const normalized = (rawLanguage || '').toLowerCase().trim();
-  if (!normalized) {
-    if (defaultLanguage !== undefined) {
-      return defaultLanguage;
-    }
-    throw new Error(`Language is required. Allowed languages: ${allowed.join(', ')}.`);
-  }
-
-  const canonical = (LANGUAGE_ALIASES[normalized] ?? normalized) as T[number];
-  if ((allowed as readonly string[]).includes(canonical)) {
-    return canonical;
-  }
-
-  const prefix = frameworkName ? `Unsupported ${frameworkName} language:` : 'Unsupported language:';
-  const listLabel = frameworkName ? 'Supported languages:' : 'Allowed languages:';
-  throw new Error(`${prefix} '${rawLanguage}'. ${listLabel} ${allowed.join(', ')}.`);
+  return resolveSafeOption(
+    rawLanguage,
+    allowed,
+    'language',
+    defaultLanguage,
+    frameworkName,
+    LANGUAGE_ALIASES
+  );
 }
 
 /**
@@ -287,37 +303,7 @@ export function sanitizeDomain<const T extends readonly string[]>(
   defaultDomain?: T[number],
   frameworkName?: string
 ): T[number] {
-  if (rawDomain !== undefined && rawDomain !== null) {
-    if (typeof rawDomain !== 'string') {
-      throw new TypeError(`Invalid domain: expected string, received ${typeof rawDomain}`);
-    }
-    if (
-      rawDomain.includes('\0') ||
-      rawDomain.includes('..') ||
-      rawDomain.includes('/') ||
-      rawDomain.includes('\\')
-    ) {
-      throw new Error(
-        `Invalid domain: path traversal or illegal characters detected in '${rawDomain}'`
-      );
-    }
-  }
-
-  const normalized = (rawDomain || '').toLowerCase().trim();
-  if (!normalized) {
-    if (defaultDomain !== undefined) {
-      return defaultDomain;
-    }
-    throw new Error(`Domain is required. Allowed domains: ${allowed.join(', ')}.`);
-  }
-
-  if ((allowed as readonly string[]).includes(normalized)) {
-    return normalized;
-  }
-
-  const prefix = frameworkName ? `Unsupported ${frameworkName} domain:` : 'Unsupported domain:';
-  const listLabel = frameworkName ? 'Supported domains:' : 'Allowed domains:';
-  throw new Error(`${prefix} '${rawDomain}'. ${listLabel} ${allowed.join(', ')}.`);
+  return resolveSafeOption(rawDomain, allowed, 'domain', defaultDomain, frameworkName);
 }
 
 export const MAX_REFERENCE_CACHE_ENTRIES = 256;

@@ -185,6 +185,23 @@ export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<
   }),
 });
 
+function scorePatterns(
+  patterns: readonly RegExp[],
+  query: string,
+  weight: number,
+  matchedKeywords: string[]
+): number {
+  let score = 0;
+  for (const pattern of patterns) {
+    const match = pattern.exec(query);
+    if (match) {
+      matchedKeywords.push(match[0]);
+      score += weight;
+    }
+  }
+  return score;
+}
+
 export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null {
   if (!query || typeof query !== 'string') {
     return null;
@@ -197,33 +214,12 @@ export function routeFrameworkQuery(query: string): FrameworkRoutingMatch | null
   }> = [];
 
   for (const framework of FRAMEWORK_IDS) {
-    const signatureGroup = FRAMEWORK_ROUTING_SIGNATURES[framework];
+    const group = FRAMEWORK_ROUTING_SIGNATURES[framework];
     const matchedKeywords: string[] = [];
-    let score = 0;
-
-    for (const signature of signatureGroup.primary) {
-      const match = signature.exec(query);
-      if (match) {
-        matchedKeywords.push(match[0]);
-        score += ROUTING_WEIGHTS.primary;
-      }
-    }
-
-    for (const signature of signatureGroup.secondary) {
-      const match = signature.exec(query);
-      if (match) {
-        matchedKeywords.push(match[0]);
-        score += ROUTING_WEIGHTS.secondary;
-      }
-    }
-
-    for (const signature of signatureGroup.context) {
-      const match = signature.exec(query);
-      if (match) {
-        matchedKeywords.push(match[0]);
-        score += ROUTING_WEIGHTS.context;
-      }
-    }
+    const score =
+      scorePatterns(group.primary, query, ROUTING_WEIGHTS.primary, matchedKeywords) +
+      scorePatterns(group.secondary, query, ROUTING_WEIGHTS.secondary, matchedKeywords) +
+      scorePatterns(group.context, query, ROUTING_WEIGHTS.context, matchedKeywords);
 
     if (matchedKeywords.length > 0) {
       results.push({ framework, matchedKeywords, score });
