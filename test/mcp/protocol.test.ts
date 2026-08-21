@@ -158,8 +158,8 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           id: 92,
           method: 'tools/call',
           params: {
-            name: 'read_se_locator_docs',
-            arguments: { language: 'typescript' },
+            name: 'read_sdet_docs',
+            arguments: { framework: 'selenium', domain: 'locators', language: 'typescript' },
             _meta: {
               'io.modelcontextprotocol/protocolVersion': '2026-07-28',
               'io.modelcontextprotocol/clientCapabilities': {},
@@ -183,7 +183,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
           id: 91,
           method: 'tools/call',
           params: {
-            name: 'read_selenium_docs',
+            name: 'read_sdet_docs',
             _meta: {
               'io.modelcontextprotocol/protocolVersion': '2026-07-28',
               'io.modelcontextprotocol/clientCapabilities': {},

@@ -83,12 +83,15 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       const tools = listData.result?.tools || [];
       expect.soft(tools.length).toBeGreaterThanOrEqual(1);
 
-      const docTool = tools.find((t: { name: string }) => t.name.startsWith('read_')) || tools[0];
+      const docTool = tools.find((t: { name: string }) => t.name === 'read_sdet_docs') || tools[0];
       const res = await mcpFetch(url, {
         jsonrpc: '2.0',
         id: 40,
         method: 'tools/call',
-        params: { name: docTool.name, arguments: { domain: 'locators', language: 'typescript' } },
+        params: {
+          name: docTool.name,
+          arguments: { framework: 'playwright', domain: 'locators', language: 'typescript' },
+        },
       });
 
       expect.soft(res.status).toBe(200);
@@ -123,7 +126,8 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         await mcpFetch(url, { jsonrpc: '2.0', id: 50, method: 'tools/list' })
       );
       const tools = listData.result?.tools || [];
-      const targetTool = tools[0];
+      const targetTool =
+        tools.find((t: { name: string }) => t.name === 'read_sdet_docs') || tools[0];
 
       const res = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -132,6 +136,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         params: {
           name: targetTool.name,
           arguments: {
+            framework: 'playwright',
             domain: '__invalid_unsupported_domain__',
             language: '__invalid_unsupported_language__',
           },
@@ -151,8 +156,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         id: 52,
         method: 'tools/call',
         params: {
-          name: 'read_vibium_docs',
+          name: 'read_sdet_docs',
           arguments: {
+            framework: 'vibium',
             domain: 'core',
             language: 'typescript',
             unrecognized_hallucinated_param: 'unexpected',
@@ -167,30 +173,45 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
 
     it('tools/call successfully executes documentation tools across all supported frameworks', async () => {
       const crossFrameworkTools = [
-        { name: 'read_pw_docs', domain: 'locators', lang: 'typescript', expectText: 'Playwright' },
-        { name: 'read_pw_docs', domain: 'actions', lang: 'python', expectText: 'Playwright' },
-        { name: 'read_pw_docs', domain: 'assertions', lang: 'java', expectText: 'Playwright' },
-        { name: 'read_pw_docs', domain: 'network', lang: 'csharp', expectText: 'Playwright' },
-        { name: 'read_pw_docs', domain: 'storage', lang: 'typescript', expectText: 'Playwright' },
-        { name: 'read_pw_docs', domain: 'observability', lang: 'python', expectText: 'Playwright' },
-        { name: 'read_se_docs', domain: 'actions', lang: 'java', expectText: 'Selenium' },
-        { name: 'read_se_docs', domain: 'bidi', lang: 'python', expectText: 'Selenium' },
-        { name: 'read_cy_docs', domain: 'commands', lang: 'typescript', expectText: 'Cypress' },
-        { name: 'read_vibium_docs', domain: 'core', lang: 'python', expectText: 'Vibium' },
-        { name: 'read_vibium_docs', domain: 'selectors', lang: 'typescript', expectText: 'Vibium' },
-        { name: 'read_vibium_docs', domain: 'interactions', lang: 'java', expectText: 'Vibium' },
-        { name: 'read_vibium_docs', domain: 'bidi', lang: 'javascript', expectText: 'Vibium' },
-        { name: 'read_vibium_docs', domain: 'state', lang: 'typescript', expectText: 'Vibium' },
         {
-          name: 'read_appium_docs',
+          framework: 'playwright',
+          domain: 'locators',
+          lang: 'typescript',
+          expectText: 'Playwright',
+        },
+        { framework: 'playwright', domain: 'actions', lang: 'python', expectText: 'Playwright' },
+        { framework: 'playwright', domain: 'assertions', lang: 'java', expectText: 'Playwright' },
+        { framework: 'playwright', domain: 'network', lang: 'csharp', expectText: 'Playwright' },
+        {
+          framework: 'playwright',
+          domain: 'storage',
+          lang: 'typescript',
+          expectText: 'Playwright',
+        },
+        {
+          framework: 'playwright',
+          domain: 'observability',
+          lang: 'python',
+          expectText: 'Playwright',
+        },
+        { framework: 'selenium', domain: 'actions', lang: 'java', expectText: 'Selenium' },
+        { framework: 'selenium', domain: 'bidi', lang: 'python', expectText: 'Selenium' },
+        { framework: 'cypress', domain: 'commands', lang: 'typescript', expectText: 'Cypress' },
+        { framework: 'vibium', domain: 'core', lang: 'python', expectText: 'Vibium' },
+        { framework: 'vibium', domain: 'selectors', lang: 'typescript', expectText: 'Vibium' },
+        { framework: 'vibium', domain: 'interactions', lang: 'java', expectText: 'Vibium' },
+        { framework: 'vibium', domain: 'bidi', lang: 'javascript', expectText: 'Vibium' },
+        { framework: 'vibium', domain: 'state', lang: 'typescript', expectText: 'Vibium' },
+        {
+          framework: 'appium',
           domain: 'capabilities',
           lang: 'typescript',
           expectText: 'Appium',
         },
-        { name: 'read_appium_docs', domain: 'locators', lang: 'python', expectText: 'Appium' },
-        { name: 'read_appium_docs', domain: 'gestures', lang: 'java', expectText: 'Appium' },
-        { name: 'read_appium_docs', domain: 'context', lang: 'csharp', expectText: 'Appium' },
-        { name: 'read_appium_docs', domain: 'device', lang: 'javascript', expectText: 'Appium' },
+        { framework: 'appium', domain: 'locators', lang: 'python', expectText: 'Appium' },
+        { framework: 'appium', domain: 'gestures', lang: 'java', expectText: 'Appium' },
+        { framework: 'appium', domain: 'context', lang: 'csharp', expectText: 'Appium' },
+        { framework: 'appium', domain: 'device', lang: 'javascript', expectText: 'Appium' },
       ];
 
       for (const item of crossFrameworkTools) {
@@ -198,7 +219,10 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
           jsonrpc: '2.0',
           id: 60,
           method: 'tools/call',
-          params: { name: item.name, arguments: { domain: item.domain, language: item.lang } },
+          params: {
+            name: 'read_sdet_docs',
+            arguments: { framework: item.framework, domain: item.domain, language: item.lang },
+          },
         });
 
         expect.soft(res.status).toBe(200);
@@ -214,8 +238,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         id: 70,
         method: 'tools/call',
         params: {
-          name: 'read_pw_docs',
+          name: 'read_sdet_docs',
           arguments: {
+            framework: 'playwright',
             domain: 'locators',
             language: 'typescript',
             query: 'getByRole',
@@ -239,8 +264,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         id: 71,
         method: 'tools/call',
         params: {
-          name: 'read_pw_docs',
+          name: 'read_sdet_docs',
           arguments: {
+            framework: 'playwright',
             domain: 'locators',
             language: 'typescript',
           },
@@ -257,8 +283,9 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         id: 72,
         method: 'tools/call',
         params: {
-          name: 'read_pw_docs',
+          name: 'read_sdet_docs',
           arguments: {
+            framework: 'playwright',
             domain: 'locators',
             language: 'typescript',
             query: 'non_existent_symbol_xyz123',
@@ -366,7 +393,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('vibium');
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
       expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('sdet://guidelines');
-      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_vibium_docs');
+      expect.soft(genData.result?.messages?.[0]?.content?.text).toContain('read_sdet_docs');
 
       const pwGenRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -387,7 +414,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('playwright');
       expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('skills/sdet-*');
       expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('sdet://guidelines');
-      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('read_pw_docs');
+      expect.soft(pwGenData.result?.messages?.[0]?.content?.text).toContain('read_sdet_docs');
 
       const migRes = await mcpFetch(url, {
         jsonrpc: '2.0',
@@ -407,7 +434,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
       expect
         .soft(migData.result?.messages?.[0]?.content?.text)
         .toContain('sdet://migration-matrix');
-      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_cy_docs');
+      expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('read_sdet_docs');
       expect.soft(migData.result?.messages?.[0]?.content?.text).toContain('sdet://invariants');
 
       const diagRes = await mcpFetch(url, {
@@ -430,7 +457,7 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         .soft(diagData.result?.messages?.[0]?.content?.text)
         .toContain('skills/sdet-observability');
       expect.soft(diagData.result?.messages?.[0]?.content?.text).toContain('sdet://invariants');
-      expect.soft(diagData.result?.messages?.[0]?.content?.text).toContain('read_se_docs');
+      expect.soft(diagData.result?.messages?.[0]?.content?.text).toContain('read_sdet_docs');
     });
 
     it('prompts/get enforces XML containment boundaries and tag sanitization against prompt injection', async () => {

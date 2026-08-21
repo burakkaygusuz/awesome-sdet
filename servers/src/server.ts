@@ -4,7 +4,7 @@ import { registerPrompts } from './prompts/index.js';
 import { registerResources } from './resources/index.js';
 import { registerUniversalDocsGateway } from './tools/docs-gateway.js';
 import { registerVerifyTool } from './tools/verify.js';
-import { SAFE_READONLY_ANNOTATIONS } from './domains/shared.js';
+
 import {
   SERVER_NAME,
   SERVER_VERSION,
@@ -13,12 +13,7 @@ import {
   PUBLIC_CACHE_SCOPE,
 } from './version.js';
 
-export {
-  PROTOCOL_VERSION_2026_07_28,
-  DEFAULT_DOCS_CACHE_TTL_MS,
-  PUBLIC_CACHE_SCOPE,
-  SAFE_READONLY_ANNOTATIONS,
-};
+export { PROTOCOL_VERSION_2026_07_28, DEFAULT_DOCS_CACHE_TTL_MS, PUBLIC_CACHE_SCOPE };
 
 export interface CacheableResult {
   ttlMs?: number;
@@ -111,3 +106,4 @@ export function createMcpServer(): McpServer {
 }
 
 export { PUBLIC_CACHE_SCOPE as GLOBAL_CACHE_SCOPE } from './version.js';
+export { SAFE_READONLY_ANNOTATIONS } from './domains/shared.js';

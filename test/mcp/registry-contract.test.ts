@@ -28,25 +28,13 @@ describe('framework registry contract', () => {
     const data = await parseMcpResponse(response);
     const toolNames = new Set((data.result?.tools ?? []).map((tool) => tool.name));
 
-    expect(toolNames.size).toBe(6);
-    expect(toolNames).toEqual(
-      new Set([
-        'read_pw_docs',
-        'read_se_docs',
-        'read_cy_docs',
-        'read_vibium_docs',
-        'read_appium_docs',
-        'verify_test_artifact',
-      ])
-    );
+    expect(toolNames.size).toBe(2);
+    expect(toolNames).toEqual(new Set(['read_sdet_docs', 'verify_test_artifact']));
 
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
       expect(definition.domains.length).toBeGreaterThan(0);
       expect(definition.languages.length).toBeGreaterThan(0);
-      for (const toolName of definition.toolNames) {
-        expect(toolNames).toContain(toolName);
-      }
     }
   });
 
@@ -68,20 +56,21 @@ describe('framework registry contract', () => {
 
   it('successfully loads reference docs for all registered framework, domain, and language combinations', async () => {
     let callId = 100;
+    let combinationCount = 0;
     for (const framework of FRAMEWORK_IDS) {
       const definition = FRAMEWORK_REGISTRY[framework];
-      const toolName = definition.toolNames[0];
 
       for (const domain of definition.domains) {
         for (const language of definition.languages) {
+          combinationCount++;
           callId++;
           const response = await mcpFetch(url, {
             jsonrpc: '2.0',
             id: callId,
             method: 'tools/call',
             params: {
-              name: toolName,
-              arguments: { domain, language },
+              name: 'read_sdet_docs',
+              arguments: { framework, domain, language },
             },
           });
 
@@ -112,5 +101,6 @@ describe('framework registry contract', () => {
         }
       }
     }
+    expect(combinationCount).toBe(133);
   });
 });

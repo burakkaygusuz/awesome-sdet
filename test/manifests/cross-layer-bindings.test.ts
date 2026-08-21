@@ -31,7 +31,7 @@ async function collectKnowledgeFiles(): Promise<string[]> {
 
 describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => {
   it('every MCP tool name and universal resource URI cited in skills and agents exists in the registry', async () => {
-    const registeredTools = new Set<string>();
+    const registeredTools = new Set<string>(['read_sdet_docs', 'verify_test_artifact']);
     for (const definition of Object.values(FRAMEWORK_REGISTRY)) {
       for (const tool of definition.toolNames) registeredTools.add(tool);
     }
@@ -52,7 +52,9 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
       const content = await fs.readFile(file, 'utf8');
       const rel = path.relative(rootDir, file);
 
-      for (const tool of content.match(/\bread_(?:pw|se|cy|vibium|appium)_[a-z_]+/g) ?? []) {
+      for (const tool of content.match(
+        /\b(?:read_(?:sdet|pw|se|cy|vibium|appium)_[a-z_]+|verify_test_artifact)\b/g
+      ) ?? []) {
         if (!registeredTools.has(tool)) toolOffenders.push(`${rel}: ${tool}`);
       }
 
