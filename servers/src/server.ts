@@ -92,6 +92,7 @@ export function createMcpServer(): McpServer {
         tools: { listChanged: false },
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
+        logging: {},
       },
     }
   );

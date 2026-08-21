@@ -91,18 +91,6 @@ export async function handleMcpPostRequest(
       return;
     }
 
-    if (effectiveMethod === 'ping' || effectiveMethod === 'logging/setLevel') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ jsonrpc: '2.0', id: jsonPayload.id, result: {} }));
-      return;
-    }
-
-    if (effectiveMethod?.startsWith('notifications/')) {
-      res.writeHead(202);
-      res.end();
-      return;
-    }
-
     const transport = new NodeStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
     });
