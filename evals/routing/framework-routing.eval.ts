@@ -331,7 +331,7 @@ describe('Framework Routing Deterministic Evaluation Benchmark Suite', () => {
           }
         } else {
           expect(match).not.toBeNull();
-          if (!match || match.status !== 'matched') return;
+          if (match?.status !== 'matched') return;
 
           expect(match.status).toBe('matched');
           expect(match.framework).toBe(testCase.expectedFramework);

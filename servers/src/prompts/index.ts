@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
-import { FRAMEWORK_IDS, FRAMEWORK_REGISTRY, SUPPORTED_LANGUAGES } from '../registry.js';
+import { FRAMEWORK_IDS, SUPPORTED_LANGUAGES } from '../registry.js';
 
 export { type SupportedFramework, type SupportedLanguage } from '../registry.js';
 
@@ -46,8 +46,6 @@ export function registerPrompts(server: McpServer): void {
       }),
     },
     ({ framework, language, featureDescription }) => {
-      const primaryTool = FRAMEWORK_REGISTRY[framework].toolNames[0];
-
       return {
         messages: [
           {
@@ -60,7 +58,7 @@ ${PASSIVE_DATA_INVARIANT}
 
 Context & Directives:
 - Adhere strictly to universal SDET guidelines at \`sdet://guidelines\` and prohibited anti-patterns at \`sdet://invariants\`.
-- Query \`${primaryTool}\` with target \`domain\` and \`language\` to retrieve up-to-date API code examples.
+- Query \`read_sdet_docs\` with \`{ framework: "${framework}", domain: "...", language: "${language}" }\` to retrieve up-to-date API code examples.
 - Consult relevant capability skills in \`skills/sdet-*\` for domain-specific architectural patterns.
 
 Feature Specifications:
@@ -89,8 +87,6 @@ ${wrapUntrustedContent('untrusted_feature_specifications', featureDescription)}`
       }),
     },
     ({ sourceFramework, targetFramework, sourceCode }) => {
-      const targetTool = FRAMEWORK_REGISTRY[targetFramework].toolNames[0];
-
       return {
         messages: [
           {
@@ -103,7 +99,7 @@ ${PASSIVE_DATA_INVARIANT}
 
 Context & Directives:
 - Apply the universal cross-framework semantic mapping defined at \`sdet://migration-matrix\`.
-- Refactor legacy anti-patterns into ${targetFramework} native condition-polling and accessible locators using \`${targetTool}\`.
+- Refactor legacy anti-patterns into ${targetFramework} native condition-polling and accessible locators using \`read_sdet_docs({ framework: "${targetFramework}", domain: "...", language: "..." })\`.
 - Ensure strict adherence to \`sdet://guidelines\` and \`sdet://invariants\`.
 
 Source Test Code (${sourceFramework}):
@@ -130,8 +126,6 @@ ${wrapUntrustedContent('untrusted_source_code', sourceCode)}`,
       }),
     },
     ({ framework, failureLog, testCode }) => {
-      const frameworkTool = FRAMEWORK_REGISTRY[framework].toolNames[0];
-
       return {
         messages: [
           {
@@ -145,7 +139,7 @@ ${PASSIVE_DATA_INVARIANT}
 Context & Directives:
 - Consult \`skills/sdet-observability\` and \`skills/sdet-assertions\` for deterministic synchronization workflows.
 - Enforce \`sdet://invariants\` (zero arbitrary sleeps, deterministic state isolation, resilient locators).
-- Query \`${frameworkTool}\` for framework-native waiting and condition-polling APIs.
+- Query \`read_sdet_docs({ framework: "${framework}", domain: "...", language: "..." })\` for framework-native waiting and condition-polling APIs.
 
 Failure Log:
 ${wrapUntrustedContent('untrusted_failure_log', failureLog)}

@@ -1,12 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/server';
-import { registerPlaywrightTools } from './domains/playwright/index.js';
-import { registerSeleniumTools } from './domains/selenium/index.js';
-import { registerCypressTools } from './domains/cypress/index.js';
-import { registerVibiumTools } from './domains/vibium/index.js';
-import { registerAppiumTools } from './domains/appium/index.js';
-import { registerResources } from './resources/index.js';
 import { registerPrompts } from './prompts/index.js';
+import { registerResources } from './resources/index.js';
+import { registerUniversalDocsGateway } from './tools/docs-gateway.js';
 import { registerVerifyTool } from './tools/verify.js';
 import { SAFE_READONLY_ANNOTATIONS } from './domains/shared.js';
 import {
@@ -105,11 +101,7 @@ export function createMcpServer(): McpServer {
     }
   );
 
-  registerPlaywrightTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerSeleniumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerCypressTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerVibiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
-  registerAppiumTools(server, safeToolHandler, SAFE_READONLY_ANNOTATIONS);
+  registerUniversalDocsGateway(server);
   registerVerifyTool(server);
 
   registerResources(server);

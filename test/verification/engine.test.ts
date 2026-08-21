@@ -301,7 +301,7 @@ describe('Unified Verification Engine', () => {
         code: 'expect(true).toBe(true);',
       };
 
-      const result = await verifyTestArtifact(untrusted as VerificationRequest);
+      const result = await verifyTestArtifact(untrusted);
       expect(result.passed).toBe(true);
       expect(result.score).toBe(100);
     });
@@ -312,7 +312,7 @@ describe('Unified Verification Engine', () => {
         code: '',
       };
 
-      await expect(verifyTestArtifact(invalid as VerificationRequest)).rejects.toThrow();
+      await expect(verifyTestArtifact(invalid)).rejects.toThrow();
     });
 
     it('rejects payload with missing code', async () => {
@@ -320,7 +320,7 @@ describe('Unified Verification Engine', () => {
         framework: 'playwright',
       };
 
-      await expect(verifyTestArtifact(invalid as unknown as VerificationRequest)).rejects.toThrow();
+      await expect(verifyTestArtifact(invalid as unknown)).rejects.toThrow();
     });
 
     it('rejects payload with invalid framework', async () => {
@@ -329,7 +329,7 @@ describe('Unified Verification Engine', () => {
         code: 'expect(true).toBe(true);',
       };
 
-      await expect(verifyTestArtifact(invalid as unknown as VerificationRequest)).rejects.toThrow();
+      await expect(verifyTestArtifact(invalid as unknown)).rejects.toThrow();
     });
 
     it('rejects payload with unrecognized strict properties', async () => {
@@ -339,15 +339,13 @@ describe('Unified Verification Engine', () => {
         extraMaliciousProp: 'pwned',
       };
 
-      await expect(verifyTestArtifact(invalid as unknown as VerificationRequest)).rejects.toThrow();
+      await expect(verifyTestArtifact(invalid as unknown)).rejects.toThrow();
     });
 
     it('rejects non-object raw inputs', async () => {
       await expect(verifyTestArtifact(null)).rejects.toThrow();
-      await expect(
-        verifyTestArtifact('not an object' as unknown as VerificationRequest)
-      ).rejects.toThrow();
-      await expect(verifyTestArtifact(12345 as unknown as VerificationRequest)).rejects.toThrow();
+      await expect(verifyTestArtifact('not an object' as unknown)).rejects.toThrow();
+      await expect(verifyTestArtifact(12345 as unknown)).rejects.toThrow();
     });
   });
 });
