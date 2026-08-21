@@ -59,12 +59,12 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
+To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
 
-- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
-- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`).
-- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
-- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`).
+- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_sdet_docs({ framework: "playwright", domain: "storage", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
+- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_sdet_docs({ framework: "cypress", domain: "session", language: "typescript" | "javascript" })`.
+- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_sdet_docs({ framework: "selenium", domain: "bidi", language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby" })`.
+- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_sdet_docs({ framework: "vibium", domain: "state", language: "typescript" | "javascript" | "python" | "java" })`.
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
 

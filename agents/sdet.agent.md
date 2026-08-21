@@ -48,7 +48,7 @@ When a request requires framework-specific authoring, refactoring, or migration 
 
 2. **Standard / Single-Agent Hosts (e.g. Cursor, VS Code Copilot, CLI):**
    - If subagent dispatch tools are unavailable in the host runtime, adopt the persona, execution constraints, and tool bindings of the target specialist directly within your execution context.
-   - Read the specialist's specification (`agents/<specialty>/<specialty>.agent.md`), query the matching `sdet-mcp` tool (`read_pw_docs`, `read_se_docs`, etc.), and generate code adhering strictly to that framework's execution invariants.
+   - Read the specialist's specification (`agents/<specialty>/<specialty>.agent.md`), query the universal `sdet-mcp` gateway `read_sdet_docs({ framework: "<specialty>", domain: "...", language: "..." })`, and generate code adhering strictly to that framework's execution invariants.
 
 **Delegation workflow:**
 

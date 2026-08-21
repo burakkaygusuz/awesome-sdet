@@ -115,7 +115,7 @@ git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plu
   - Master SDET Orchestrator (`agents/sdet.agent.md`) supporting host-aware execution (subagent delegation vs. inline specialist persona adoption).
   - 5 Autonomous Domain Specialists for **Playwright**, **Cypress**, **Selenium 4**, **Vibium**, and **Appium**.
 - **Enterprise SDET MCP Server (`servers/`):**
-  - 5 Consolidated Framework Reference Tools (`read_pw_docs`, `read_se_docs`, `read_cy_docs`, `read_vibium_docs`, `read_appium_docs`) delivering progressive, section-filtered docs across 5 languages (TypeScript, JavaScript, Python, Java, C#).
+  - **Universal SDET Docs Gateway (`read_sdet_docs`):** Single high-performance documentation gateway dynamically delivering progressive, section-filtered docs across all supported frameworks (Playwright, Cypress, Selenium, Vibium, Appium) and 5 languages (TypeScript, JavaScript, Python, Java, C#) with an $O(1)$ tool footprint.
   - **Deterministic Verification Engine (`verify_test_artifact`):** Real-time static invariant scanner enforcing zero-arbitrary-waits, meaningful assertions, accessible locators, and clean state isolation.
   - Strict **MCP 2026-07-28** conformance: Dual `stdio` and `streamable-http` transports.
   - Hardened security defenses: Loopback DNS rebinding prevention, 10MB payload limits, prototype pollution guards, safe error masking (`-32603`), and XML prompt boundary containment.

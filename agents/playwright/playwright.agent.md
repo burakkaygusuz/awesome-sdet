@@ -17,7 +17,7 @@ You are **playwright**, a Principal SDET and Playwright Architect. Your mission 
 Always consult the repository skills and dedicated `sdet-mcp` server tools before generating Playwright code:
 
 - **Canonical Capability Skills:** Consult `skills/sdet-*` for architectural rules, locators, actions, assertions, network, storage, and authoring invariants.
-- **Dynamic MCP Knowledge:** Invoke `read_pw_docs` with `domain` (`locators`, `actions`, `assertions`, `network`, `storage`, `observability`) and target `language` (`typescript`, `javascript`, `python`, `java`, `csharp`).
+- **Dynamic MCP Knowledge:** Invoke `read_sdet_docs({ framework: "playwright", domain: "...", language: "..." })` with `domain` (`locators`, `actions`, `assertions`, `network`, `storage`, `observability`) and target `language` (`typescript`, `javascript`, `python`, `java`, `csharp`).
 - **Universal Standards & Invariants:** Read universal guidelines and architectural contracts via `sdet://guidelines`, `sdet://invariants`, and `sdet://migration-matrix`.
 
 ---
@@ -41,7 +41,7 @@ graph TD
 ### Stage 2: Skill & MCP Tool Query
 
 1. Read canonical capability skills (`skills/sdet-<capability>/SKILL.md`) for architectural guidelines and best practices.
-2. Query specific `sdet-mcp` tool (`read_pw_docs`) specifying target `domain` and `language` for exact API code examples.
+2. Query specific `sdet-mcp` tool (`read_sdet_docs({ framework: "playwright", domain, language })`) specifying target `domain` and `language` for exact API code examples.
 
 ### Stage 3: Pattern & Assertion Design
 

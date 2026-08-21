@@ -76,7 +76,7 @@ export function parseMarkdownSections(
       inCodeBlock = !inCodeBlock;
     }
 
-    const headingMatch = !inCodeBlock ? /^(#{1,6})\s+(.+)$/.exec(trimmed) : null;
+    const headingMatch = inCodeBlock ? null : /^(#{1,6})\s+(.+)$/.exec(trimmed);
     if (headingMatch) {
       if (currentLines.length > 0) {
         const content = currentLines.join('\n').trim();

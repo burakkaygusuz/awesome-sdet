@@ -59,13 +59,13 @@ Simulating genuine user interactions requires strict actionability verification 
 
 ## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke consolidated `sdet-mcp` tools:
+To fetch complete, language-specific code implementations without context pollution, invoke `read_sdet_docs`:
 
-- **Playwright Actions**: When implementing Playwright clicks, fills, or drag-and-drop, invoke `read_pw_docs` (Parameters: `domain: "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
-- **Cypress Commands**: When implementing Cypress click, type, or custom commands, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`).
-- **Selenium Actions**: When implementing Selenium 4 W3C action chains or keyboard events, invoke `read_se_docs` (Parameters: `domain: "actions"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`).
-- **Vibium Interactions**: When implementing Vibium clicks, fills, or auto-waiting interactions, invoke `read_vibium_docs` (Parameters: `domain: "interactions"`, `language: "typescript" | "javascript" | "python" | "java"`).
-- **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`).
+- **Playwright Actions**: When implementing Playwright clicks, fills, or drag-and-drop, invoke `read_sdet_docs({ framework: "playwright", domain: "actions", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
+- **Cypress Commands**: When implementing Cypress click, type, or custom commands, invoke `read_sdet_docs({ framework: "cypress", domain: "commands", language: "typescript" | "javascript" })`.
+- **Selenium Actions**: When implementing Selenium 4 W3C action chains or keyboard events, invoke `read_sdet_docs({ framework: "selenium", domain: "actions", language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby" })`.
+- **Vibium Interactions**: When implementing Vibium clicks, fills, or auto-waiting interactions, invoke `read_sdet_docs({ framework: "vibium", domain: "interactions", language: "typescript" | "javascript" | "python" | "java" })`.
+- **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_sdet_docs({ framework: "appium", domain: "gestures", language: "typescript" | "javascript" | "python" | "java" | "csharp" })`.
 
 Universal quality invariants and execution rules are accessible via `sdet://guidelines` and `sdet://invariants`.
 
