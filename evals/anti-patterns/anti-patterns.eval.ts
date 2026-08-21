@@ -9,7 +9,13 @@ export interface AntiPatternBenchmarkCase {
   readonly framework: SupportedFramework;
   readonly language?: SupportedLanguage;
   readonly category:
-    'arbitrary-sleep' | 'missing-assertions' | 'fragile-xpath' | 'shared-driver-state' | 'clean';
+    | 'arbitrary-sleep'
+    | 'missing-assertions'
+    | 'fragile-xpath'
+    | 'fragile-locators'
+    | 'tautological-assertion'
+    | 'shared-driver-state'
+    | 'clean';
   readonly code: string;
   readonly expectedPassed: boolean;
   readonly expectedFailedRuleId?:
@@ -658,6 +664,122 @@ export const ANTI_PATTERN_BENCHMARK_CASES: readonly AntiPatternBenchmarkCase[] =
       }
     `,
     expectedPassed: true,
+  },
+  {
+    id: 'pw-tautological-assertion',
+    name: 'Playwright: tautological dummy assertion expect(true).toBe(true)',
+    framework: 'playwright',
+    language: 'typescript',
+    category: 'tautological-assertion',
+    code: `
+      import { test, expect } from '@playwright/test';
+
+      test('dummy assertion test', async ({ page }) => {
+        await page.goto('/dashboard');
+        expect(true).toBe(true);
+      });
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'meaningful-assertions',
+    expectedHintSubstring: 'Replace tautological dummy assertion',
+  },
+  {
+    id: 'se-tautological-assertion',
+    name: 'Selenium: tautological dummy assertion Assert.assertTrue(true)',
+    framework: 'selenium',
+    language: 'java',
+    category: 'tautological-assertion',
+    code: `
+      public class DummyTest {
+        private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+
+        @Test
+        public void testStatus() {
+          driver.get().get("https://example.com");
+          Assert.assertTrue(true);
+        }
+      }
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'meaningful-assertions',
+    expectedHintSubstring: 'Replace tautological dummy assertion',
+  },
+  {
+    id: 'pw-sleep-generic-promise-timeout',
+    name: 'Playwright: generic delay with new Promise and setTimeout',
+    framework: 'playwright',
+    language: 'typescript',
+    category: 'arbitrary-sleep',
+    code: `
+      import { test, expect } from '@playwright/test';
+
+      test('custom delay', async ({ page }) => {
+        await page.goto('/orders');
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await expect(page.getByRole('button', { name: 'Refresh' })).toBeVisible();
+      });
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'no-arbitrary-waits',
+    expectedHintSubstring: 'Replace arbitrary sleep with framework-native dynamic condition waiter',
+  },
+  {
+    id: 'pw-fragile-hashed-css',
+    name: 'Playwright: fragile hashed CSS class selector',
+    framework: 'playwright',
+    language: 'typescript',
+    category: 'fragile-locators',
+    code: `
+      import { test, expect } from '@playwright/test';
+
+      test('click hashed button', async ({ page }) => {
+        await page.goto('/checkout');
+        await page.locator('.css-1a2b3c4d').click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+      });
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'resilient-accessibility-locators',
+    expectedHintSubstring: 'Replace brittle XPath/DOM index paths with accessible locators',
+  },
+  {
+    id: 'pw-fragile-tag-soup-xpath',
+    name: 'Playwright: tag soup XPath hierarchy locator',
+    framework: 'playwright',
+    language: 'typescript',
+    category: 'fragile-locators',
+    code: `
+      import { test, expect } from '@playwright/test';
+
+      test('click nested link', async ({ page }) => {
+        await page.goto('/nav');
+        await page.locator('//div/div/span/a').click();
+        await expect(page.getByRole('heading')).toBeVisible();
+      });
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'resilient-accessibility-locators',
+    expectedHintSubstring: 'Replace brittle XPath/DOM index paths with accessible locators',
+  },
+  {
+    id: 'pw-unisolated-top-level-page',
+    name: 'Playwright: un-isolated top-level page variable declaration',
+    framework: 'playwright',
+    language: 'typescript',
+    category: 'shared-driver-state',
+    code: `
+      import { test, expect, Page } from '@playwright/test';
+
+      let page: Page;
+
+      test('user login flow', async () => {
+        await page.goto('/login');
+        await expect(page).toHaveTitle('Login');
+      });
+    `,
+    expectedPassed: false,
+    expectedFailedRuleId: 'thread-isolated-state',
+    expectedHintSubstring: 'Use test fixture-scoped page/context',
   },
 ];
 

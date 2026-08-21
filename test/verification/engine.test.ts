@@ -298,7 +298,7 @@ describe('Unified Verification Engine', () => {
     it('validates raw untrusted payload and succeeds when valid', async () => {
       const untrusted: unknown = {
         framework: 'playwright',
-        code: 'expect(true).toBe(true);',
+        code: 'await expect(page.getByRole("button")).toBeVisible();',
       };
 
       const result = await verifyTestArtifact(untrusted);

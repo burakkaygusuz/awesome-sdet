@@ -1,3 +1,4 @@
+import { getTreeSitterParser, parseAst } from './ast.js';
 import {
   checkArbitraryWaits,
   checkAssertions,
@@ -13,17 +14,26 @@ import {
 
 export * from './schemas.js';
 export * from './rules/index.js';
+export * from './ast.js';
 
 export async function verifyTestArtifact(rawRequest: unknown): Promise<VerificationResult> {
   const request = await VerificationRequestSchema.parseAsync(rawRequest);
-  const { code, framework } = request;
+  const { code, framework, language } = request;
+
+  const { parser } = await getTreeSitterParser(language);
+  const tree = parseAst(parser, code);
+  const rootNode = tree?.rootNode;
 
   const checks: VerificationCheck[] = [
-    checkArbitraryWaits(code, framework),
-    checkAssertions(code, framework),
-    checkLocators(code, framework),
-    checkStateIsolation(code, framework),
+    checkArbitraryWaits(code, framework, rootNode),
+    checkAssertions(code, framework, rootNode),
+    checkLocators(code, framework, rootNode),
+    checkStateIsolation(code, framework, rootNode),
   ];
+
+  if (tree) {
+    tree.delete();
+  }
 
   const totalChecks = checks.length;
   const passedChecks = checks.filter((c) => c.passed).length;
