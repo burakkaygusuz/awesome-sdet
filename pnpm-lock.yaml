@@ -79,6 +79,9 @@ importers:
       web-tree-sitter:
         specifier: ^0.26.12
         version: 0.26.12
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   servers:
     dependencies:
@@ -4111,8 +4114,7 @@ snapshots:
 
   y18n@5.0.8: {}
 
-  yaml@2.9.0:
-    optional: true
+  yaml@2.9.0: {}
 
   yargs-parser@22.0.0: {}
 

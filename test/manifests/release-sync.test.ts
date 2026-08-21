@@ -2,7 +2,14 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { calculateNextVersion, syncVersions, type VersionTargets } from '../../scripts/release.js';
+import {
+  calculateNextVersion,
+  determineBumpTypeFromCommits,
+  parseReleaseOptions,
+  resolveTargetVersion,
+  syncVersions,
+  type VersionTargets,
+} from '../../scripts/release.js';
 import { PluginManifestSchema } from '../../scripts/schemas.js';
 
 describe('Release Version Calculation & Sync', () => {
@@ -140,5 +147,87 @@ describe('Release Version Calculation & Sync', () => {
 
     expect(plugin.version).toBe(root.version);
     expect(servers.version).toBe(root.version);
+  });
+
+  describe('determineBumpTypeFromCommits', () => {
+    it('returns major for breaking changes in conventional commit format', () => {
+      expect(determineBumpTypeFromCommits(['feat!: remove legacy api', 'fix: bug'])).toBe('major');
+      expect(determineBumpTypeFromCommits(['feat(mcp)!: breaking schema change'])).toBe('major');
+      expect(
+        determineBumpTypeFromCommits(['refactor: rewrite parser\n\nBREAKING CHANGE: new ast'])
+      ).toBe('major');
+    });
+
+    it('returns minor for feat commits', () => {
+      expect(determineBumpTypeFromCommits(['feat: add new verification rule', 'fix: typos'])).toBe(
+        'minor'
+      );
+      expect(determineBumpTypeFromCommits(['feat(skills): add new locator guide'])).toBe('minor');
+    });
+
+    it('returns patch for fix, docs, perf, chore, and refactor commits', () => {
+      expect(determineBumpTypeFromCommits(['fix: address edge case', 'docs: update readme'])).toBe(
+        'patch'
+      );
+      expect(determineBumpTypeFromCommits(['perf: optimize tree-sitter caching'])).toBe('patch');
+    });
+
+    it('returns null when no releaseable commits exist', () => {
+      expect(determineBumpTypeFromCommits([])).toBeNull();
+      expect(determineBumpTypeFromCommits(['chore(release): bump version to 1.3.1'])).toBeNull();
+      expect(determineBumpTypeFromCommits(['docs: typo [skip ci]'])).toBeNull();
+    });
+  });
+
+  describe('parseReleaseOptions', () => {
+    it('parses default CLI flags accurately', () => {
+      const options = parseReleaseOptions(['node', 'release.js']);
+      expect(options.isAuto).toBe(false);
+      expect(options.isDryRun).toBe(false);
+      expect(options.isBumpOnly).toBe(false);
+      expect(options.isTagOnly).toBe(false);
+      expect(options.allowDirty).toBe(false);
+      expect(options.bumpTypeOrVersion).toBeUndefined();
+    });
+
+    it('parses flags and bump argument accurately', () => {
+      const options = parseReleaseOptions([
+        'node',
+        'release.js',
+        'minor',
+        '--auto',
+        '--dry-run',
+        '--allow-dirty',
+      ]);
+      expect(options.isAuto).toBe(true);
+      expect(options.isDryRun).toBe(true);
+      expect(options.allowDirty).toBe(true);
+      expect(options.bumpTypeOrVersion).toBe('minor');
+    });
+  });
+
+  describe('resolveTargetVersion', () => {
+    it('resolves explicit version or fallback bump', () => {
+      expect(
+        resolveTargetVersion('1.0.0', {
+          bumpTypeOrVersion: 'minor',
+          isAuto: false,
+          isDryRun: false,
+          isBumpOnly: false,
+          isTagOnly: false,
+          allowDirty: false,
+        })
+      ).toBe('1.1.0');
+
+      expect(
+        resolveTargetVersion('1.0.0', {
+          isAuto: false,
+          isDryRun: false,
+          isBumpOnly: false,
+          isTagOnly: false,
+          allowDirty: false,
+        })
+      ).toBe('1.0.1');
+    });
   });
 });
