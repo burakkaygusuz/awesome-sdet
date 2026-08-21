@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import YAML from 'yaml';
 import {
   AgentFrontmatterSchema,
   AgentInfoSchema,
@@ -8,6 +7,7 @@ import {
   type AgentFrontmatter,
   type AgentInfo,
 } from '../schemas.js';
+import { parseMarkdownFrontmatter } from './frontmatter-parser.js';
 
 const VALID_RESOURCE_URIS = new Set([
   'sdet://guidelines',
@@ -32,41 +32,7 @@ function parseFrontmatter(
   frontmatter: AgentFrontmatter | null;
   hasError: boolean;
 } {
-  if (!content.startsWith('---')) {
-    console.error(`Error: ${relPath}: Missing frontmatter start delimiter '---'`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const frontmatterEnd = content.indexOf('---', 3);
-  if (frontmatterEnd === -1) {
-    console.error(`Error: ${relPath}: Missing frontmatter end delimiter '---'`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const frontmatter = content.substring(3, frontmatterEnd);
-  let parsedYaml: unknown;
-  try {
-    parsedYaml = YAML.parse(frontmatter);
-  } catch (err) {
-    console.error(`Error: ${relPath}: Failed to parse YAML frontmatter: ${String(err)}`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  if (typeof parsedYaml !== 'object' || parsedYaml === null) {
-    console.error(`Error: ${relPath}: Frontmatter must be a valid YAML dictionary`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const parsed = AgentFrontmatterSchema.safeParse(parsedYaml);
-  if (!parsed.success) {
-    console.error(
-      `Error: ${relPath}: Agent frontmatter validation failed:`,
-      parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
-    );
-    return { frontmatter: null, hasError: true };
-  }
-
-  return { frontmatter: parsed.data, hasError: false };
+  return parseMarkdownFrontmatter(content, relPath, AgentFrontmatterSchema, 'Agent');
 }
 
 function validateAgentMetadata(

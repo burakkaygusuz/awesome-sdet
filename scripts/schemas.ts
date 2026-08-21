@@ -97,8 +97,6 @@ export const CAPABILITY_SKILL_NAMES = [
 
 export type CapabilitySkillName = (typeof CAPABILITY_SKILL_NAMES)[number];
 
-export const REQUIRED_FRONTMATTER = ['name', 'description', 'user-invocable', 'license'];
-
 export const SkillFrontmatterMetadataSchema = z.strictObject({
   capability: z.enum(CAPABILITY_TOPICS).optional(),
   frameworks: z.string().optional(),

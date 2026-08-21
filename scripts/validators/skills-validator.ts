@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import YAML from 'yaml';
 import {
   SkillFrontmatterSchema,
   SkillSchema,
@@ -8,46 +7,13 @@ import {
   type Skill,
   type SkillFrontmatter,
 } from '../schemas.js';
+import { parseMarkdownFrontmatter } from './frontmatter-parser.js';
 
 export function parseFrontmatter(
   content: string,
   relPath: string
 ): { frontmatter: SkillFrontmatter | null; hasError: boolean } {
-  if (!content.startsWith('---')) {
-    console.error(`Error: ${relPath}: Missing frontmatter start delimiter '---'`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const frontmatterEnd = content.indexOf('---', 3);
-  if (frontmatterEnd === -1) {
-    console.error(`Error: ${relPath}: Missing frontmatter end delimiter '---'`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const frontmatterString = content.substring(3, frontmatterEnd);
-  let parsedYaml: unknown;
-  try {
-    parsedYaml = YAML.parse(frontmatterString);
-  } catch (err) {
-    console.error(`Error: ${relPath}: Failed to parse YAML frontmatter: ${String(err)}`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  if (typeof parsedYaml !== 'object' || parsedYaml === null) {
-    console.error(`Error: ${relPath}: Frontmatter must be a valid YAML dictionary`);
-    return { frontmatter: null, hasError: true };
-  }
-
-  const schemaParsed = SkillFrontmatterSchema.safeParse(parsedYaml);
-  if (!schemaParsed.success) {
-    console.error(
-      `Error: ${relPath}: Skill frontmatter validation failed:`,
-      schemaParsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
-    );
-    return { frontmatter: null, hasError: true };
-  }
-
-  return { frontmatter: schemaParsed.data, hasError: false };
+  return parseMarkdownFrontmatter(content, relPath, SkillFrontmatterSchema, 'Skill');
 }
 
 export async function validateSkillFile(
