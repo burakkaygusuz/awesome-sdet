@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { FRAMEWORK_REGISTRY } from '../../servers/src/registry.js';
-
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../');
 
 async function collectKnowledgeFiles(): Promise<string[]> {
@@ -32,9 +30,6 @@ async function collectKnowledgeFiles(): Promise<string[]> {
 describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => {
   it('every MCP tool name and universal resource URI cited in skills and agents exists in the registry', async () => {
     const registeredTools = new Set<string>(['read_sdet_docs', 'verify_test_artifact']);
-    for (const definition of Object.values(FRAMEWORK_REGISTRY)) {
-      for (const tool of definition.toolNames) registeredTools.add(tool);
-    }
 
     const validResourceUris = new Set([
       'sdet://guidelines',

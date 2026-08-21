@@ -342,7 +342,6 @@ describe('Framework Routing Deterministic Evaluation Benchmark Suite', () => {
           expect(registryDefinition).toBeDefined();
           expect(registryDefinition.domains.length).toBeGreaterThan(0);
           expect(registryDefinition.languages.length).toBeGreaterThan(0);
-          expect(registryDefinition.toolNames.length).toBeGreaterThan(0);
           expect(registryDefinition.defaultDomain).toBeDefined();
           expect(registryDefinition.defaultLanguage).toBeDefined();
 
@@ -365,18 +364,6 @@ describe('Framework Routing Deterministic Evaluation Benchmark Suite', () => {
         const match = routeFrameworkQuery(query);
         expect(match?.status).toBe('matched');
         expect(match?.framework).toBe(frameworkId);
-      }
-    });
-
-    it('every framework tool in registry triggers framework identification', () => {
-      for (const frameworkId of FRAMEWORK_IDS) {
-        const definition = FRAMEWORK_REGISTRY[frameworkId];
-        for (const toolName of definition.toolNames) {
-          const query = `Lookup documentation using ${toolName}`;
-          const match = routeFrameworkQuery(query);
-          expect(match?.status).toBe('matched');
-          expect(match?.framework).toBe(frameworkId);
-        }
       }
     });
   });

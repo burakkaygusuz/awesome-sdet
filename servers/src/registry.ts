@@ -54,52 +54,40 @@ export const PLAYWRIGHT_DOMAINS = [
 ] as const;
 
 export interface FrameworkDefinition {
-  readonly toolPrefix: string;
   readonly domains: readonly string[];
   readonly languages: readonly SupportedLanguage[];
-  readonly toolNames: readonly string[];
   readonly defaultDomain: string;
   readonly defaultLanguage: SupportedLanguage;
 }
 
 export const FRAMEWORK_REGISTRY = {
   selenium: {
-    toolPrefix: 'se',
     domains: SELENIUM_DOMAINS,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'] as const,
-    toolNames: ['read_se_docs'],
     defaultDomain: 'actions',
     defaultLanguage: 'java',
   },
   cypress: {
-    toolPrefix: 'cy',
     domains: CYPRESS_DOMAINS,
     languages: ['typescript', 'javascript'] as const,
-    toolNames: ['read_cy_docs'],
     defaultDomain: 'commands',
     defaultLanguage: 'typescript',
   },
   vibium: {
-    toolPrefix: 'vibium',
     domains: VIBIUM_DOMAINS,
     languages: ['typescript', 'javascript', 'python', 'java'] as const,
-    toolNames: ['read_vibium_docs'],
     defaultDomain: 'core',
     defaultLanguage: 'typescript',
   },
   appium: {
-    toolPrefix: 'appium',
     domains: APPIUM_DOMAINS,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
-    toolNames: ['read_appium_docs'],
     defaultDomain: 'capabilities',
     defaultLanguage: 'typescript',
   },
   playwright: {
-    toolPrefix: 'pw',
     domains: PLAYWRIGHT_DOMAINS,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
-    toolNames: ['read_pw_docs'],
     defaultDomain: 'locators',
     defaultLanguage: 'typescript',
   },
@@ -126,7 +114,6 @@ export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<Record<SupportedFramework, r
     playwright: Object.freeze([
       /\bplaywright\b/i,
       /\b@playwright\/test\b/i,
-      /\bread_pw_docs\b/i,
       /\bpage\.(?:getByRole|getByLabel|getByText|getByTestId|getByPlaceholder|getByAltText|getByTitle|locator|goto|waitForURL|route|unroute)\b/i,
       /\bexpect\s*\(\s*(?:page|locator)\b/i,
       /\bbrowserContext\b/i,
@@ -134,7 +121,6 @@ export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<Record<SupportedFramework, r
     ]),
     selenium: Object.freeze([
       /\bselenium\b/i,
-      /\bread_se_docs\b/i,
       /\bwebdriver\b/i,
       /\bremotewebdriver\b/i,
       /\bchromedriver\b/i,
@@ -148,19 +134,16 @@ export const FRAMEWORK_ROUTING_SIGNATURES: Readonly<Record<SupportedFramework, r
     ]),
     cypress: Object.freeze([
       /\bcypress\b/i,
-      /\bread_cy_docs\b/i,
       /\bcy\.(?:visit|get|contains|intercept|origin|session|mount|request|wrap|fixture|wait|xpath)\b/i,
       /\bcypress\.config\b/i,
     ]),
     vibium: Object.freeze([
       /\bvibium\b/i,
-      /\bread_vibium_docs\b/i,
       /\bsense-think-act\b/i,
       /\bvibium\.(?:find|findByRole|click|type)\b/i,
     ]),
     appium: Object.freeze([
       /\bappium\b/i,
-      /\bread_appium_docs\b/i,
       /\bAppiumBy\b/i,
       /\bAndroidDriver\b/i,
       /\bIOSDriver\b/i,

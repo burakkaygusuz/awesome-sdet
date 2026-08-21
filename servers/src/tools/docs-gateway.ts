@@ -1,23 +1,14 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
-import { readAppiumReferenceDoc } from '../domains/appium/common.js';
-import { readCypressReferenceDoc } from '../domains/cypress/common.js';
-import { readPlaywrightReferenceDoc } from '../domains/playwright/common.js';
-import { readSeleniumReferenceDoc } from '../domains/selenium/common.js';
 import {
   DocsOutputSchema,
   extractStructuredDocs,
+  readFrameworkReferenceDoc,
   SAFE_READONLY_ANNOTATIONS,
   sanitizeDomain,
   sanitizeLanguage,
 } from '../domains/shared.js';
-import { readVibiumReferenceDoc } from '../domains/vibium/common.js';
-import {
-  FRAMEWORK_IDS,
-  FRAMEWORK_REGISTRY,
-  SUPPORTED_LANGUAGES,
-  type SupportedFramework,
-} from '../registry.js';
+import { FRAMEWORK_IDS, FRAMEWORK_REGISTRY, SUPPORTED_LANGUAGES } from '../registry.js';
 import { safeToolHandler } from '../server.js';
 
 export const DocsGatewayInputSchema = z.strictObject({
@@ -34,17 +25,6 @@ export const DocsGatewayInputSchema = z.strictObject({
 });
 
 export type DocsGatewayInput = z.infer<typeof DocsGatewayInputSchema>;
-
-export const FRAMEWORK_READERS: Record<
-  SupportedFramework,
-  (domain: string, language?: string) => Promise<string>
-> = {
-  playwright: readPlaywrightReferenceDoc,
-  selenium: readSeleniumReferenceDoc,
-  cypress: readCypressReferenceDoc,
-  vibium: readVibiumReferenceDoc,
-  appium: readAppiumReferenceDoc,
-};
 
 export function registerUniversalDocsGateway(server: McpServer): void {
   server.registerTool(
@@ -78,12 +58,7 @@ export function registerUniversalDocsGateway(server: McpServer): void {
         framework
       );
 
-      const reader = FRAMEWORK_READERS[framework];
-      if (!reader) {
-        throw new Error(`No documentation reader registered for framework: '${framework}'.`);
-      }
-
-      const markdown = await reader(targetDomain, targetLanguage);
+      const markdown = await readFrameworkReferenceDoc(framework, targetDomain, targetLanguage);
       const { structuredContent, renderedMarkdown } = extractStructuredDocs(
         framework,
         targetDomain,

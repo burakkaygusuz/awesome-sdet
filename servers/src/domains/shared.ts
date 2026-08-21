@@ -1,9 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { McpServer, ToolAnnotations } from '@modelcontextprotocol/server';
+import type { ToolAnnotations } from '@modelcontextprotocol/server';
 import { z } from 'zod';
-import type { safeToolHandler, ToolExecutionResult } from '../server.js';
 
 export interface MarkdownSection {
   heading: string;
@@ -363,75 +362,13 @@ export async function loadCachedReferenceMarkdown(
 }
 
 /**
- * Factory that creates a strongly-typed reference doc reader for a given framework.
- * Eliminates the per-domain readXxxReferenceDoc boilerplate pattern.
+ * Loads and caches reference markdown documentation for any framework and domain.
  */
-export function createFrameworkReader(
-  frameworkName: string,
-  domains: readonly string[],
-  languages: readonly string[],
-  defaultDomain: string,
-  defaultLanguage: string,
-  importMetaUrl: string
-): (domain: string, language?: string) => Promise<string> {
-  return async function readReferenceDoc(
-    domain: string,
-    language: string = defaultLanguage
-  ): Promise<string> {
-    const safeDomain = sanitizeDomain(domain, domains, defaultDomain, frameworkName);
-    const normLang = sanitizeLanguage(language, languages, defaultLanguage, frameworkName);
-    const referencesDirUrl = new URL(`./${safeDomain}/references/`, importMetaUrl).href;
-    const safeLang = sanitizeLanguage(normLang, languages, defaultLanguage);
-    return loadCachedReferenceMarkdown(referencesDirUrl, safeLang);
-  };
-}
-
-export interface FrameworkToolConfig<TShape extends z.ZodRawShape> {
-  readonly toolName: string;
-  readonly title: string;
-  readonly description: string;
-  readonly inputSchema: z.ZodObject<TShape>;
-  readonly reader: (domain: string, language?: string) => Promise<string>;
-  readonly frameworkName: string;
-}
-
-/**
- * Factory that registers a single framework docs tool on an McpServer.
- * Eliminates the per-framework registerXxxTools() boilerplate pattern.
- */
-export function registerFrameworkTool<TShape extends z.ZodRawShape>(
-  server: McpServer,
-  safeHandler: typeof safeToolHandler,
-  config: FrameworkToolConfig<TShape>,
-  annotations: ToolAnnotations = SAFE_READONLY_ANNOTATIONS
-): void {
-  server.registerTool(
-    config.toolName,
-    {
-      title: config.title,
-      description: config.description,
-      inputSchema: config.inputSchema,
-      outputSchema: DocsOutputSchema,
-      annotations,
-    },
-    safeHandler(async (args: z.infer<z.ZodObject<TShape>>): Promise<ToolExecutionResult> => {
-      const { domain, language, query } = args as {
-        domain: string;
-        language: string;
-        query?: string;
-      };
-      const text = await config.reader(domain, language);
-      const { structuredContent, renderedMarkdown } = extractStructuredDocs(
-        config.frameworkName,
-        domain,
-        language,
-        text,
-        query
-      );
-      return {
-        content: [{ type: 'text' as const, text: renderedMarkdown }],
-        structuredContent,
-      };
-    })
-  );
+export async function readFrameworkReferenceDoc(
+  framework: string,
+  domain: string,
+  language: string
+): Promise<string> {
+  const referencesDirUrl = new URL(`./${framework}/${domain}/references/`, import.meta.url).href;
+  return loadCachedReferenceMarkdown(referencesDirUrl, language);
 }
