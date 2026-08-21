@@ -105,6 +105,3 @@ export function createMcpServer(): McpServer {
 
   return server;
 }
-
-export { PUBLIC_CACHE_SCOPE as GLOBAL_CACHE_SCOPE } from './version.js';
-export { SAFE_READONLY_ANNOTATIONS } from './domains/shared.js';

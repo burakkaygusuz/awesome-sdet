@@ -69,6 +69,19 @@ export function parseMarkdownSections(
   let currentLines: string[] = [];
   let inCodeBlock = false;
 
+  const flush = () => {
+    if (currentLines.length > 0) {
+      const content = currentLines.join('\n').trim();
+      sections.push({
+        heading: currentHeading,
+        level: currentLevel,
+        content,
+        codeSnippets: extractCodeBlocksFromChunk(content, defaultLanguage),
+      });
+      currentLines = [];
+    }
+  };
+
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed.startsWith('```')) {
@@ -77,16 +90,7 @@ export function parseMarkdownSections(
 
     const headingMatch = inCodeBlock ? null : /^(#{1,6})\s+(.+)$/.exec(trimmed);
     if (headingMatch) {
-      if (currentLines.length > 0) {
-        const content = currentLines.join('\n').trim();
-        sections.push({
-          heading: currentHeading,
-          level: currentLevel,
-          content,
-          codeSnippets: extractCodeBlocksFromChunk(content, defaultLanguage),
-        });
-        currentLines = [];
-      }
+      flush();
       currentLevel = headingMatch[1].length;
       currentHeading = headingMatch[2].trim();
     } else {
@@ -94,16 +98,7 @@ export function parseMarkdownSections(
     }
   }
 
-  if (currentLines.length > 0) {
-    const content = currentLines.join('\n').trim();
-    sections.push({
-      heading: currentHeading,
-      level: currentLevel,
-      content,
-      codeSnippets: extractCodeBlocksFromChunk(content, defaultLanguage),
-    });
-  }
-
+  flush();
   return sections;
 }
 
@@ -206,18 +201,12 @@ export const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = Object.freeze({
 });
 
 export const LANGUAGE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
-  javascript: 'javascript',
   js: 'javascript',
   node: 'javascript',
-  typescript: 'typescript',
   ts: 'typescript',
-  python: 'python',
   py: 'python',
-  java: 'java',
-  csharp: 'csharp',
   cs: 'csharp',
   'c#': 'csharp',
-  ruby: 'ruby',
   rb: 'ruby',
 });
 

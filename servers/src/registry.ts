@@ -36,46 +36,6 @@ export const IntentResultSchema = z.strictObject({
 
 export type IntentResult = z.infer<typeof IntentResultSchema>;
 
-export const SELENIUM_DOMAINS = [
-  'actions',
-  'bidi',
-  'grid',
-  'listeners',
-  'locators',
-  'observability',
-  'pagefactory',
-] as const;
-
-export const CYPRESS_DOMAINS = [
-  'commands',
-  'component',
-  'fixtures',
-  'network',
-  'session',
-  'shadow',
-  'stubs',
-  'task',
-] as const;
-
-export const VIBIUM_DOMAINS = ['bidi', 'core', 'interactions', 'selectors', 'state'] as const;
-
-export const APPIUM_DOMAINS = [
-  'capabilities',
-  'context',
-  'device',
-  'gestures',
-  'locators',
-] as const;
-
-export const PLAYWRIGHT_DOMAINS = [
-  'actions',
-  'assertions',
-  'locators',
-  'network',
-  'observability',
-  'storage',
-] as const;
-
 export interface FrameworkDefinition {
   readonly domains: readonly string[];
   readonly languages: readonly SupportedLanguage[];
@@ -85,31 +45,48 @@ export interface FrameworkDefinition {
 
 export const FRAMEWORK_REGISTRY = {
   selenium: {
-    domains: SELENIUM_DOMAINS,
+    domains: [
+      'actions',
+      'bidi',
+      'grid',
+      'listeners',
+      'locators',
+      'observability',
+      'pagefactory',
+    ] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp', 'ruby'] as const,
     defaultDomain: 'actions',
     defaultLanguage: 'java',
   },
   cypress: {
-    domains: CYPRESS_DOMAINS,
+    domains: [
+      'commands',
+      'component',
+      'fixtures',
+      'network',
+      'session',
+      'shadow',
+      'stubs',
+      'task',
+    ] as const,
     languages: ['typescript', 'javascript'] as const,
     defaultDomain: 'commands',
     defaultLanguage: 'typescript',
   },
   vibium: {
-    domains: VIBIUM_DOMAINS,
+    domains: ['bidi', 'core', 'interactions', 'selectors', 'state'] as const,
     languages: ['typescript', 'javascript', 'python', 'java'] as const,
     defaultDomain: 'core',
     defaultLanguage: 'typescript',
   },
   appium: {
-    domains: APPIUM_DOMAINS,
+    domains: ['capabilities', 'context', 'device', 'gestures', 'locators'] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
     defaultDomain: 'capabilities',
     defaultLanguage: 'typescript',
   },
   playwright: {
-    domains: PLAYWRIGHT_DOMAINS,
+    domains: ['actions', 'assertions', 'locators', 'network', 'observability', 'storage'] as const,
     languages: ['typescript', 'javascript', 'python', 'java', 'csharp'] as const,
     defaultDomain: 'locators',
     defaultLanguage: 'typescript',
@@ -364,23 +341,13 @@ export function classifyIntent(query: string): IntentResult | null {
     framework = routingMatch?.status === 'matched' ? routingMatch.framework : null;
   }
 
-  let detectedLanguage: SupportedLanguage | undefined;
-  for (const [lang, patterns] of Object.entries(LANGUAGE_SIGNATURES) as Array<
-    [SupportedLanguage, readonly RegExp[]]
-  >) {
-    if (patterns.some((p) => p.test(query))) {
-      detectedLanguage = lang;
-      break;
-    }
-  }
+  const detectedLanguage = (
+    Object.entries(LANGUAGE_SIGNATURES) as Array<[SupportedLanguage, readonly RegExp[]]>
+  ).find(([, patterns]) => patterns.some((p) => p.test(query)))?.[0];
 
-  let detectedDomain: string | undefined;
-  for (const [domain, patterns] of Object.entries(DOMAIN_SIGNATURES)) {
-    if (patterns.some((p) => p.test(query))) {
-      detectedDomain = domain;
-      break;
-    }
-  }
+  const detectedDomain = Object.entries(DOMAIN_SIGNATURES).find(([, patterns]) =>
+    patterns.some((p) => p.test(query))
+  )?.[0];
 
   const routingMatch = routeFrameworkQuery(query);
   const matchedKeywords = routingMatch?.matchedKeywords ? [...routingMatch.matchedKeywords] : [];

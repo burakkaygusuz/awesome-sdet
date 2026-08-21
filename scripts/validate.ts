@@ -26,7 +26,8 @@ export async function validate(): Promise<void> {
   }
 
   const skillsByFramework = skillResult.skills.reduce<Record<string, Skill[]>>((acc, skill) => {
-    (acc[skill.framework] ??= []).push(skill);
+    acc[skill.framework] ??= [];
+    acc[skill.framework].push(skill);
     return acc;
   }, {});
 
