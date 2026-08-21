@@ -57,31 +57,52 @@ const CALL_NODE_TYPES = new Set([
   'method_invocation',
 ]);
 
+let initPromise: Promise<Parser> | null = null;
 let parserInstance: Parser | null = null;
 const loadedLanguages = new Map<SupportedGrammar, Language>();
+const inFlightGrammarLoads = new Map<SupportedGrammar, Promise<Language>>();
+
+async function getInitializedParser(): Promise<Parser> {
+  if (parserInstance) return parserInstance;
+  if (!initPromise) {
+    initPromise = Parser.init().then(() => {
+      parserInstance = new Parser();
+      return parserInstance;
+    });
+  }
+  return initPromise;
+}
+
+async function loadGrammarLanguage(grammarKey: SupportedGrammar): Promise<Language> {
+  const cached = loadedLanguages.get(grammarKey);
+  if (cached) return cached;
+
+  let inFlight = inFlightGrammarLoads.get(grammarKey);
+  if (!inFlight) {
+    const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
+    const wasmPath = path.join(path.dirname(wasmPkg), 'out', WASM_FILE_BY_GRAMMAR[grammarKey]);
+    inFlight = Language.load(wasmPath).then((lang) => {
+      loadedLanguages.set(grammarKey, lang);
+      inFlightGrammarLoads.delete(grammarKey);
+      return lang;
+    });
+    inFlightGrammarLoads.set(grammarKey, inFlight);
+  }
+  return inFlight;
+}
 
 export async function getTreeSitterParser(languageName?: string): Promise<{
   parser: Parser;
   language: Language | null;
 }> {
-  if (!parserInstance) {
-    await Parser.init();
-    parserInstance = new Parser();
-  }
-
+  const parser = await getInitializedParser();
   const grammarKey = languageName ? (GRAMMAR_BY_LANG[languageName.toLowerCase()] ?? 'tsx') : 'tsx';
-  if (!loadedLanguages.has(grammarKey)) {
-    const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
-    const wasmPath = path.join(path.dirname(wasmPkg), 'out', WASM_FILE_BY_GRAMMAR[grammarKey]);
-    const lang = await Language.load(wasmPath);
-    loadedLanguages.set(grammarKey, lang);
-  }
+  const lang = await loadGrammarLanguage(grammarKey);
 
-  const lang = loadedLanguages.get(grammarKey) ?? null;
   if (lang) {
-    parserInstance.setLanguage(lang);
+    parser.setLanguage(lang);
   }
-  return { parser: parserInstance, language: lang };
+  return { parser, language: lang };
 }
 
 export function parseAst(parser: Parser, code: string): Tree | null {

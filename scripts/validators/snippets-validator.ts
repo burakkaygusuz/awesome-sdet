@@ -52,37 +52,47 @@ export function resolveGrammar(rawLang: string): SupportedGrammar | null {
   return GRAMMAR_ALIASES[normalized] ?? null;
 }
 
+let cachedEnginePromise: Promise<{
+  parser: Parser;
+  languages: LanguageGrammarMap;
+}> | null = null;
+
 export async function loadTreeSitterEngine(): Promise<{
   parser: Parser;
   languages: LanguageGrammarMap;
 }> {
-  await Parser.init();
-  const parser = new Parser();
+  cachedEnginePromise ??= (async () => {
+    await Parser.init();
+    const parser = new Parser();
 
-  const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
-  const wasmDir = path.join(path.dirname(wasmPkg), 'out');
+    const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
+    const wasmDir = path.join(path.dirname(wasmPkg), 'out');
 
-  const entries = await Promise.all(
-    Object.entries(WASM_FILE_BY_GRAMMAR).map(async ([grammar, file]) => {
-      const lang = await Language.load(path.join(wasmDir, file));
-      return [grammar, lang] as const;
-    })
-  );
+    const entries = await Promise.all(
+      Object.entries(WASM_FILE_BY_GRAMMAR).map(async ([grammar, file]) => {
+        const lang = await Language.load(path.join(wasmDir, file));
+        return [grammar, lang] as const;
+      })
+    );
 
-  const languages = Object.fromEntries(entries) as unknown as LanguageGrammarMap;
-  return { parser, languages };
+    const languages = Object.fromEntries(entries) as unknown as LanguageGrammarMap;
+    return { parser, languages };
+  })();
+
+  return cachedEnginePromise;
 }
 
 export async function collectReferenceMarkdownFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  let files: string[] = [];
+  const entries = await fs.readdir(dir, { recursive: true, withFileTypes: true });
+  const files: string[] = [];
 
   for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files = files.concat(await collectReferenceMarkdownFiles(fullPath));
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      files.push(fullPath);
+    if (entry.isFile() && entry.name.endsWith('.md')) {
+      const parentDir =
+        (entry as unknown as { path?: string; parentPath?: string }).path ||
+        (entry as unknown as { parentPath?: string }).parentPath ||
+        dir;
+      files.push(path.join(parentDir, entry.name));
     }
   }
 
@@ -138,7 +148,7 @@ export function validateSingleSnippet(
   snippet: ExtractedSnippet
 ): boolean {
   if (!snippet.grammar) {
-    return true; // Skip non-executable/auxiliary blocks (bash, graphql, yaml, etc.)
+    return true;
   }
 
   const grammar = languages[snippet.grammar];
@@ -181,13 +191,17 @@ export async function validateSnippets(rootDir: string): Promise<boolean> {
     collectReferenceMarkdownFiles(domainsDir),
   ]);
 
+  const fileSnippets = await Promise.all(
+    mdFiles.map(async (file) => {
+      const content = await fs.readFile(file, 'utf8');
+      const relPath = path.relative(rootDir, file);
+      return extractSnippetsFromMarkdown(content, relPath, file);
+    })
+  );
+
   let allValid = true;
 
-  for (const file of mdFiles) {
-    const content = await fs.readFile(file, 'utf8');
-    const relPath = path.relative(rootDir, file);
-    const snippets = extractSnippetsFromMarkdown(content, relPath, file);
-
+  for (const snippets of fileSnippets) {
     for (const snippet of snippets) {
       const isValid = validateSingleSnippet(parser, languages, snippet);
       if (!isValid) {

@@ -54,18 +54,11 @@ function parseFrontmatterFields(
   return { fields, hasError: false };
 }
 
-export async function validateAgentFile(
+function validateAgentMetadata(
+  fields: Record<string, string>,
   filePath: string,
-  rootDir: string
-): Promise<{ agent: AgentInfo | null; hasError: boolean }> {
-  const relPath = path.relative(rootDir, filePath);
-  const content = await fs.readFile(filePath, 'utf8');
-
-  const { fields, hasError: parseError } = parseFrontmatterFields(content, relPath);
-  if (parseError) {
-    return { agent: null, hasError: true };
-  }
-
+  relPath: string
+): boolean {
   let hasError = false;
 
   const parsedFrontmatter = AgentFrontmatterSchema.safeParse(fields);
@@ -96,6 +89,7 @@ export async function validateAgentFile(
     );
     hasError = true;
   }
+
   if (description.length >= 1024) {
     console.error(
       `Error: ${relPath}: description is ${description.length} characters; keep it strictly under 1024 characters`
@@ -103,12 +97,18 @@ export async function validateAgentFile(
     hasError = true;
   }
 
+  return hasError;
+}
+
+function validateAgentContentBans(content: string, relPath: string): boolean {
+  let hasError = false;
+
   if (content.toLowerCase().includes('freemium')) {
     console.error(`Error: ${relPath}: Contains forbidden keyword 'freemium'`);
     hasError = true;
   }
 
-  if (/file:\/\/\/[a-zA-Z]:|\/Users\/|\/home\/|[a-zA-Z]:\\/i.test(content)) {
+  if (/file:\/\/\/[a-z]:|\/Users\/|\/home\/|[a-z]:\\/i.test(content)) {
     console.error(`Error: ${relPath}: Contains hardcoded absolute or user-specific file path(s)`);
     hasError = true;
   }
@@ -121,6 +121,12 @@ export async function validateAgentFile(
       hasError = true;
     }
   }
+
+  return hasError;
+}
+
+function validateAgentReferences(content: string, relPath: string): boolean {
+  let hasError = false;
 
   const skillRefs = content.match(/skills\/sdet-[a-z0-9-]+/g) || [];
   for (const ref of skillRefs) {
@@ -139,6 +145,12 @@ export async function validateAgentFile(
     }
   }
 
+  return hasError;
+}
+
+function validateAgentDirectives(content: string, relPath: string): boolean {
+  let hasError = false;
+
   if (!content.includes('verify_test_artifact')) {
     console.error(
       `Error: ${relPath}: Missing mandatory verification tool directive 'verify_test_artifact'`
@@ -153,7 +165,32 @@ export async function validateAgentFile(
     hasError = true;
   }
 
+  return hasError;
+}
+
+export async function validateAgentFile(
+  filePath: string,
+  rootDir: string
+): Promise<{ agent: AgentInfo | null; hasError: boolean }> {
+  const relPath = path.relative(rootDir, filePath);
+  const content = await fs.readFile(filePath, 'utf8');
+
+  const { fields, hasError: parseError } = parseFrontmatterFields(content, relPath);
+  if (parseError) {
+    return { agent: null, hasError: true };
+  }
+
+  const metaError = validateAgentMetadata(fields, filePath, relPath);
+  const bansError = validateAgentContentBans(content, relPath);
+  const refsError = validateAgentReferences(content, relPath);
+  const directivesError = validateAgentDirectives(content, relPath);
+
+  const hasValidationErrors = metaError || bansError || refsError || directivesError;
+
+  const name = fields['name'] || '';
+  const description = fields['description'] || '';
   const framework = VALID_FRAMEWORKS.has(name) ? name : undefined;
+
   const rawAgent: AgentInfo = {
     name,
     canonicalName: framework ? `sdet/${framework}` : 'sdet/orchestrator',
@@ -168,11 +205,12 @@ export async function validateAgentFile(
       `Error: ${relPath}: AgentInfo schema validation failed:`,
       schemaParsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
     );
-    hasError = true;
   }
 
+  const hasError = hasValidationErrors || !schemaParsed.success;
+
   return {
-    agent: hasError ? null : (schemaParsed.data as AgentInfo),
+    agent: hasError ? null : schemaParsed.data,
     hasError,
   };
 }

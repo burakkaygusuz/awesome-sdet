@@ -333,11 +333,8 @@ export function sanitizeDomain<const T extends readonly string[]>(
 
 export const MAX_REFERENCE_CACHE_ENTRIES = 256;
 const referenceCache = new Map<string, string>();
+const inFlightReferenceReads = new Map<string, Promise<string>>();
 
-/**
- * Loads the requested language-specific reference markdown file for an MCP module
- * and caches the result in memory with defensive maximum capacity.
- */
 export async function loadCachedReferenceMarkdown(
   referencesDirOrUrl: string,
   language: string
@@ -346,20 +343,29 @@ export async function loadCachedReferenceMarkdown(
   const cached = referenceCache.get(cacheKey);
   if (cached) return cached;
 
-  const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
-    ? fileURLToPath(referencesDirOrUrl)
-    : path.resolve(referencesDirOrUrl);
+  let inFlight = inFlightReferenceReads.get(cacheKey);
+  if (!inFlight) {
+    inFlight = (async () => {
+      const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
+        ? fileURLToPath(referencesDirOrUrl)
+        : path.resolve(referencesDirOrUrl);
 
-  const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
-  const content = await fs.readFile(filePath, 'utf8');
+      const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
+      const content = await fs.readFile(filePath, 'utf8');
 
-  if (referenceCache.size >= MAX_REFERENCE_CACHE_ENTRIES) {
-    const oldestKey = referenceCache.keys().next().value;
-    if (oldestKey) referenceCache.delete(oldestKey);
+      if (referenceCache.size >= MAX_REFERENCE_CACHE_ENTRIES) {
+        const oldestKey = referenceCache.keys().next().value;
+        if (oldestKey) referenceCache.delete(oldestKey);
+      }
+
+      referenceCache.set(cacheKey, content);
+      inFlightReferenceReads.delete(cacheKey);
+      return content;
+    })();
+    inFlightReferenceReads.set(cacheKey, inFlight);
   }
 
-  referenceCache.set(cacheKey, content);
-  return content;
+  return inFlight;
 }
 
 /**

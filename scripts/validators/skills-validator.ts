@@ -64,7 +64,7 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  if (/file:\/\/\/[a-zA-Z]:|\/Users\/|\/home\/|[a-zA-Z]:\\/i.test(content)) {
+  if (/file:\/\/\/[a-z]:|\/Users\/|\/home\/|[a-z]:\\/i.test(content)) {
     console.error(`Error: ${relPath}: Contains hardcoded absolute or user-specific file path(s)`);
     hasError = true;
   }
