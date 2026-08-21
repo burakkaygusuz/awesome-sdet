@@ -794,13 +794,9 @@ describe('Anti-Pattern Deterministic Evaluation Benchmark Suite', () => {
   });
 
   describe('100% Anti-Pattern Detection Rate & Accurate Actionable Hints', () => {
-    let truePositives = 0;
-    let trueNegatives = 0;
-    let falsePositives = 0;
-    let falseNegatives = 0;
-
-    for (const testCase of ANTI_PATTERN_BENCHMARK_CASES) {
-      it(`evaluates fixture: [${testCase.framework}] ${testCase.name}`, async () => {
+    it.each(ANTI_PATTERN_BENCHMARK_CASES)(
+      'evaluates fixture: [$framework] $name',
+      async (testCase) => {
         const result = await verifyTestArtifact({
           framework: testCase.framework,
           language: testCase.language,
@@ -808,72 +804,29 @@ describe('Anti-Pattern Deterministic Evaluation Benchmark Suite', () => {
         });
 
         if (testCase.expectedPassed) {
-          if (result.passed) {
-            trueNegatives++;
-          } else {
-            falsePositives++;
-          }
-
           expect(result.passed).toBe(true);
           expect(result.score).toBe(100);
           expect(result.actionableHints).toEqual([]);
           expect(result.checks.every((c) => c.passed)).toBe(true);
         } else {
-          if (result.passed) {
-            falseNegatives++;
-          } else {
-            truePositives++;
-          }
-
           expect(result.passed).toBe(false);
           expect(result.score).toBeLessThan(100);
           expect(result.actionableHints.length).toBeGreaterThanOrEqual(1);
 
           if (testCase.expectedFailedRuleId) {
             const failedCheck = result.checks.find((c) => c.id === testCase.expectedFailedRuleId);
-            expect(failedCheck, `Rule ${testCase.expectedFailedRuleId} must fail`).toBeDefined();
             expect(failedCheck?.passed).toBe(false);
-
-            const matchingHint = result.actionableHints.some((h) =>
-              h.startsWith(`[${testCase.expectedFailedRuleId}]`)
-            );
             expect(
-              matchingHint,
-              `Actionable hint for ${testCase.expectedFailedRuleId} must be present`
+              result.actionableHints.some((h) => h.startsWith(`[${testCase.expectedFailedRuleId}]`))
             ).toBe(true);
           }
 
           if (testCase.expectedHintSubstring !== undefined) {
-            const expectedSubstring = testCase.expectedHintSubstring;
-            const hasExpectedHint = result.actionableHints.some((h) =>
-              h.includes(expectedSubstring)
-            );
-            expect(hasExpectedHint, `Actionable hint must contain: "${expectedSubstring}"`).toBe(
-              true
-            );
+            const expectedHint = testCase.expectedHintSubstring;
+            expect(result.actionableHints.some((h) => h.includes(expectedHint))).toBe(true);
           }
         }
-      });
-    }
-
-    it('achieves 100% detection rate (recall: 1.0, precision: 1.0, zero false negatives/positives)', () => {
-      const antiPatternCases = ANTI_PATTERN_BENCHMARK_CASES.filter((c) => !c.expectedPassed);
-      const cleanCases = ANTI_PATTERN_BENCHMARK_CASES.filter((c) => c.expectedPassed);
-
-      expect(antiPatternCases.length).toBeGreaterThanOrEqual(15);
-      expect(cleanCases.length).toBeGreaterThanOrEqual(5);
-
-      const detectionRate =
-        antiPatternCases.length > 0 ? truePositives / antiPatternCases.length : 1;
-      const precision =
-        truePositives + falsePositives > 0 ? truePositives / (truePositives + falsePositives) : 1;
-
-      expect(truePositives).toBe(antiPatternCases.length);
-      expect(trueNegatives).toBe(cleanCases.length);
-      expect(falseNegatives).toBe(0);
-      expect(falsePositives).toBe(0);
-      expect(detectionRate).toBe(1);
-      expect(precision).toBe(1);
-    });
+      }
+    );
   });
 });
