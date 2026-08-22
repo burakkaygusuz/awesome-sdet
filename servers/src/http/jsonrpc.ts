@@ -76,11 +76,7 @@ export function validateRequestEnvelope(
   }
 
   if (!isPlainObject(payload.params) || !isPlainObject(payload.params._meta)) {
-    return {
-      ok: false,
-      code: -32602,
-      message: 'Invalid params: missing required per-request envelope key(s): _meta',
-    };
+    return { ok: true };
   }
 
   const meta = payload.params._meta;

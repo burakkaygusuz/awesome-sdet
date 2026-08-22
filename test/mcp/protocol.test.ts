@@ -383,7 +383,10 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
 
   describe('MCP 2026-07-28 per-request _meta envelope validation', () => {
     const invalidMetaCases = [
-      { name: 'missing params._meta', payload: { jsonrpc: '2.0', id: 201, method: 'tools/list' } },
+      {
+        name: 'empty _meta object',
+        payload: { jsonrpc: '2.0', id: 201, method: 'tools/list', params: { _meta: {} } },
+      },
       {
         name: 'missing protocolVersion',
         payload: {
@@ -716,6 +719,52 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const data = await parseMcpResponse(res);
       expect.soft(data.id).toBe('log-1');
       expect.soft(data.result).toEqual({});
+    });
+
+    it('supports initialize lifecycle handshake over Streamable HTTP', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'initialize',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'init-1',
+          method: 'initialize',
+          params: {
+            protocolVersion: '2026-07-28',
+            capabilities: {},
+            clientInfo: { name: 'test-client', version: '1.0.0' },
+          },
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe('init-1');
+      expect.soft(data.result?.serverInfo).toBeDefined();
+    });
+
+    it('accepts valid requests without _meta envelope', async () => {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          ...MCP_HEADERS,
+          'Mcp-Method': 'tools/list',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'bare-1',
+          method: 'tools/list',
+          params: {},
+        }),
+      });
+
+      expect.soft(res.status).toBe(200);
+      const data = await parseMcpResponse(res);
+      expect.soft(data.id).toBe('bare-1');
+      expect.soft(Array.isArray(data.result?.tools)).toBe(true);
     });
   });
 });

@@ -19,6 +19,7 @@ export const SUPPORTED_PROTOCOL_VERSIONS = new Set([PROTOCOL_VERSION_2026_07_28]
 
 const MCP_NAME_METHODS = new Set(['tools/call', 'resources/read', 'prompts/get']);
 export const SUPPORTED_MCP_METHODS = new Set([
+  'initialize',
   'server/discover',
   'ping',
   'logging/setLevel',
