@@ -13,20 +13,12 @@ import {
 } from './http/jsonrpc.js';
 import {
   collectBodyWithinLimit,
-  decodeHeaderValue,
   extractHostAndOrigin,
   handleCorsPreflight,
   isLocalHostAndOrigin,
   MAX_BODY_BYTES,
 } from './http/security.js';
-import {
-  handleServerDiscover,
-  jsonRpcShapeError,
-  methodHeaderError,
-  nameHeaderError,
-  protocolVersionHeaderError,
-  requestEnvelopeError,
-} from './http/request-guards.js';
+import { handleServerDiscover, validateMcpRequest } from './http/request-guards.js';
 
 export const rawPort = process.env.PORT || '3000';
 export const PORT = Number.parseInt(rawPort, 10);
@@ -66,40 +58,17 @@ export async function handleMcpPostRequest(
     jsonPayload = {};
   }
 
-  const protocolVersionHeader = (
-    (req.headers['mcp-protocol-version'] as string | undefined)?.split(',')[0] ?? ''
-  ).trim();
-  const mcpMethodHeader = (req.headers['mcp-method'] as string | undefined)?.trim();
-  const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
-  const rawMcpNameHeader = (req.headers['mcp-name'] as string | undefined)?.trim();
-  const mcpNameHeader = rawMcpNameHeader ? decodeHeaderValue(rawMcpNameHeader) : undefined;
-
   try {
-    const error =
-      protocolVersionHeaderError(protocolVersionHeader || undefined, jsonPayload) ??
-      jsonRpcShapeError(jsonPayload) ??
-      methodHeaderError(mcpMethodHeader, effectiveMethod, jsonPayload) ??
-      nameHeaderError(mcpNameHeader, effectiveMethod ?? '', jsonPayload) ??
-      requestEnvelopeError(jsonPayload, protocolVersionHeader);
+    const error = validateMcpRequest(req.headers, jsonPayload);
     if (error) {
       writeJsonRpcError(res, error);
       return;
     }
 
+    const effectiveMethod =
+      jsonPayload.method ?? (req.headers['mcp-method'] as string | undefined)?.trim();
     if (effectiveMethod === 'server/discover') {
       handleServerDiscover(res, jsonPayload);
-      return;
-    }
-
-    if (effectiveMethod === 'ping' || effectiveMethod === 'logging/setLevel') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ jsonrpc: '2.0', id: jsonPayload.id, result: {} }));
-      return;
-    }
-
-    if (effectiveMethod?.startsWith('notifications/')) {
-      res.writeHead(202);
-      res.end();
       return;
     }
 

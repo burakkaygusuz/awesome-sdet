@@ -168,122 +168,205 @@ function validateReleasePackage(): void {
   try {
     const packageDir = stageReleasePackage(process.cwd(), stagingRoot);
     verifyReleasePackage(packageDir);
-    console.log(`📦 Release package verified at ${packageDir}`);
+    console.log(`[pkg] Release package verified at ${packageDir}`);
   } finally {
     fs.rmSync(stagingRoot, { recursive: true, force: true });
   }
 }
 
-export async function runRelease(): Promise<void> {
-  const args = process.argv.slice(2);
-  const bumpArg = args.find((a) => !a.startsWith('--')) || 'patch';
-  const isDryRun = args.includes('--dry-run');
-  const isBumpOnly = args.includes('--bump-only') || args.includes('--prepare-branch');
-  const isTagOnly = args.includes('--tag-only');
+export function determineBumpTypeFromCommits(
+  commits: string[]
+): 'major' | 'minor' | 'patch' | null {
+  const filtered = commits
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0 && !c.startsWith('chore(release):') && !c.includes('[skip ci]'));
 
+  if (filtered.length === 0) {
+    return null;
+  }
+
+  const isMajor = filtered.some(
+    (c) =>
+      /^[a-z0-9_-]+(\([a-z0-9_-]+\))?!:/i.test(c) ||
+      /\bBREAKING CHANGE\b/i.test(c) ||
+      /^BREAKING-CHANGE:/i.test(c)
+  );
+  if (isMajor) return 'major';
+
+  const isMinor = filtered.some((c) => /^feat(\([a-z0-9_-]+\))?:/i.test(c));
+  if (isMinor) return 'minor';
+
+  return 'patch';
+}
+
+export function getCommitsSinceLastTag(): string[] {
+  try {
+    const latestTag = execSync('git describe --tags --abbrev=0 2>/dev/null', {
+      encoding: 'utf8',
+    }).trim();
+    const log = execSync(`git log ${latestTag}..HEAD --oneline`, { encoding: 'utf8' }).trim();
+    return log.split('\n').map((l) => l.replace(/^[a-f0-9]+\s+/, ''));
+  } catch {
+    const log = execSync('git log --oneline', { encoding: 'utf8' }).trim();
+    return log.split('\n').map((l) => l.replace(/^[a-f0-9]+\s+/, ''));
+  }
+}
+
+export interface ReleaseOptions {
+  bumpTypeOrVersion?: string;
+  isAuto: boolean;
+  isDryRun: boolean;
+  isBumpOnly: boolean;
+  isTagOnly: boolean;
+  allowDirty: boolean;
+}
+
+export function parseReleaseOptions(argv: string[]): ReleaseOptions {
+  const args = argv.slice(2);
+  const bumpTypeOrVersion = args.find((a) => !a.startsWith('--'));
+
+  return {
+    bumpTypeOrVersion,
+    isAuto: args.includes('--auto'),
+    isDryRun: args.includes('--dry-run'),
+    isBumpOnly: args.includes('--bump-only') || args.includes('--prepare-branch'),
+    isTagOnly: args.includes('--tag-only'),
+    allowDirty: args.includes('--allow-dirty'),
+  };
+}
+
+export function assertCleanWorkingTree(allowDirty = false): void {
+  if (allowDirty) return;
+  const status = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
+  if (status.length > 0) {
+    throw new Error('Working tree has uncommitted changes. Commit or stash them first.');
+  }
+}
+
+export function buildAndValidateRelease(): void {
+  console.log(`[build] Building assets and MCP server...`);
+  execSync('pnpm run build', { stdio: 'inherit' });
+
+  console.log(`[test] Running test suite and validations...`);
+  execSync('pnpm test', { stdio: 'inherit' });
+  execSync('pnpm run validate', { stdio: 'inherit' });
+  validateReleasePackage();
+}
+
+export function commitAndTagRelease(version: string): void {
+  console.log(`\n[doc] Creating release commit and git tag...`);
+  execSync(`git add package.json plugin.json servers/package.json`, {
+    stdio: 'inherit',
+  });
+  execSync(`git commit -m "chore(release): bump version to ${version}"`, { stdio: 'inherit' });
+  execSync(`git tag -a "v${version}" -m "Release v${version}"`, { stdio: 'inherit' });
+
+  console.log(`[git] Pushing commit and tag to origin main...`);
+  execSync(`git push origin main && git push origin "v${version}"`, { stdio: 'inherit' });
+}
+
+export function publishGitHubRelease(version: string): void {
+  console.log(`[release] Creating GitHub Release with gh CLI...`);
+  try {
+    execSync(`gh release create "v${version}" --title "v${version}" --generate-notes`, {
+      stdio: 'inherit',
+    });
+    console.log(`\n[success] Successfully published GitHub Release v${version}!`);
+  } catch (error) {
+    console.error(
+      '[warn] Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
+      error
+    );
+  }
+}
+
+export function resolveTargetVersion(
+  currentVersion: string,
+  options: ReleaseOptions
+): string | null {
+  if (options.isAuto) {
+    const commits = getCommitsSinceLastTag();
+    const autoBump = determineBumpTypeFromCommits(commits);
+    if (!autoBump) {
+      return null;
+    }
+    return calculateNextVersion(currentVersion, autoBump);
+  }
+
+  const bump = options.bumpTypeOrVersion || 'patch';
+  return calculateNextVersion(currentVersion, bump);
+}
+
+function handleTagOnlyRelease(currentVersion: string, isDryRun: boolean): void {
+  console.log(`\n[tag] Awesome SDET Tag Release Automation`);
+  console.log(`--------------------------------------`);
+  console.log(`Current version: v${currentVersion}`);
+  console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
+
+  if (isDryRun) {
+    console.log(`[ok] Dry-run: Would create tag v${currentVersion} and push to origin.`);
+    return;
+  }
+
+  console.log(`[doc] Creating git tag v${currentVersion}...`);
+  execSync(`git tag -a "v${currentVersion}" -m "Release v${currentVersion}"`, {
+    stdio: 'inherit',
+  });
+  console.log(`[git] Pushing tag to origin...`);
+  execSync(`git push origin "v${currentVersion}"`, { stdio: 'inherit' });
+  publishGitHubRelease(currentVersion);
+}
+
+export async function runRelease(
+  options: ReleaseOptions = parseReleaseOptions(process.argv)
+): Promise<void> {
   const targets = getVersionTargets();
   const rootPkg = JSON.parse(fs.readFileSync(targets.rootPkgPath, 'utf8'));
   const currentVersion: string = rootPkg.version;
 
-  if (isTagOnly) {
-    console.log(`\n🏷️ Awesome SDET Tag Release Automation`);
-    console.log(`--------------------------------------`);
-    console.log(`Current version: v${currentVersion}`);
-    console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
-
-    if (isDryRun) {
-      console.log(`✅ Dry-run: Would create tag v${currentVersion} and push to origin.`);
-      return;
-    }
-
-    console.log(`📝 Creating git tag v${currentVersion}...`);
-    execSync(`git tag -a "v${currentVersion}" -m "Release v${currentVersion}"`, {
-      stdio: 'inherit',
-    });
-    console.log(`⬆️ Pushing tag to origin...`);
-    execSync(`git push origin "v${currentVersion}"`, { stdio: 'inherit' });
-
-    console.log(`🎉 Creating GitHub Release with gh CLI...`);
-    try {
-      execSync(
-        `gh release create "v${currentVersion}" --title "v${currentVersion}" --generate-notes`,
-        { stdio: 'inherit' }
-      );
-      console.log(`\n✨ Successfully published GitHub Release v${currentVersion}!`);
-    } catch (error) {
-      console.error(
-        '⚠️ Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
-        error
-      );
-    }
+  if (options.isTagOnly) {
+    handleTagOnlyRelease(currentVersion, options.isDryRun);
     return;
   }
 
-  const newVersion = calculateNextVersion(currentVersion, bumpArg);
+  const newVersion = resolveTargetVersion(currentVersion, options);
+  if (!newVersion) {
+    console.log('[info] No releaseable changes detected since last tag. Skipping release.');
+    return;
+  }
 
-  console.log(`\n🚀 Awesome SDET Release Automation`);
+  console.log(`\n[release] Awesome SDET Release Automation`);
   console.log(`-----------------------------------`);
   console.log(`Current version: v${currentVersion}`);
   console.log(`Next release:    v${newVersion}`);
-  console.log(`Bump only:       ${isBumpOnly ? 'YES' : 'NO'}`);
-  console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
+  console.log(`Bump only:       ${options.isBumpOnly ? 'YES' : 'NO'}`);
+  console.log(`Dry run:         ${options.isDryRun ? 'YES' : 'NO'}\n`);
 
-  if (!isDryRun) {
-    const status = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
-    if (status.length > 0 && !args.includes('--allow-dirty')) {
-      console.error('❌ Error: Working tree has uncommitted changes. Commit or stash them first.');
-      process.exit(1);
-    }
-  }
-
-  console.log(
-    `📦 Synchronizing version across package.json, plugin.json, and servers/package.json...`
-  );
-  syncVersions(newVersion, targets);
-
-  console.log(`🔨 Building assets and MCP server...`);
-  execSync('pnpm run build', { stdio: 'inherit' });
-
-  console.log(`🧪 Running test suite and validations...`);
-  execSync('pnpm test', { stdio: 'inherit' });
-  execSync('pnpm run validate', { stdio: 'inherit' });
-  validateReleasePackage();
-
-  if (isDryRun) {
-    console.log(`\n✅ Dry-run completed successfully for v${newVersion}. Reverting changes...`);
-    syncVersions(currentVersion, targets);
-    execSync('pnpm run build', { stdio: 'inherit' });
+  if (options.isDryRun) {
+    console.log(`[test] Running dry-run validation suite (zero filesystem mutation)...`);
+    buildAndValidateRelease();
+    console.log(
+      `\n[ok] Dry-run succeeded: repository is release-ready for v${newVersion} (no files modified).`
+    );
     return;
   }
 
-  if (isBumpOnly) {
-    console.log(`\n📝 Version files updated to v${newVersion}. (Bump-only mode)`);
+  assertCleanWorkingTree(options.allowDirty);
+
+  console.log(
+    `[pkg] Synchronizing version across package.json, plugin.json, and servers/package.json...`
+  );
+  syncVersions(newVersion, targets);
+  buildAndValidateRelease();
+
+  if (options.isBumpOnly) {
+    console.log(`\n[doc] Version files updated to v${newVersion}. (Bump-only mode)`);
     console.log(`Ready to commit and push to release/v${newVersion} branch.`);
     return;
   }
 
-  console.log(`\n📝 Creating release commit and git tag...`);
-  execSync(`git add package.json plugin.json servers/package.json`, {
-    stdio: 'inherit',
-  });
-  execSync(`git commit -m "chore(release): bump version to ${newVersion}"`, { stdio: 'inherit' });
-  execSync(`git tag -a "v${newVersion}" -m "Release v${newVersion}"`, { stdio: 'inherit' });
-
-  console.log(`⬆️ Pushing commit and tag to origin main...`);
-  execSync(`git push origin main && git push origin "v${newVersion}"`, { stdio: 'inherit' });
-
-  console.log(`🎉 Creating GitHub Release with gh CLI...`);
-  try {
-    execSync(`gh release create "v${newVersion}" --title "v${newVersion}" --generate-notes`, {
-      stdio: 'inherit',
-    });
-    console.log(`\n✨ Successfully published GitHub Release v${newVersion}!`);
-  } catch (error) {
-    console.error(
-      '⚠️ Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
-      error
-    );
-  }
+  commitAndTagRelease(newVersion);
+  publishGitHubRelease(newVersion);
 }
 
 const isDirectExecution =

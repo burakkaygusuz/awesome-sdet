@@ -28,7 +28,14 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
 - **Ambiguous Text Matching**: Generic text queries like `getByText('Submit')` match both paragraph text and buttons; disambiguate with explicit role filters (`getByRole('button', { name: 'Submit' })`).
 - **XPath Piercing Limitations**: Native browser XPath engines cannot pierce open or closed Shadow DOM boundaries; use semantic selectors or framework piercing combinators (`>>`, `>>>`).
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Examine Semantic Role & Accessible Name**: Inspect the target element for explicit ARIA roles, labels, or visible text.
+2. **Apply Locator Priority**: Choose `getByRole` > `getByLabel` > `getByText` > `getByTestId`. Avoid full-tree DOM paths or class names.
+3. **Scope to Parent Container**: When locating repetitive items (e.g. table rows, cards), scope within the parent container (`card.getByRole(...)`).
+4. **Enforce Deterministic Resolution**: Ensure the locator resolves unambiguously to a single node and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Designing, querying, or refactoring element locators for Web, Mobile, or Hybrid applications.
@@ -37,11 +44,11 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
   - Defining locators within Page Object Models (POM) or Screen Object Models (SOM).
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Performing clicks, fills, drag-and-drop, or gestures -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
-  - Asserting element visibility, state, or text values -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Mobile-specific device lifecycle or driver capabilities -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Performing clicks, fills, drag-and-drop, or gestures -> Use [sdet-actions](../sdet-actions/SKILL.md).
+  - Asserting element visibility, state, or text values -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Mobile-specific device lifecycle or driver capabilities -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Canonical Primary Strategy                              | Scoping & Filtering                             | Piercing & Traversal                              |
 | :------------------- | :------------------------------------------------------ | :---------------------------------------------- | :------------------------------------------------ |
@@ -51,12 +58,17 @@ Accessibility-first semantic locators identify UI elements via ARIA roles, acces
 | **Vibium**           | `vibe.find({ role: '...' })`, `{ label }`, `{ testid }` | Subtree chaining (`el.find(...)`)               | `>>` (one boundary), `>>>` (any depth)            |
 | **Appium**           | `driver.findElement(AppiumBy.accessibilityId(...))`     | iOS Class Chains, Android `UiScrollable`        | Native context switching (`WEBVIEW`/`NATIVE_APP`) |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when querying elements:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Locators**: When selecting elements in Playwright, invoke `read_pw_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://locators/{language}`
-- **Cypress Locators & Shadow DOM**: When selecting elements in Cypress or piercing Shadow DOM, invoke `read_cy_docs` (Parameters: `domain: "commands" | "shadow"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://commands/{language}`, `cypress://shadow/{language}`
-- **Selenium Locators**: When authoring Selenium By queries or Relative Locators, invoke `read_se_docs` (Parameters: `domain: "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://locators/{language}`
-- **Vibium Selectors**: When querying elements with semantic or piercing selectors in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "selectors"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://selectors/{language}`
-- **Appium Locators**: When authoring mobile selectors across Android and iOS, invoke `read_appium_docs` (Parameters: `domain: "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://locators/{language}`
+- Playwright `locators` · Cypress `commands` | `shadow` · Selenium `locators` · Vibium `selectors` · Appium `locators`
+
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero brittle XPath (`//html/body/...`) or deep CSS selectors.
+- [ ] Accessible roles, labels, or test IDs prioritized.
+- [ ] Queries scoped within parent containers to eliminate ambiguity.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

@@ -28,7 +28,14 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 - **Domain-Scoped Cookies**: Injected cookies must match the exact protocol, domain, and path of the AUT, or the browser will silently ignore them during navigation.
 - **SameSite Cookie Restrictions**: Restoring storage snapshots across different subdomains can fail if authentication cookies are configured with `SameSite=Strict`.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Authenticate in Global Setup or via API**: Perform login once per persona and serialize storage state (`storageState.json`, `cy.session()`).
+2. **Inject Pre-Authenticated Session**: Instantiate isolated browser contexts pre-seeded with target role credentials.
+3. **Validate Session Freshness**: Attach validation callbacks to refresh expired tokens without manual UI login cascades.
+4. **Enforce Storage Immutability**: Treat snapshots as read-only baselines and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Configuring global setup authentication flows for CI/CD test runs.
@@ -37,11 +44,11 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
   - Ensuring multi-worker parallel test isolation across distributed test runners.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Testing the login UI flow itself (invalid passwords, MFA form validation) -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md) and [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Intercepting HTTP requests or stubbing API responses -> Use [sdet-network](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-network/SKILL.md).
-  - Managing mobile device app sessions and capabilities -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Testing the login UI flow itself (invalid passwords, MFA form validation) -> Use [sdet-actions](../sdet-actions/SKILL.md) and [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Intercepting HTTP requests or stubbing API responses -> Use [sdet-network](../sdet-network/SKILL.md).
+  - Managing mobile device app sessions and capabilities -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Session Caching Strategy                         | Multi-Role Isolation                       | Storage Injection API                                   |
 | :------------------- | :----------------------------------------------- | :----------------------------------------- | :------------------------------------------------------ |
@@ -50,11 +57,17 @@ Persisting authenticated state (cookies, local storage, session storage) allows 
 | **Selenium 4**       | Programmatic cookie & localStorage serialization | Separate `WebDriver` session instances     | `driver.manage().addCookie()` & JS localStorage scripts |
 | **Vibium**           | Browser context state snapshots                  | Isolated state pools                       | Native state import/export APIs                         |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing session state:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Storage**: When managing storage state snapshots and cookies in Playwright, invoke `read_pw_docs` (Parameters: `domain: "storage"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://storage/{language}`
-- **Cypress Session**: When caching sessions and cookies in Cypress, invoke `read_cy_docs` (Parameters: `domain: "session"`, `language: "typescript" | "javascript"`) -> URI: `cypress://session/{language}`
-- **Selenium BiDi & Session State**: When managing cookies or BiDi network session state in Selenium 4, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium State**: When saving or restoring browser context state snapshots in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "state"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://state/{language}`
+- Playwright `storage` · Cypress `session` · Selenium `bidi` · Vibium `state`
+
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Repetitive UI logins replaced with storage snapshots or API auth.
+- [ ] Multi-role tests isolated with separate state files.
+- [ ] Shared state files kept immutable during test execution.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

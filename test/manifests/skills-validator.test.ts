@@ -89,4 +89,94 @@ describe('skills validator guide enforcement (§3.2/§3.3)', () => {
     const result = await validate(skillFile('# Heading\n\nBody.\n', longDescription));
     expect(result.hasError).toBe(true);
   });
+
+  it('rejects hardcoded absolute or user-specific file paths in body', async () => {
+    const result = await validate(
+      skillFile('# Heading\n\n- Link: [other](file:///Users/burak/repo/skills/sdet/SKILL.md)\n')
+    );
+    expect(result.hasError).toBe(true);
+  });
+
+  it('rejects invalid user-invocable values like banana', async () => {
+    const invalidYaml = [
+      '---',
+      'name: sdet-locators',
+      "description: 'Use this skill when authoring element locators.'",
+      'user-invocable: banana',
+      'license: MIT',
+      '---',
+      '# Heading\n\nBody content.\n',
+    ].join('\n');
+    const result = await validate(invalidYaml);
+    expect(result.hasError).toBe(true);
+  });
+
+  it('rejects invalid capability metadata or unknown metadata attributes', async () => {
+    const invalidCapability = [
+      '---',
+      'name: sdet-locators',
+      "description: 'Use this skill when authoring element locators.'",
+      'user-invocable: true',
+      'license: MIT',
+      'metadata:',
+      '  capability: invalid_capability',
+      '---',
+      '# Heading\n\nBody content.\n',
+    ].join('\n');
+    const result = await validate(invalidCapability);
+    expect(result.hasError).toBe(true);
+
+    const unknownField = [
+      '---',
+      'name: sdet-locators',
+      "description: 'Use this skill when authoring element locators.'",
+      'user-invocable: true',
+      'license: MIT',
+      'metadata:',
+      '  capability: locators',
+      '  unknown_property: true',
+      '---',
+      '# Heading\n\nBody content.\n',
+    ].join('\n');
+    const result2 = await validate(unknownField);
+    expect(result2.hasError).toBe(true);
+  });
+
+  it('rejects malformed YAML frontmatter syntax', async () => {
+    const malformedYaml = [
+      '---',
+      'name: sdet-locators',
+      'description: [unclosed array',
+      'user-invocable: true',
+      'license: MIT',
+      '---',
+      '# Heading\n\nBody content.\n',
+    ].join('\n');
+    const result = await validate(malformedYaml);
+    expect(result.hasError).toBe(true);
+  });
+
+  it('accepts valid structured metadata in YAML frontmatter', async () => {
+    const validYaml = [
+      '---',
+      'name: sdet-locators',
+      "description: 'Use this skill when authoring element locators.'",
+      'user-invocable: true',
+      'license: MIT',
+      'metadata:',
+      '  capability: locators',
+      '  frameworks: playwright,selenium,cypress,vibium,appium',
+      '---',
+      '# Heading\n\nBody content.\n',
+    ].join('\n');
+    const result = await validate(validYaml);
+    expect(result.hasError).toBe(false);
+    expect(result.declaredFrameworks).toEqual([
+      'playwright',
+      'selenium',
+      'cypress',
+      'vibium',
+      'appium',
+    ]);
+  });
 });

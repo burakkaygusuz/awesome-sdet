@@ -1,38 +1,19 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { REQUIRED_FRONTMATTER, SkillSchema, type Skill } from '../schemas.js';
+import {
+  SkillFrontmatterSchema,
+  SkillSchema,
+  type CapabilityTopic,
+  type Skill,
+  type SkillFrontmatter,
+} from '../schemas.js';
+import { parseMarkdownFrontmatter } from './frontmatter-parser.js';
 
 export function parseFrontmatter(
   content: string,
   relPath: string
-): { fields: Record<string, string>; hasError: boolean } {
-  if (!content.startsWith('---')) {
-    console.error(`Error: ${relPath}: Missing frontmatter start delimiter '---'`);
-    return { fields: {}, hasError: true };
-  }
-
-  const frontmatterEnd = content.indexOf('---', 3);
-  if (frontmatterEnd === -1) {
-    console.error(`Error: ${relPath}: Missing frontmatter end delimiter '---'`);
-    return { fields: {}, hasError: true };
-  }
-
-  const frontmatter = content.substring(3, frontmatterEnd);
-  const fields: Record<string, string> = {};
-  let hasError = false;
-
-  for (const req of REQUIRED_FRONTMATTER) {
-    const regex = new RegExp(String.raw`^${req}:\s*(.+)$`, 'm');
-    const match = regex.exec(frontmatter);
-    if (match) {
-      fields[req] = match[1].trim().replace(/^["']|["']$/g, '');
-    } else {
-      console.error(`Error: ${relPath}: Missing required frontmatter attribute '${req}'`);
-      hasError = true;
-    }
-  }
-
-  return { fields, hasError };
+): { frontmatter: SkillFrontmatter | null; hasError: boolean } {
+  return parseMarkdownFrontmatter(content, relPath, SkillFrontmatterSchema, 'Skill');
 }
 
 export async function validateSkillFile(
@@ -42,14 +23,14 @@ export async function validateSkillFile(
 ): Promise<{ skill: Skill | null; hasError: boolean; declaredFrameworks?: string[] }> {
   const relPath = path.relative(skillsDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
-  const { fields, hasError: parseError } = parseFrontmatter(content, relPath);
+  const { frontmatter, hasError: parseError } = parseFrontmatter(content, relPath);
 
-  if (parseError) {
+  if (parseError || !frontmatter) {
     return { skill: null, hasError: true, declaredFrameworks: [] };
   }
 
   let hasError = false;
-  const name = fields['name'];
+  const name = frontmatter.name;
   const skillDirName = path.basename(path.dirname(filePath));
 
   if (name !== skillDirName) {
@@ -61,6 +42,11 @@ export async function validateSkillFile(
 
   if (content.toLowerCase().includes('freemium')) {
     console.error(`Error: ${relPath}: Contains forbidden keyword 'freemium'`);
+    hasError = true;
+  }
+
+  if (/file:\/\/\/[a-z]:|\/Users\/|\/home\/|[a-z]:\\/i.test(content)) {
+    console.error(`Error: ${relPath}: Contains hardcoded absolute or user-specific file path(s)`);
     hasError = true;
   }
 
@@ -82,7 +68,7 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  const description = fields['description'] || '';
+  const description = frontmatter.description || '';
   const descriptionWords = description.split(/\s+/).filter(Boolean).length;
   if (descriptionWords > 100) {
     console.error(
@@ -97,12 +83,15 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  const framework = skillDirName.startsWith('sdet-') ? 'sdet' : skillDirName.split('-')[0];
-  const topic = skillDirName.startsWith('sdet-') ? skillDirName.substring(5) : skillDirName;
+  const framework = 'sdet';
+  const inferredTopic = skillDirName.startsWith('sdet-') ? skillDirName.substring(5) : skillDirName;
+  const topic = (frontmatter.metadata?.capability || inferredTopic) as CapabilityTopic;
 
-  const frameworksMatch = /frameworks:\s*['"]?([^'"\n\r]+)['"]?/m.exec(content);
-  const declaredFrameworks = frameworksMatch
-    ? frameworksMatch[1].split(',').map((f) => f.trim())
+  const declaredFrameworks = frontmatter.metadata?.frameworks
+    ? frontmatter.metadata.frameworks
+        .split(',')
+        .map((f) => f.trim())
+        .filter(Boolean)
     : [];
 
   const rawSkill = {
@@ -110,7 +99,7 @@ export async function validateSkillFile(
     canonicalName: `sdet/${topic}`,
     framework,
     topic,
-    description: fields['description'] || '',
+    description: frontmatter.description || '',
     filePath: path.relative(rootDir, filePath),
   };
 

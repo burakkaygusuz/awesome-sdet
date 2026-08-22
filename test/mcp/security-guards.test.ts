@@ -3,15 +3,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  readFrameworkReferenceDoc,
   resolveSafePath,
   sanitizeDomain,
   sanitizeLanguage,
 } from '../../servers/src/domains/shared.js';
-import { readPlaywrightReferenceDoc } from '../../servers/src/domains/playwright/common.js';
-import { readSeleniumReferenceDoc } from '../../servers/src/domains/selenium/common.js';
-import { readCypressReferenceDoc } from '../../servers/src/domains/cypress/common.js';
-import { readVibiumReferenceDoc } from '../../servers/src/domains/vibium/common.js';
-import { readAppiumReferenceDoc } from '../../servers/src/domains/appium/common.js';
 
 describe('Security Guards: Path Traversal & Sanitization', () => {
   describe('sanitizeLanguage', () => {
@@ -43,11 +39,11 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeLanguage(undefined, allowed)).toThrow(/required/i);
     });
 
-    it('rejects path traversal sequences (../, ..\\)', () => {
+    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
       expect(() => sanitizeLanguage('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeLanguage('..\\..\\windows\\win.ini', allowed)).toThrow(
+      expect(() => sanitizeLanguage(String.raw`..\..\windows\win.ini`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
       expect(() => sanitizeLanguage('typescript/../python', allowed)).toThrow(
@@ -59,7 +55,7 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeLanguage('sub/typescript', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeLanguage('sub\\typescript', allowed)).toThrow(
+      expect(() => sanitizeLanguage(String.raw`sub\typescript`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
       expect(() => sanitizeLanguage('/typescript', allowed)).toThrow(
@@ -101,11 +97,11 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeDomain(undefined, allowed)).toThrow(/required/i);
     });
 
-    it('rejects path traversal sequences (../, ..\\)', () => {
+    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
       expect(() => sanitizeDomain('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
-      expect(() => sanitizeDomain('..\\..\\windows\\win.ini', allowed)).toThrow(
+      expect(() => sanitizeDomain(String.raw`..\..\windows\win.ini`, allowed)).toThrow(
         /path traversal|illegal characters/i
       );
     });
@@ -180,83 +176,28 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
   });
 
   describe('Domain Reference Loaders Hardening', () => {
-    describe('Playwright', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readPlaywrightReferenceDoc('locators', 'typescript');
-        expect(text).toContain('Playwright');
-      });
+    const frameworks = [
+      { framework: 'playwright', domain: 'locators', lang: 'typescript', name: 'Playwright' },
+      { framework: 'selenium', domain: 'actions', lang: 'java', name: 'Selenium' },
+      { framework: 'cypress', domain: 'commands', lang: 'typescript', name: 'Cypress' },
+      { framework: 'vibium', domain: 'core', lang: 'typescript', name: 'Vibium' },
+      { framework: 'appium', domain: 'capabilities', lang: 'typescript', name: 'Appium' },
+    ] as const;
 
-      it('rejects path traversal in domain', async () => {
+    it.each(frameworks)(
+      'loads valid markdown and rejects path traversal for $name',
+      async ({ framework, domain, lang, name }) => {
+        const text = await readFrameworkReferenceDoc(framework, domain, lang);
+        expect(text).toContain(name);
+
         await expect(
-          readPlaywrightReferenceDoc('../../../etc/passwd', 'typescript')
+          readFrameworkReferenceDoc(framework, '../../../etc/passwd', lang)
         ).rejects.toThrow();
-      });
 
-      it('rejects path traversal in language', async () => {
-        await expect(readPlaywrightReferenceDoc('locators', '../../etc/passwd')).rejects.toThrow();
-      });
-    });
-
-    describe('Selenium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readSeleniumReferenceDoc('actions', 'java');
-        expect(text).toContain('Selenium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(readSeleniumReferenceDoc('../../../etc/passwd', 'java')).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(readSeleniumReferenceDoc('actions', '../../etc/passwd')).rejects.toThrow();
-      });
-    });
-
-    describe('Cypress', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readCypressReferenceDoc('commands', 'typescript');
-        expect(text).toContain('Cypress');
-      });
-
-      it('rejects path traversal in domain', async () => {
         await expect(
-          readCypressReferenceDoc('../../../etc/passwd', 'typescript')
+          readFrameworkReferenceDoc(framework, domain, '../../etc/passwd')
         ).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(readCypressReferenceDoc('commands', '../../etc/passwd')).rejects.toThrow();
-      });
-    });
-
-    describe('Vibium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readVibiumReferenceDoc('core', 'typescript');
-        expect(text).toContain('Vibium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(readVibiumReferenceDoc('../../../etc/passwd', 'typescript')).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(readVibiumReferenceDoc('core', '../../etc/passwd')).rejects.toThrow();
-      });
-    });
-
-    describe('Appium', () => {
-      it('successfully loads reference markdown for valid language', async () => {
-        const text = await readAppiumReferenceDoc('capabilities', 'typescript');
-        expect(text).toContain('Appium');
-      });
-
-      it('rejects path traversal in domain', async () => {
-        await expect(readAppiumReferenceDoc('../../../etc/passwd', 'typescript')).rejects.toThrow();
-      });
-
-      it('rejects path traversal in language', async () => {
-        await expect(readAppiumReferenceDoc('capabilities', '../../etc/passwd')).rejects.toThrow();
-      });
-    });
+      }
+    );
   });
 });

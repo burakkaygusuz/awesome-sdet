@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "awesome-sdet",
-  "version": "1.3.0",
-  "description": "Enterprise SDET Agent Plugin for AI coding assistants featuring test automation skills and a secure Model Context Protocol (MCP) server.",
+  "version": "1.3.1",
+  "description": "Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.",
   "author": {
     "name": "Burak Kaygusuz",
     "url": "https://github.com/burakkaygusuz"

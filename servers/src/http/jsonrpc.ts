@@ -75,23 +75,11 @@ export function validateRequestEnvelope(
     };
   }
 
-  const params = isPlainObject(payload.params) ? payload.params : undefined;
-  if (!params) {
-    return {
-      ok: false,
-      code: -32602,
-      message: 'Invalid params: missing required per-request envelope key(s): _meta',
-    };
+  if (!isPlainObject(payload.params) || !isPlainObject(payload.params._meta)) {
+    return { ok: true };
   }
 
-  const meta = isPlainObject(params._meta) ? params._meta : undefined;
-  if (!meta) {
-    return {
-      ok: false,
-      code: -32602,
-      message: 'Invalid params: missing required per-request envelope key(s): _meta',
-    };
-  }
+  const meta = payload.params._meta;
 
   const protocolVersion = meta[PROTOCOL_VERSION_META_KEY];
   if (typeof protocolVersion !== 'string' || protocolVersion.trim().length === 0) {

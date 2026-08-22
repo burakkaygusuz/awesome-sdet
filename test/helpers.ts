@@ -25,13 +25,13 @@ export function mcpFetch(
   const standardMeta = {
     'io.modelcontextprotocol/protocolVersion': '2026-07-28',
     'io.modelcontextprotocol/clientCapabilities': {},
-    ...((body.params?._meta as Record<string, unknown>) || {}),
+    ...(body.params?._meta as Record<string, unknown>),
   };
 
   const payload = {
     ...body,
     params: {
-      ...(body.params || {}),
+      ...body.params,
       _meta: standardMeta,
     },
   };
@@ -59,6 +59,8 @@ export interface JsonRpcResponse {
     tools?: Array<{
       name: string;
       description?: string;
+      inputSchema?: Record<string, unknown>;
+      outputSchema?: Record<string, unknown>;
       annotations?: {
         readOnlyHint?: boolean;
         destructiveHint?: boolean;
@@ -75,6 +77,7 @@ export interface JsonRpcResponse {
     contents?: Array<{ uri: string; text?: string; mimeType?: string }>;
     messages?: Array<{ role: string; content: { type: string; text?: string } }>;
     content?: Array<{ type: string; text?: string }>;
+    structuredContent?: Record<string, unknown>;
     ttlMs?: number;
     cacheScope?: string;
     isError?: boolean;

@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { FRAMEWORK_REGISTRY } from '../../servers/src/registry.js';
-
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../');
 
 async function collectKnowledgeFiles(): Promise<string[]> {
@@ -30,13 +28,14 @@ async function collectKnowledgeFiles(): Promise<string[]> {
 }
 
 describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => {
-  it('every MCP tool name and URI domain cited in skills and agents exists in the registry', async () => {
-    const registeredTools = new Set<string>();
-    const domainsByFramework = new Map<string, Set<string>>();
-    for (const [framework, definition] of Object.entries(FRAMEWORK_REGISTRY)) {
-      for (const tool of definition.toolNames) registeredTools.add(tool);
-      domainsByFramework.set(framework, new Set(definition.domains));
-    }
+  it('every MCP tool name and universal resource URI cited in skills and agents exists in the registry', async () => {
+    const registeredTools = new Set<string>(['read_sdet_docs', 'verify_test_artifact']);
+
+    const validResourceUris = new Set([
+      'sdet://guidelines',
+      'sdet://invariants',
+      'sdet://migration-matrix',
+    ]);
 
     const files = await collectKnowledgeFiles();
     expect(files.length).toBeGreaterThanOrEqual(13);
@@ -48,15 +47,15 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
       const content = await fs.readFile(file, 'utf8');
       const rel = path.relative(rootDir, file);
 
-      for (const tool of content.match(/\bread_(?:pw|se|cy|vibium|appium)_[a-z_]+/g) ?? []) {
+      for (const tool of content.match(
+        /\b(?:read_(?:sdet|pw|se|cy|vibium|appium)_[a-z_]+|verify_test_artifact)\b/g
+      ) ?? []) {
         if (!registeredTools.has(tool)) toolOffenders.push(`${rel}: ${tool}`);
       }
 
-      for (const [, framework, domain] of content.matchAll(
-        /\b(playwright|selenium|cypress|vibium|appium):\/\/([a-z]+)\//g
-      )) {
-        if (!domainsByFramework.get(framework)?.has(domain)) {
-          uriOffenders.push(`${rel}: ${framework}://${domain}/`);
+      for (const [uri] of content.matchAll(/\bsdet:\/\/[a-z-]+/g)) {
+        if (!validResourceUris.has(uri)) {
+          uriOffenders.push(`${rel}: ${uri}`);
         }
       }
     }
@@ -83,5 +82,31 @@ describe('cross-layer binding contract (skills/agents <-> MCP registry)', () => 
     }
 
     expect(pathOffenders).toEqual([]);
+  });
+
+  it('portable core MCP server has zero host-specific client dependencies', async () => {
+    const serversPkgRaw = await fs.readFile(path.join(rootDir, 'servers/package.json'), 'utf8');
+    const serversPkg = JSON.parse(serversPkgRaw) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+
+    const forbiddenClientDeps = ['vscode', '@types/vscode', 'electron', 'claude-code'];
+    for (const dep of forbiddenClientDeps) {
+      expect(serversPkg.dependencies?.[dep]).toBeUndefined();
+      expect(serversPkg.devDependencies?.[dep]).toBeUndefined();
+    }
+  });
+
+  it('root plugin.json cleanly exposes portable core and skills without leaking client bindings', async () => {
+    const pluginRaw = await fs.readFile(path.join(rootDir, 'plugin.json'), 'utf8');
+    const pluginJson = JSON.parse(pluginRaw) as {
+      $schema: string;
+      name: string;
+      version?: string;
+    };
+
+    expect(pluginJson.$schema).toBe('https://agent-plugins.org/schemas/1.0.0/plugin.schema.json');
+    expect(pluginJson.name).toBe('awesome-sdet');
   });
 });

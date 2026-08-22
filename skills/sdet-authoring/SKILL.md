@@ -28,7 +28,14 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
 - **Global Hook State Leaks**: Setting shared mutable variables in `beforeAll` hooks causes subtle race conditions and test pollution across parallel worker shards.
 - **Over-Abstracted Base Classes**: Deep multi-level inheritance hierarchies in test base classes obscure test failure origins and create rigid framework lock-in.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Model Page/Screen Components**: Encapsulate locators and interaction chains inside focused Page Objects or Screen Objects.
+2. **Inject Test Fixtures**: Configure modular fixtures (`test.extend()`, `ThreadLocal` factory) for dependency injection.
+3. **Preserve Assertion Boundaries**: Keep assertions strictly in test spec files, never inside page helper methods.
+4. **Enforce State Teardown**: Write idempotent cleanup in `afterEach` or fixture teardown hooks and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Structuring new test repositories, Page Object Models (POM), or Screen Object Models (SOM).
@@ -37,11 +44,11 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
   - Setting up Component Testing / Storybook test mount harnesses.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Querying element selectors -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Executing user actions and inputs -> Use [sdet-actions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-actions/SKILL.md).
-  - Setting up session state snapshots and cookies -> Use [sdet-storage-state](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-storage-state/SKILL.md).
+  - Querying element selectors -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Executing user actions and inputs -> Use [sdet-actions](../sdet-actions/SKILL.md).
+  - Setting up session state snapshots and cookies -> Use [sdet-storage-state](../sdet-storage-state/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Modeling Pattern                                       | Fixture & Dependency Injection           | Component & Parallel Topologies                     |
 | :------------------- | :----------------------------------------------------- | :--------------------------------------- | :-------------------------------------------------- |
@@ -51,12 +58,17 @@ Scalable test authoring establishes clean structural design patterns (Page Objec
 | **Vibium**           | Declarative workflows & SDK page helpers               | Environment configuration fixtures       | Isolated browser contexts                           |
 | **Appium**           | Screen Object Model (SOM)                              | Multi-platform driver factory            | Parallel mobile execution via unique system ports   |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when structuring test suites:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Architecture**: When structuring Playwright POM, fixtures, or component tests, invoke `read_pw_docs` (Parameters: `domain: "locators" | "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `playwright://locators/{language}`, `playwright://actions/{language}`
-- **Cypress Architecture**: When structuring Cypress component tests, commands, or tasks, invoke `read_cy_docs` (Parameters: `domain: "component" | "commands" | "task"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://component/{language}`, `cypress://commands/{language}`, `cypress://task/{language}`
-- **Selenium POM & PageFactory**: When structuring Selenium Page Object Models or PageFactory patterns, invoke `read_se_docs` (Parameters: `domain: "pagefactory" | "locators"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URIs: `selenium://pagefactory/{language}`, `selenium://locators/{language}`
-- **Vibium Architecture**: When structuring Vibium workflows and page helpers, invoke `read_vibium_docs` (Parameters: `domain: "core"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://core/{language}`
-- **Appium Screen Objects**: When structuring Appium Screen Object Models or multi-platform factories, invoke `read_appium_docs` (Parameters: `domain: "capabilities" | "locators"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URIs: `appium://capabilities/{language}`, `appium://locators/{language}`
+- Playwright `locators` · Cypress `component` | `commands` · Selenium `pagefactory` | `locators` · Vibium `core` · Appium `capabilities` | `locators`
+
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero assertions placed inside Page Objects.
+- [ ] Thread-safe driver management (`ThreadLocal` / fixture scoping).
+- [ ] Clean lifecycle teardown without orphaned browser processes.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

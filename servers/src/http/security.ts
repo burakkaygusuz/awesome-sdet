@@ -76,25 +76,45 @@ export function collectBodyWithinLimit(
   res: http.ServerResponse
 ): Promise<string | null> {
   return new Promise((resolve) => {
-    let body = '';
+    const chunks: Buffer[] = [];
     let receivedBytes = 0;
     let exceeded = false;
+    let settled = false;
+
+    const finalize = (result: string | null) => {
+      if (!settled) {
+        settled = true;
+        resolve(result);
+      }
+    };
 
     req.on('data', (chunk: Buffer | string) => {
-      if (exceeded) return;
-      receivedBytes += typeof chunk === 'string' ? Buffer.byteLength(chunk) : chunk.length;
+      if (exceeded || settled) return;
+      const buf = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+      receivedBytes += buf.length;
 
       if (receivedBytes > MAX_BODY_BYTES) {
         exceeded = true;
         if (!res.headersSent) writeJsonRpcError(res, payloadTooLargeReply());
         req.resume();
-        resolve(null);
+        finalize(null);
         return;
       }
 
-      body += chunk;
+      chunks.push(buf);
     });
 
-    req.on('end', () => resolve(body));
+    req.on('end', () => {
+      if (!exceeded) {
+        finalize(Buffer.concat(chunks).toString('utf8'));
+      }
+    });
+
+    req.on('error', () => finalize(null));
+    req.on('close', () => {
+      if (!req.complete) {
+        finalize(null);
+      }
+    });
   });
 }

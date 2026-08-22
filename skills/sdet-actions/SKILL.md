@@ -27,7 +27,14 @@ Simulating genuine user interactions requires strict actionability verification 
 - **Framework Synthetic Events**: Modifying input values directly via script evaluation does not trigger React/Vue `onChange` state updates; use native framework fill/type methods.
 - **Hover Menus in Headless CI**: Mouse hover states can reset between actions in headless runners if subsequent commands lack pointer coordinate continuity.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Resolve Target Element**: Query element using semantic accessible locators from [sdet-locators](../sdet-locators/SKILL.md).
+2. **Ensure Actionability**: Rely on native framework auto-waiting or explicit condition waiters (`toBeVisible`, `elementToBeClickable`).
+3. **Dispatch Interaction**: Execute atomic actions (`fill()`, `click()`, `selectOption()`) without force overrides.
+4. **Trigger Verification**: Hand off to [sdet-assertions](../sdet-assertions/SKILL.md) and run `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Automating user interactions: clicks, double-clicks, right-clicks, and hover states.
@@ -36,11 +43,11 @@ Simulating genuine user interactions requires strict actionability verification 
   - Uploading or downloading files through standard browser dialogues.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Locating elements and writing selectors -> Use [sdet-locators](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-locators/SKILL.md).
-  - Verifying state, text, or DOM conditions after interactions -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Managing mobile device app lifecycle or permissions -> Use [sdet-mobile](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-mobile/SKILL.md).
+  - Locating elements and writing selectors -> Use [sdet-locators](../sdet-locators/SKILL.md).
+  - Verifying state, text, or DOM conditions after interactions -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Managing mobile device app lifecycle or permissions -> Use [sdet-mobile](../sdet-mobile/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Action Pipeline & Synchronization                             | Text Input Strategy                                  | Gestures & Pointer Chains                                           |
 | :------------------- | :------------------------------------------------------------ | :--------------------------------------------------- | :------------------------------------------------------------------ |
@@ -50,12 +57,17 @@ Simulating genuine user interactions requires strict actionability verification 
 | **Vibium**           | Built-in auto-waiting action pipeline                         | `element.type()`, `element.fill()`                   | Pointer gestures and drag operations                                |
 | **Appium**           | `WebDriverWait` + `ExpectedConditions`                        | `element.sendKeys()`                                 | W3C `ActionChains` (`PointerInput` swipe, scroll, tap)              |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when implementing actions:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Actions**: When implementing Playwright clicks, fills, or drag-and-drop, invoke `read_pw_docs` (Parameters: `domain: "actions"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://actions/{language}`
-- **Cypress Commands**: When implementing Cypress click, type, or custom commands, invoke `read_cy_docs` (Parameters: `domain: "commands"`, `language: "typescript" | "javascript"`) -> URI: `cypress://commands/{language}`
-- **Selenium Actions**: When implementing Selenium 4 W3C action chains or keyboard events, invoke `read_se_docs` (Parameters: `domain: "actions"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://actions/{language}`
-- **Vibium Interactions**: When implementing Vibium clicks, fills, or auto-waiting interactions, invoke `read_vibium_docs` (Parameters: `domain: "interactions"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://interactions/{language}`
-- **Appium Gestures**: When implementing Appium mobile touch gestures, swipes, or scroll chains, invoke `read_appium_docs` (Parameters: `domain: "gestures"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `appium://gestures/{language}`
+- Playwright `actions` · Cypress `commands` · Selenium `actions` · Vibium `interactions` · Appium `gestures`
+
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Zero arbitrary time delays (`waitForTimeout`, `sleep`) used.
+- [ ] No `{ force: true }` or synthetic JS `element.click()` bypasses.
+- [ ] Atomic `fill()` chosen over character-by-character loops.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.

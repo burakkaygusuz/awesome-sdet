@@ -28,7 +28,14 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 - **Service Worker Interception Bypass**: Browser Service Workers can intercept fetch requests before standard devtools network routing catches them; bypass service workers when comprehensive API stubbing is required.
 - **Missing CORS Headers on Fulfilled Routes**: When stubbing cross-origin responses with `route.fulfill()`, ensure required CORS headers (`access-control-allow-origin: '*'`) are included, otherwise the browser will block the response.
 
-## 3. When to Use
+## 3. Step-by-Step Workflow
+
+1. **Fast-Seed State via API**: Authenticate and populate required test data using headless HTTP requests rather than UI forms.
+2. **Register Interceptors Before Navigation**: Attach `page.route()`, `cy.intercept()`, or BiDi network handlers prior to initiating `goto()`.
+3. **Synchronize on Network Events**: Explicitly await response completion (`waitForResponse()`, `cy.wait('@alias')`) rather than guessing DOM settling times.
+4. **Clean Up Interceptor Scope**: Unroute stubs in test teardown hooks and verify via `verify_test_artifact`.
+
+## 4. When to Use
 
 - **When to Use**:
   - Intercepting, stubbing, or modifying HTTP/HTTPS requests and responses.
@@ -38,11 +45,11 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
   - Validating payload schemas and API response contracts.
 
 - **When NOT to Use (Route to Neighboring Skills)**:
-  - Storing and restoring browser cookies / session storage snapshots -> Use [sdet-storage-state](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-storage-state/SKILL.md).
-  - Verifying UI DOM states and visibility -> Use [sdet-assertions](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-assertions/SKILL.md).
-  - Capturing performance traces and console errors -> Use [sdet-observability](file:///Users/burak/Documents/GitHub/awesome-sdet/skills/sdet-observability/SKILL.md).
+  - Storing and restoring browser cookies / session storage snapshots -> Use [sdet-storage-state](../sdet-storage-state/SKILL.md).
+  - Verifying UI DOM states and visibility -> Use [sdet-assertions](../sdet-assertions/SKILL.md).
+  - Capturing performance traces and console errors -> Use [sdet-observability](../sdet-observability/SKILL.md).
 
-## 4. Universal Framework Paradigm Mapping
+## 5. Universal Framework Paradigm Mapping
 
 | Automation Framework | Interception & Mocking API                                                 | Request Synchronization                                         | Direct API Testing Engine                                 |
 | :------------------- | :------------------------------------------------------------------------- | :-------------------------------------------------------------- | :-------------------------------------------------------- |
@@ -51,11 +58,17 @@ Controlling HTTP/HTTPS traffic via route interception, response stubbing, latenc
 | **Selenium 4**       | W3C BiDi `Network.addIntercept()` / `driver.network.add_request_handler()` | BiDi `onBeforeRequestSent` / `responseCompleted` event handlers | HTTP client libraries (HttpClient, requests, RestAssured) |
 | **Vibium**           | BiDi network routing and mock response rules                               | BiDi response event subscriptions                               | Integrated BiDi network driver                            |
 
-## 5. Dynamic MCP Tool & Resource Schemas (Level 3 On-Demand Code Delivery)
+## 6. Dynamic MCP Knowledge & Tool Schemas (Level 3 On-Demand Code Delivery)
 
-To fetch complete, language-specific code implementations without context pollution, invoke `sdet-mcp` tools when managing network traffic:
+`read_sdet_docs({ framework, domain, query })` — `language` optional (framework default). Domains for this capability:
 
-- **Playwright Network**: When stubbing routes or mocking responses in Playwright, invoke `read_pw_docs` (Parameters: `domain: "network"`, `language: "typescript" | "javascript" | "python" | "java" | "csharp"`) -> URI: `playwright://network/{language}`
-- **Cypress Network & Fixtures**: When intercepting requests or loading fixture stubs in Cypress, invoke `read_cy_docs` (Parameters: `domain: "network" | "stubs" | "fixtures"`, `language: "typescript" | "javascript"`) -> URIs: `cypress://network/{language}`, `cypress://stubs/{language}`, `cypress://fixtures/{language}`
-- **Selenium BiDi Network**: When managing network interception via Selenium 4 BiDi, invoke `read_se_docs` (Parameters: `domain: "bidi"`, `language: "java" | "python" | "typescript" | "javascript" | "csharp" | "ruby"`) -> URI: `selenium://bidi/{language}`
-- **Vibium BiDi Network**: When routing requests or stubbing responses in Vibium, invoke `read_vibium_docs` (Parameters: `domain: "bidi"`, `language: "typescript" | "javascript" | "python" | "java"`) -> URI: `vibium://bidi/{language}`
+- Playwright `network` · Cypress `network` | `stubs` | `fixtures` · Selenium `bidi` · Vibium `bidi`
+
+Universal invariants: `sdet://guidelines` · `sdet://invariants`.
+
+## 7. Verification Checklist
+
+- [ ] Network routes registered before navigation calls.
+- [ ] Explicit promise/alias synchronization on network requests.
+- [ ] Network mocks cleanly scoped and torn down per test.
+- [ ] Validated via `verify_test_artifact({ code, framework, language })` with 100/100 score.
