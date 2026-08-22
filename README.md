@@ -1,4 +1,4 @@
-# Awesome SDET — Agent Plugin [release]
+# Awesome SDET — Agent Plugin
 
 Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.
 
@@ -19,99 +19,7 @@ Install `awesome-sdet` into your AI assistant or agentic coding environment:
 
 ---
 
-### 1. Claude Code
-
-Install directly via the Claude Code CLI:
-
-```bash
-claude plugin add github:burakkaygusuz/awesome-sdet
-```
-
-Or from inside an active Claude Code session:
-
-```text
-/plugin install github:burakkaygusuz/awesome-sdet
-```
-
-Or declare in your project's `.claude/settings.json`:
-
-```json
-{
-  "plugins": ["github:burakkaygusuz/awesome-sdet"]
-}
-```
-
----
-
-### 2. OpenCode
-
-Install via the OpenCode CLI:
-
-```bash
-opencode plugin install github:burakkaygusuz/awesome-sdet
-```
-
-Or declare in `opencode.json`:
-
-```json
-{
-  "$schema": "https://opencode.ai/schema.json",
-  "plugins": ["github:burakkaygusuz/awesome-sdet"]
-}
-```
-
----
-
-### 3. VS Code & GitHub Copilot
-
-Install from source via the Command Palette (`Chat: Install Plugin From Source`) with:
-
-```text
-https://github.com/burakkaygusuz/awesome-sdet.git
-```
-
-Or register the local plugin path in `.vscode/settings.json`:
-
-```json
-{
-  "chat.plugins.enabled": true,
-  "chat.plugins.paths": {
-    "<path-to-awesome-sdet>": true
-  }
-}
-```
-
----
-
-### 4. Google Antigravity & Codex
-
-Add the plugin into your workspace or global agent plugins directory:
-
-```bash
-# Workspace level
-git clone https://github.com/burakkaygusuz/awesome-sdet.git .agents/plugins/awesome-sdet
-
-# Global level
-git clone https://github.com/burakkaygusuz/awesome-sdet.git ~/.gemini/config/plugins/awesome-sdet
-```
-
----
-
-### 5. Local Development & Contributing
-
-To develop, customize, or contribute to `awesome-sdet`:
-
-```bash
-git clone https://github.com/burakkaygusuz/awesome-sdet.git
-cd awesome-sdet
-pnpm install
-```
-
-`pnpm install` automatically triggers the build lifecycle hook (`prepare`) to build the MCP server and compile TypeScript sources.
-
----
-
-## [pkg] What's Included?
+## What's Included?
 
 - **8 Canonical Capability-First Skills (`skills/sdet-*`):**
   - Universal SDET workflows, anti-pattern guides, and verification checklists following `agentskills.io` standards (`sdet-locators`, `sdet-actions`, `sdet-assertions`, `sdet-network`, `sdet-storage-state`, `sdet-observability`, `sdet-mobile`, and `sdet-authoring`).
@@ -130,7 +38,7 @@ pnpm install
 
 ---
 
-## ️ Development & Validation
+## Development & Validation
 
 **Prerequisites:** Node.js `>=22.0.0`, pnpm `>=11.0.0`
 
@@ -144,7 +52,7 @@ pnpm run build
 # Run TypeScript typecheck
 pnpm run typecheck
 
-# Run unit & live MCP matrix test suites (133 combinations)
+# Run unit, protocol, and runtime test suites
 pnpm test
 
 # Run deterministic evaluation benchmark suites
@@ -156,8 +64,8 @@ pnpm run validate
 # Lint and format
 pnpm run lint && pnpm run format:check
 
-# Security audits
-pnpm run audit:all
+# Security audit
+pnpm run audit
 ```
 
 ---
