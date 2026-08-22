@@ -168,7 +168,7 @@ function validateReleasePackage(): void {
   try {
     const packageDir = stageReleasePackage(process.cwd(), stagingRoot);
     verifyReleasePackage(packageDir);
-    console.log(`📦 Release package verified at ${packageDir}`);
+    console.log(`[pkg] Release package verified at ${packageDir}`);
   } finally {
     fs.rmSync(stagingRoot, { recursive: true, force: true });
   }
@@ -244,37 +244,37 @@ export function assertCleanWorkingTree(allowDirty = false): void {
 }
 
 export function buildAndValidateRelease(): void {
-  console.log(`🔨 Building assets and MCP server...`);
+  console.log(`[build] Building assets and MCP server...`);
   execSync('pnpm run build', { stdio: 'inherit' });
 
-  console.log(`🧪 Running test suite and validations...`);
+  console.log(`[test] Running test suite and validations...`);
   execSync('pnpm test', { stdio: 'inherit' });
   execSync('pnpm run validate', { stdio: 'inherit' });
   validateReleasePackage();
 }
 
 export function commitAndTagRelease(version: string): void {
-  console.log(`\n📝 Creating release commit and git tag...`);
+  console.log(`\n[doc] Creating release commit and git tag...`);
   execSync(`git add package.json plugin.json servers/package.json`, {
     stdio: 'inherit',
   });
   execSync(`git commit -m "chore(release): bump version to ${version}"`, { stdio: 'inherit' });
   execSync(`git tag -a "v${version}" -m "Release v${version}"`, { stdio: 'inherit' });
 
-  console.log(`⬆️ Pushing commit and tag to origin main...`);
+  console.log(`[git] Pushing commit and tag to origin main...`);
   execSync(`git push origin main && git push origin "v${version}"`, { stdio: 'inherit' });
 }
 
 export function publishGitHubRelease(version: string): void {
-  console.log(`🎉 Creating GitHub Release with gh CLI...`);
+  console.log(`[release] Creating GitHub Release with gh CLI...`);
   try {
     execSync(`gh release create "v${version}" --title "v${version}" --generate-notes`, {
       stdio: 'inherit',
     });
-    console.log(`\n✨ Successfully published GitHub Release v${version}!`);
+    console.log(`\n[success] Successfully published GitHub Release v${version}!`);
   } catch (error) {
     console.error(
-      '⚠️ Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
+      '[warn] Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
       error
     );
   }
@@ -298,21 +298,21 @@ export function resolveTargetVersion(
 }
 
 function handleTagOnlyRelease(currentVersion: string, isDryRun: boolean): void {
-  console.log(`\n🏷️ Awesome SDET Tag Release Automation`);
+  console.log(`\n[tag] Awesome SDET Tag Release Automation`);
   console.log(`--------------------------------------`);
   console.log(`Current version: v${currentVersion}`);
   console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
 
   if (isDryRun) {
-    console.log(`✅ Dry-run: Would create tag v${currentVersion} and push to origin.`);
+    console.log(`[ok] Dry-run: Would create tag v${currentVersion} and push to origin.`);
     return;
   }
 
-  console.log(`📝 Creating git tag v${currentVersion}...`);
+  console.log(`[doc] Creating git tag v${currentVersion}...`);
   execSync(`git tag -a "v${currentVersion}" -m "Release v${currentVersion}"`, {
     stdio: 'inherit',
   });
-  console.log(`⬆️ Pushing tag to origin...`);
+  console.log(`[git] Pushing tag to origin...`);
   execSync(`git push origin "v${currentVersion}"`, { stdio: 'inherit' });
   publishGitHubRelease(currentVersion);
 }
@@ -331,37 +331,36 @@ export async function runRelease(
 
   const newVersion = resolveTargetVersion(currentVersion, options);
   if (!newVersion) {
-    console.log('ℹ️ No releaseable changes detected since last tag. Skipping release.');
+    console.log('[info] No releaseable changes detected since last tag. Skipping release.');
     return;
   }
 
-  console.log(`\n🚀 Awesome SDET Release Automation`);
+  console.log(`\n[release] Awesome SDET Release Automation`);
   console.log(`-----------------------------------`);
   console.log(`Current version: v${currentVersion}`);
   console.log(`Next release:    v${newVersion}`);
   console.log(`Bump only:       ${options.isBumpOnly ? 'YES' : 'NO'}`);
   console.log(`Dry run:         ${options.isDryRun ? 'YES' : 'NO'}\n`);
 
-  if (!options.isDryRun) {
-    assertCleanWorkingTree(options.allowDirty);
-  }
-
-  console.log(
-    `📦 Synchronizing version across package.json, plugin.json, and servers/package.json...`
-  );
-  syncVersions(newVersion, targets);
-
-  buildAndValidateRelease();
-
   if (options.isDryRun) {
-    console.log(`\n✅ Dry-run completed successfully for v${newVersion}. Reverting changes...`);
-    syncVersions(currentVersion, targets);
-    execSync('pnpm run build', { stdio: 'inherit' });
+    console.log(`[test] Running dry-run validation suite (zero filesystem mutation)...`);
+    buildAndValidateRelease();
+    console.log(
+      `\n[ok] Dry-run succeeded: repository is release-ready for v${newVersion} (no files modified).`
+    );
     return;
   }
 
+  assertCleanWorkingTree(options.allowDirty);
+
+  console.log(
+    `[pkg] Synchronizing version across package.json, plugin.json, and servers/package.json...`
+  );
+  syncVersions(newVersion, targets);
+  buildAndValidateRelease();
+
   if (options.isBumpOnly) {
-    console.log(`\n📝 Version files updated to v${newVersion}. (Bump-only mode)`);
+    console.log(`\n[doc] Version files updated to v${newVersion}. (Bump-only mode)`);
     console.log(`Ready to commit and push to release/v${newVersion} branch.`);
     return;
   }

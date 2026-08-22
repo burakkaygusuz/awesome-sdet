@@ -1,13 +1,16 @@
 import fs from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import path from 'node:path';
-
 import { Language, Parser } from 'web-tree-sitter';
 
-const require = createRequire(import.meta.url);
+import {
+  ensureParserInitialized,
+  loadGrammarLanguage,
+  resolveGrammar,
+  type SupportedGrammar,
+  WASM_FILE_BY_GRAMMAR,
+} from '../../servers/src/verification/ast.js';
 
-export type SupportedGrammar =
-  'tsx' | 'typescript' | 'javascript' | 'python' | 'java' | 'csharp' | 'ruby';
+export type { SupportedGrammar };
 
 export interface ExtractedSnippet {
   readonly relPath: string;
@@ -20,37 +23,7 @@ export interface ExtractedSnippet {
 
 export type LanguageGrammarMap = Readonly<Record<SupportedGrammar, Language>>;
 
-export const GRAMMAR_ALIASES: Readonly<Record<string, SupportedGrammar>> = Object.freeze({
-  typescript: 'tsx',
-  ts: 'tsx',
-  tsx: 'tsx',
-  javascript: 'javascript',
-  js: 'javascript',
-  jsx: 'javascript',
-  python: 'python',
-  py: 'python',
-  java: 'java',
-  csharp: 'csharp',
-  cs: 'csharp',
-  'c#': 'csharp',
-  ruby: 'ruby',
-  rb: 'ruby',
-});
-
-const WASM_FILE_BY_GRAMMAR: Readonly<Record<SupportedGrammar, string>> = Object.freeze({
-  tsx: 'tree-sitter-tsx.wasm',
-  typescript: 'tree-sitter-typescript.wasm',
-  javascript: 'tree-sitter-javascript.wasm',
-  python: 'tree-sitter-python.wasm',
-  java: 'tree-sitter-java.wasm',
-  csharp: 'tree-sitter-c_sharp.wasm',
-  ruby: 'tree-sitter-ruby.wasm',
-});
-
-export function resolveGrammar(rawLang: string): SupportedGrammar | null {
-  const normalized = rawLang.trim().toLowerCase();
-  return GRAMMAR_ALIASES[normalized] ?? null;
-}
+export { resolveGrammar };
 
 let cachedEnginePromise: Promise<{
   parser: Parser;
@@ -62,15 +35,13 @@ export async function loadTreeSitterEngine(): Promise<{
   languages: LanguageGrammarMap;
 }> {
   cachedEnginePromise ??= (async () => {
-    await Parser.init();
+    await ensureParserInitialized();
     const parser = new Parser();
 
-    const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
-    const wasmDir = path.join(path.dirname(wasmPkg), 'out');
-
+    const grammars = Object.keys(WASM_FILE_BY_GRAMMAR) as SupportedGrammar[];
     const entries = await Promise.all(
-      Object.entries(WASM_FILE_BY_GRAMMAR).map(async ([grammar, file]) => {
-        const lang = await Language.load(path.join(wasmDir, file));
+      grammars.map(async (grammar) => {
+        const lang = await loadGrammarLanguage(grammar);
         return [grammar, lang] as const;
       })
     );
