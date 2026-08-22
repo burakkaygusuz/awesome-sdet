@@ -14,8 +14,18 @@ const SUGGESTIONS: Record<string, string> = {
     'Replace brittle XPath/DOM index paths with accessible semantic locators (e.g. vibium.findByRole or semantic selectors).',
 };
 
+function unquote(raw: string): string {
+  const trimmed = raw.trim();
+  const first = trimmed[0];
+  const last = trimmed.at(-1);
+  if ((first === "'" || first === '"' || first === '`') && first === last && trimmed.length >= 2) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 function isBrittleXpath(raw: string): boolean {
-  const clean = raw.replace(/^['"`]|['"`]$/g, '').trim();
+  const clean = unquote(raw);
   if (
     clean.startsWith('//html') ||
     clean.startsWith('/html') ||
@@ -43,7 +53,7 @@ function isBrittleXpath(raw: string): boolean {
 const HASHED_CSS_PATTERNS = [/\.css-[a-z0-9]{4,}/i, /\.sc-[a-z0-9]{4,}/i, /\.styled-[a-z0-9]{4,}/i];
 
 function isHashedCss(raw: string): boolean {
-  const clean = raw.replace(/^['"`]|['"`]$/g, '').trim();
+  const clean = unquote(raw);
   if (HASHED_CSS_PATTERNS.some((p) => p.test(clean))) {
     return true;
   }

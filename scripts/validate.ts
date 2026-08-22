@@ -25,11 +25,11 @@ export async function validate(): Promise<void> {
     process.exit(1);
   }
 
-  const skillsByFramework = skillResult.skills.reduce<Record<string, Skill[]>>((acc, skill) => {
-    acc[skill.framework] ??= [];
-    acc[skill.framework].push(skill);
-    return acc;
-  }, {});
+  const skillsByFramework: Record<string, Skill[]> = {};
+  for (const skill of skillResult.skills) {
+    skillsByFramework[skill.framework] ??= [];
+    skillsByFramework[skill.framework].push(skill);
+  }
 
   const manifestData: SkillsManifest = {
     schemaVersion: '1.0.0',

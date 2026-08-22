@@ -10,12 +10,12 @@ Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.
 
 Install `awesome-sdet` into your AI assistant or agentic coding environment:
 
-| Platform / Host         | Installation Command / Method                                                            | Standard                                         |
-| :---------------------- | :--------------------------------------------------------------------------------------- | :----------------------------------------------- |
-| **Claude Code**         | `claude plugin add github:burakkaygusuz/awesome-sdet`                                    | [Agent Plugins 1.0.0](https://agent-plugins.org) |
-| **OpenCode**            | `opencode plugin install github:burakkaygusuz/awesome-sdet`                              | [Agent Plugins 1.0.0](https://agent-plugins.org) |
-| **VS Code & Copilot**   | `Chat: Install Plugin From Source` (`https://github.com/burakkaygusuz/awesome-sdet.git`) | [Agent Plugins 1.0.0](https://agent-plugins.org) |
-| **Antigravity & Codex** | Add to `.agents/plugins/awesome-sdet` or `~/.gemini/config/plugins/`                     | [Agent Plugins 1.0.0](https://agent-plugins.org) |
+| Platform / Host         | Installation Method                                                                         |
+| :---------------------- | :------------------------------------------------------------------------------------------ |
+| **Claude Code**         | `/plugin marketplace add burakkaygusuz/awesome-sdet` then `/plugin install awesome-sdet`    |
+| **OpenCode**            | Declare `"plugin": ["github:burakkaygusuz/awesome-sdet"]` in `opencode.json`                |
+| **VS Code & Copilot**   | Register path in `.vscode/settings.json` (`"chat.plugins.paths"`) or Command Palette        |
+| **Antigravity & Codex** | Clone to `.agents/plugins/awesome-sdet` (workspace) or `~/.gemini/config/plugins/` (global) |
 
 ---
 

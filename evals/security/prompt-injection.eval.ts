@@ -208,7 +208,7 @@ describe('Prompt Injection Deterministic Evaluation Benchmark Suite', () => {
 
         const closingTagRegex = new RegExp(String.raw`</\s*${targetTag}\s*>`, 'gi');
         const matches = new RegExp(closingTagRegex).exec(wrapped) ?? [];
-        expect(matches.length).toBe(1);
+        expect(matches).toHaveLength(1);
 
         if (payload.toLowerCase().includes(`</${targetTag.toLowerCase()}`)) {
           expect(wrapped).toContain(`&lt;/${targetTag}&gt;`);

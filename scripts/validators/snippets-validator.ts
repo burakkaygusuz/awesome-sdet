@@ -59,10 +59,7 @@ export async function collectReferenceMarkdownFiles(dir: string): Promise<string
 
   for (const entry of entries) {
     if (entry.isFile() && entry.name.endsWith('.md')) {
-      const parentDir =
-        (entry as unknown as { path?: string; parentPath?: string }).path ||
-        (entry as unknown as { parentPath?: string }).parentPath ||
-        dir;
+      const parentDir = entry.parentPath ?? dir;
       files.push(path.join(parentDir, entry.name));
     }
   }
@@ -85,25 +82,27 @@ export function extractSnippetsFromMarkdown(
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const fenceMatch = /^```([a-zA-Z0-9#+_-]+)?/.exec(line.trim());
+    const trimmed = line.trim();
 
-    if (fenceMatch && !inBlock) {
-      inBlock = true;
-      currentLang = (fenceMatch[1] || '').trim().toLowerCase();
-      currentLines = [];
-      blockStartLine = i + 1;
-    } else if (line.trim().startsWith('```') && inBlock) {
-      inBlock = false;
-      const code = currentLines.join('\n').trim();
-      if (code.length > 0) {
-        snippets.push({
-          relPath,
-          filePath,
-          rawLang: currentLang,
-          grammar: resolveGrammar(currentLang),
-          code,
-          startLine: blockStartLine,
-        });
+    if (trimmed.startsWith('```')) {
+      if (inBlock) {
+        inBlock = false;
+        const code = currentLines.join('\n').trim();
+        if (code.length > 0) {
+          snippets.push({
+            relPath,
+            filePath,
+            rawLang: currentLang,
+            grammar: resolveGrammar(currentLang),
+            code,
+            startLine: blockStartLine,
+          });
+        }
+      } else {
+        inBlock = true;
+        currentLang = trimmed.slice(3).trim().toLowerCase();
+        currentLines = [];
+        blockStartLine = i + 1;
       }
     } else if (inBlock) {
       currentLines.push(line);

@@ -49,11 +49,12 @@ function detectTopLevelVariable(rootNode: SyntaxNode): string | null {
 }
 
 function hasStaticModifier(node: SyntaxNode): boolean {
-  return (
-    node.children.some((c: SyntaxNode) => c.type === 'modifiers' && c.text.includes('static')) ||
-    node.children.some((c: SyntaxNode) => c.type === 'static' || c.text === 'static') ||
-    node.text.startsWith('static ') ||
-    node.text.includes('static ')
+  return node.children.some(
+    (c: SyntaxNode) =>
+      c.type === 'static' ||
+      c.type === 'static_keyword' ||
+      (c.type === 'modifiers' && c.text.includes('static')) ||
+      c.text === 'static'
   );
 }
 
@@ -88,14 +89,14 @@ function detectGlobalAssignment(node: SyntaxNode): string | null {
 
   if (node.type === 'assignment_expression') {
     const left = node.childForFieldName('left');
-    if (
-      left &&
-      (left.text.startsWith('global.') ||
-        left.text.startsWith('globalThis.') ||
-        left.text.startsWith('window.'))
-    ) {
-      const propName = left.text.split('.')[1] ?? '';
-      if (DRIVER_VARIABLE_NAMES.has(propName)) {
+    if (left) {
+      const obj = left.childForFieldName('object')?.text ?? left.namedChildren[0]?.text;
+      const prop = left.childForFieldName('property')?.text ?? left.namedChildren.at(-1)?.text;
+      if (
+        (obj === 'global' || obj === 'globalThis' || obj === 'window') &&
+        prop &&
+        DRIVER_VARIABLE_NAMES.has(prop)
+      ) {
         return node.text;
       }
     }

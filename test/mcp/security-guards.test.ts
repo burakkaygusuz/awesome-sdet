@@ -39,7 +39,7 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeLanguage(undefined, allowed)).toThrow(/required/i);
     });
 
-    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
+    it('rejects path traversal sequences with forward and backward slashes', () => {
       expect(() => sanitizeLanguage('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );
@@ -97,7 +97,7 @@ describe('Security Guards: Path Traversal & Sanitization', () => {
       expect(() => sanitizeDomain(undefined, allowed)).toThrow(/required/i);
     });
 
-    it(String.raw`rejects path traversal sequences (../, ..\)`, () => {
+    it('rejects path traversal sequences with forward and backward slashes', () => {
       expect(() => sanitizeDomain('../../../etc/passwd', allowed)).toThrow(
         /path traversal|illegal characters/i
       );

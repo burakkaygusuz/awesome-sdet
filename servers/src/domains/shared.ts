@@ -88,14 +88,20 @@ export function parseMarkdownSections(
       inCodeBlock = !inCodeBlock;
     }
 
-    const headingMatch = inCodeBlock ? null : /^(#{1,6})\s+(.+)$/.exec(trimmed);
-    if (headingMatch) {
-      flush();
-      currentLevel = headingMatch[1].length;
-      currentHeading = headingMatch[2].trim();
-    } else {
-      currentLines.push(line);
+    let headingLevel = 0;
+    if (!inCodeBlock && trimmed.startsWith('#')) {
+      while (headingLevel < trimmed.length && trimmed[headingLevel] === '#' && headingLevel < 6) {
+        headingLevel++;
+      }
+      if (headingLevel > 0 && trimmed[headingLevel] === ' ') {
+        flush();
+        currentLevel = headingLevel;
+        currentHeading = trimmed.slice(headingLevel).trim();
+        continue;
+      }
     }
+
+    currentLines.push(line);
   }
 
   flush();

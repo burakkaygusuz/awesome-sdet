@@ -159,7 +159,7 @@ describe('agent validator guide enforcement & symmetry (§3.2/§3.3)', () => {
     const result = await collectAgents(realRootDir);
 
     expect(result.hasErrors).toBe(false);
-    expect(result.agents.length).toBe(6);
+    expect(result.agents).toHaveLength(6);
 
     const names = new Set(result.agents.map((a) => a.name));
     expect(names).toEqual(
