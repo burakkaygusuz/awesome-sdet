@@ -7,7 +7,7 @@ import {
   type Skill,
   type SkillFrontmatter,
 } from '../schemas.js';
-import { parseMarkdownFrontmatter } from './frontmatter-parser.js';
+import { parseMarkdownFrontmatter } from '../parsers/frontmatter-parser.js';
 
 export function parseFrontmatter(
   content: string,
@@ -61,7 +61,7 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  if (bodyLineCount > 300 && !/^#{1,6}\s+table of contents\s*$/im.test(body)) {
+  if (bodyLineCount > 300 && !body.toLowerCase().includes('table of contents')) {
     console.error(
       `Error: ${relPath}: SKILL.md body exceeds 300 lines without a Table of Contents heading (guide §3.3)`
     );

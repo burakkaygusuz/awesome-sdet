@@ -69,9 +69,7 @@ function detectTautology(node: SyntaxNode): string | null {
 
   if (ASSERTION_METHODS.has(methodName)) {
     const fnNode = node.childForFieldName('function') ?? node.namedChildren[0];
-    const objNode =
-      fnNode?.childForFieldName('object') ??
-      (fnNode?.type === 'member_expression' ? fnNode.namedChildren[0] : null);
+    const objNode = fnNode?.childForFieldName('object') ?? fnNode?.namedChildren[0];
 
     if (objNode) {
       const inner = extractCallInfo(objNode);

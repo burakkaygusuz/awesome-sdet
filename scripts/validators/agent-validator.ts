@@ -7,7 +7,7 @@ import {
   type AgentFrontmatter,
   type AgentInfo,
 } from '../schemas.js';
-import { parseMarkdownFrontmatter } from './frontmatter-parser.js';
+import { parseMarkdownFrontmatter } from '../parsers/frontmatter-parser.js';
 
 const VALID_RESOURCE_URIS = new Set([
   'sdet://guidelines',
@@ -15,25 +15,15 @@ const VALID_RESOURCE_URIS = new Set([
   'sdet://migration-matrix',
 ]);
 
-const LEGACY_TOOL_PATTERNS = [
-  /\bread_pw_docs\b/i,
-  /\bread_se_docs\b/i,
-  /\bread_cy_docs\b/i,
-  /\bread_vibium_docs\b/i,
-  /\bread_appium_docs\b/i,
+const LEGACY_TOOLS = [
+  'read_pw_docs',
+  'read_se_docs',
+  'read_cy_docs',
+  'read_vibium_docs',
+  'read_appium_docs',
 ];
 
 const VALID_FRAMEWORKS = new Set(['playwright', 'selenium', 'cypress', 'vibium', 'appium']);
-
-function parseFrontmatter(
-  content: string,
-  relPath: string
-): {
-  frontmatter: AgentFrontmatter | null;
-  hasError: boolean;
-} {
-  return parseMarkdownFrontmatter(content, relPath, AgentFrontmatterSchema, 'Agent');
-}
 
 function validateAgentMetadata(
   frontmatter: AgentFrontmatter,
@@ -43,7 +33,7 @@ function validateAgentMetadata(
   let hasError = false;
   const { name, description } = frontmatter;
 
-  const fileName = path.basename(filePath).replace(/\.agent\.md$|\.md$/, '');
+  const fileName = path.basename(filePath).split('.')[0];
   const dirName = path.basename(path.dirname(filePath));
   if (name !== fileName && name !== dirName) {
     console.error(
@@ -83,10 +73,10 @@ function validateAgentContentBans(content: string, relPath: string): boolean {
     hasError = true;
   }
 
-  for (const legacyPattern of LEGACY_TOOL_PATTERNS) {
-    if (legacyPattern.test(content)) {
+  for (const legacyTool of LEGACY_TOOLS) {
+    if (content.toLowerCase().includes(legacyTool)) {
       console.error(
-        `Error: ${relPath}: Contains obsolete legacy tool reference matching ${legacyPattern.source}; use 'read_sdet_docs'`
+        `Error: ${relPath}: Contains obsolete legacy tool reference '${legacyTool}'; use 'read_sdet_docs'`
       );
       hasError = true;
     }
@@ -98,7 +88,7 @@ function validateAgentContentBans(content: string, relPath: string): boolean {
 function validateAgentReferences(content: string, relPath: string): boolean {
   let hasError = false;
 
-  const skillRefs = content.match(/skills\/sdet-[a-z0-9-]+/g) || [];
+  const skillRefs = content.match(/skills\/sdet-[a-z0-9-]+/g) ?? [];
   for (const ref of skillRefs) {
     const skillName = path.basename(ref);
     if (!CAPABILITY_SKILL_NAMES.includes(skillName as (typeof CAPABILITY_SKILL_NAMES)[number])) {
@@ -107,7 +97,7 @@ function validateAgentReferences(content: string, relPath: string): boolean {
     }
   }
 
-  const resourceRefs = content.match(/sdet:\/\/[a-z0-9_-]+/g) || [];
+  const resourceRefs = content.match(/sdet:\/\/[a-z0-9_-]+/g) ?? [];
   for (const ref of resourceRefs) {
     if (!VALID_RESOURCE_URIS.has(ref)) {
       console.error(`Error: ${relPath}: References unknown resource URI '${ref}'`);
@@ -145,7 +135,12 @@ export async function validateAgentFile(
   const relPath = path.relative(rootDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
 
-  const { frontmatter, hasError: parseError } = parseFrontmatter(content, relPath);
+  const { frontmatter, hasError: parseError } = parseMarkdownFrontmatter(
+    content,
+    relPath,
+    AgentFrontmatterSchema,
+    'Agent'
+  );
   if (parseError || !frontmatter) {
     return { agent: null, hasError: true };
   }
@@ -197,10 +192,7 @@ export async function collectAgents(
 
     const results = await Promise.all(
       agentEntries.map(async (entry) => {
-        const parentDir =
-          (entry as unknown as { path?: string; parentPath?: string }).path ||
-          (entry as unknown as { parentPath?: string }).parentPath ||
-          agentsDir;
+        const parentDir = entry.parentPath ?? agentsDir;
         const filePath = path.join(parentDir, entry.name);
         return validateAgentFile(filePath, rootDir);
       })
@@ -225,8 +217,7 @@ export async function collectAgents(
       }
     }
 
-    const expectedFrameworks = ['playwright', 'selenium', 'cypress', 'vibium', 'appium'];
-    for (const fw of expectedFrameworks) {
+    for (const fw of VALID_FRAMEWORKS) {
       if (!seenNames.has(fw)) {
         console.error(`Error: Missing expected specialist agent for framework '${fw}'`);
         hasErrors = true;

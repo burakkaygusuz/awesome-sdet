@@ -12,13 +12,13 @@ export function parseMarkdownFrontmatter<T>(
     return { frontmatter: null, hasError: true };
   }
 
-  const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(content);
-  if (!match) {
+  const endIdx = content.indexOf('\n---', 3);
+  if (endIdx === -1) {
     console.error(`Error: ${relPath}: Missing frontmatter end delimiter '---'`);
     return { frontmatter: null, hasError: true };
   }
 
-  const frontmatterString = match[1];
+  const frontmatterString = content.slice(3, endIdx).trim();
   let parsedYaml: unknown;
   try {
     parsedYaml = YAML.parse(frontmatterString);
