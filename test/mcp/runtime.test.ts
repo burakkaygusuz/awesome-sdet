@@ -25,19 +25,17 @@ describe('Runtime Entrypoint Tests', () => {
   });
 
   it('rejects invalid PORT configuration values asynchronously', async () => {
-    try {
-      await execFileAsync('node', [entrypoint], {
+    await expect(
+      execFileAsync(process.execPath, [entrypoint], {
         env: { ...process.env, PORT: 'invalid' },
-      });
-      expect.unreachable('Should have failed with invalid PORT');
-    } catch (err: unknown) {
-      const error = err as { stderr?: string };
-      expect.soft(error.stderr).toContain('Invalid PORT');
-    }
+      })
+    ).rejects.toMatchObject({
+      stderr: expect.stringContaining('Invalid PORT'),
+    });
   });
 
   it('runs stdio mode successfully when --stdio argument is supplied', async () => {
-    const child = execFile('node', [entrypoint, '--stdio']);
+    const child = execFile(process.execPath, [entrypoint, '--stdio']);
     let stdoutData = '';
 
     child.stdout?.on('data', (chunk) => {

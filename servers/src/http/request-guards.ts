@@ -35,41 +35,35 @@ export const SUPPORTED_MCP_METHODS = new Set([
   'prompts/get',
 ]);
 
-export function validateMcpRequest(
-  reqHeaders: http.IncomingHttpHeaders,
-  jsonPayload: RpcPayload
-): JsonRpcErrorReply | undefined {
-  const protocolVersionHeader = (
-    (reqHeaders['mcp-protocol-version'] as string | undefined)?.split(',')[0] ?? ''
-  ).trim();
-  const mcpMethodHeader = (reqHeaders['mcp-method'] as string | undefined)?.trim();
-  const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
-  const rawMcpNameHeader = (reqHeaders['mcp-name'] as string | undefined)?.trim();
-  const mcpNameHeader = rawMcpNameHeader ? decodeHeaderValue(rawMcpNameHeader) : undefined;
-
-  if (!protocolVersionHeader) {
+function checkProtocolVersionHeader(header: string, id: unknown): JsonRpcErrorReply | undefined {
+  const safeId = typeof id === 'string' || typeof id === 'number' ? id : null;
+  if (!header) {
     return {
       status: 400,
-      id: jsonPayload.id ?? null,
+      id: safeId,
       error: { code: -32020, message: 'Missing required header: Mcp-Protocol-Version' },
     };
   }
 
-  if (!SUPPORTED_PROTOCOL_VERSIONS.has(protocolVersionHeader)) {
+  if (!SUPPORTED_PROTOCOL_VERSIONS.has(header)) {
     return {
       status: 400,
-      id: jsonPayload.id ?? null,
+      id: safeId,
       error: {
         code: -32022,
-        message: `Unsupported protocol version: '${protocolVersionHeader}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
+        message: `Unsupported protocol version: '${header}'. Supported version: '${PROTOCOL_VERSION_2026_07_28}'`,
         data: {
           supported: Array.from(SUPPORTED_PROTOCOL_VERSIONS),
-          requested: protocolVersionHeader,
+          requested: header,
         },
       },
     };
   }
 
+  return undefined;
+}
+
+function checkJsonRpcStructure(jsonPayload: RpcPayload): JsonRpcErrorReply | undefined {
   if (jsonPayload.jsonrpc !== undefined && jsonPayload.jsonrpc !== '2.0') {
     return {
       status: 400,
@@ -89,6 +83,15 @@ export function validateMcpRequest(
     };
   }
 
+  return undefined;
+}
+
+function checkMethodAndHeaders(
+  mcpMethodHeader: string | undefined,
+  effectiveMethod: string | undefined,
+  mcpNameHeader: string | undefined,
+  jsonPayload: RpcPayload
+): JsonRpcErrorReply | undefined {
   if (!mcpMethodHeader) {
     return {
       status: 400,
@@ -140,30 +143,57 @@ export function validateMcpRequest(
     }
   }
 
-  const isRequest = jsonPayload.method !== undefined && jsonPayload.id !== undefined;
-  if (isRequest) {
-    const envelope = validateRequestEnvelope(jsonPayload);
-    if (!envelope.ok) {
-      return {
-        status: 400,
-        id: jsonPayload.id ?? null,
-        error: { code: envelope.code ?? -32602, message: envelope.message ?? 'Invalid params' },
-      };
-    }
+  return undefined;
+}
 
-    if (envelope.protocolVersion && envelope.protocolVersion !== protocolVersionHeader) {
-      return {
-        status: 400,
-        id: jsonPayload.id ?? null,
-        error: {
-          code: -32020,
-          message: `Header mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${envelope.protocolVersion}'`,
-        },
-      };
-    }
+function checkRequestEnvelope(
+  jsonPayload: RpcPayload,
+  protocolVersionHeader: string
+): JsonRpcErrorReply | undefined {
+  const isRequest = jsonPayload.method !== undefined && jsonPayload.id !== undefined;
+  if (!isRequest) return undefined;
+
+  const envelope = validateRequestEnvelope(jsonPayload);
+  if (!envelope.ok) {
+    return {
+      status: 400,
+      id: jsonPayload.id ?? null,
+      error: { code: envelope.code ?? -32602, message: envelope.message ?? 'Invalid params' },
+    };
+  }
+
+  if (envelope.protocolVersion && envelope.protocolVersion !== protocolVersionHeader) {
+    return {
+      status: 400,
+      id: jsonPayload.id ?? null,
+      error: {
+        code: -32020,
+        message: `Header mismatch: Mcp-Protocol-Version header '${protocolVersionHeader}' does not match body metadata version '${envelope.protocolVersion}'`,
+      },
+    };
   }
 
   return undefined;
+}
+
+export function validateMcpRequest(
+  reqHeaders: http.IncomingHttpHeaders,
+  jsonPayload: RpcPayload
+): JsonRpcErrorReply | undefined {
+  const protocolVersionHeader = (
+    (reqHeaders['mcp-protocol-version'] as string | undefined)?.split(',')[0] ?? ''
+  ).trim();
+  const mcpMethodHeader = (reqHeaders['mcp-method'] as string | undefined)?.trim();
+  const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
+  const rawMcpNameHeader = (reqHeaders['mcp-name'] as string | undefined)?.trim();
+  const mcpNameHeader = rawMcpNameHeader ? decodeHeaderValue(rawMcpNameHeader) : undefined;
+
+  return (
+    checkProtocolVersionHeader(protocolVersionHeader, jsonPayload.id) ??
+    checkJsonRpcStructure(jsonPayload) ??
+    checkMethodAndHeaders(mcpMethodHeader, effectiveMethod, mcpNameHeader, jsonPayload) ??
+    checkRequestEnvelope(jsonPayload, protocolVersionHeader)
+  );
 }
 
 export function handleServerDiscover(res: http.ServerResponse, jsonPayload: RpcPayload): void {

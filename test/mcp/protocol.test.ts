@@ -226,7 +226,7 @@ describe('MCP 2026-07-28 Protocol Validation', () => {
       const statusCode = await new Promise<number>((resolve, reject) => {
         const req = http.request(
           url,
-          { method: 'POST', headers: { ...MCP_HEADERS, Origin: 'http://evil.com' } },
+          { method: 'POST', headers: { ...MCP_HEADERS, Origin: 'https://evil.com' } },
           (res) => resolve(res.statusCode || 0)
         );
         req.on('error', reject);

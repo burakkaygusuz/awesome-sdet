@@ -62,19 +62,24 @@ describe('MCP 2026-07-28 Primitives (tools / resources / prompts)', () => {
         expect.soft(tool.annotations?.destructiveHint).toBe(false);
         expect.soft(tool.annotations?.idempotentHint).toBe(true);
         expect.soft(tool.annotations?.openWorldHint).toBe(false);
-
         expect.soft(tool.outputSchema).toBeDefined();
-        const schemaProps = (tool.outputSchema?.properties ?? {}) as Record<string, unknown>;
         expect.soft(tool.outputSchema?.type).toBe('object');
-        if (tool.name.startsWith('read_')) {
-          expect.soft(schemaProps.framework).toBeDefined();
-          expect.soft(schemaProps.codeSnippets).toBeDefined();
-        } else if (tool.name === 'verify_test_artifact') {
-          expect.soft(schemaProps.passed).toBeDefined();
-          expect.soft(schemaProps.complianceScore).toBeDefined();
-          expect.soft(schemaProps.qualityScore).toBeDefined();
-        }
       }
+
+      const docTools = tools.filter((t) => t.name.startsWith('read_'));
+      expect(docTools.length).toBeGreaterThan(0);
+      for (const tool of docTools) {
+        const schemaProps = (tool.outputSchema?.properties ?? {}) as Record<string, unknown>;
+        expect.soft(schemaProps.framework).toBeDefined();
+        expect.soft(schemaProps.codeSnippets).toBeDefined();
+      }
+
+      const verifyTool = tools.find((t) => t.name === 'verify_test_artifact');
+      expect(verifyTool).toBeDefined();
+      const verifyProps = (verifyTool?.outputSchema?.properties ?? {}) as Record<string, unknown>;
+      expect.soft(verifyProps.passed).toBeDefined();
+      expect.soft(verifyProps.complianceScore).toBeDefined();
+      expect.soft(verifyProps.qualityScore).toBeDefined();
     });
 
     it('tools/call returns CacheableResult (ttlMs, cacheScope) and dual-output (content + structuredContent) for documentation tools', async () => {

@@ -21,14 +21,13 @@ describe('release package', () => {
         path.join(packageDir, 'node_modules')
       );
 
-      let stderr = '';
-      child = execFile('node', [path.join(packageDir, 'servers/dist/index.js'), '--stdio'], {
-        cwd: packageDir,
-      });
-      child.stderr?.setEncoding('utf8');
-      child.stderr?.on('data', (chunk: string) => {
-        stderr += chunk;
-      });
+      child = execFile(
+        process.execPath,
+        [path.join(packageDir, 'servers/dist/index.js'), '--stdio'],
+        {
+          cwd: packageDir,
+        }
+      );
 
       const exitCode = await new Promise<number>((resolve, reject) => {
         child?.once('error', reject);
@@ -44,7 +43,7 @@ describe('release package', () => {
       });
 
       expect(fs.existsSync(path.join(packageDir, 'servers/dist/index.js'))).toBe(true);
-      expect(exitCode, stderr).toBe(0);
+      expect(exitCode).toBe(0);
     } finally {
       if (child?.exitCode === null) {
         child.kill();

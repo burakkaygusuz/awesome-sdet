@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const RELEASE_RUNTIME_DEPENDENCIES = [
   '@modelcontextprotocol/node',
@@ -166,15 +166,14 @@ export function verifyReleasePackage(packageDir: string): void {
   }
 }
 
-function validateReleasePackage(): void {
-  const stagingRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'awesome-sdet-release-'));
-
+export function validateReleasePackage(rootDir = process.cwd()): void {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awesome-sdet-release-'));
   try {
-    const packageDir = stageReleasePackage(process.cwd(), stagingRoot);
+    const packageDir = stageReleasePackage(rootDir, tempDir);
     verifyReleasePackage(packageDir);
-    console.log(`[pkg] Release package verified at ${packageDir}`);
+    console.log(`[verify] Staged release package structure verified successfully.`);
   } finally {
-    fs.rmSync(stagingRoot, { recursive: true, force: true });
+    fs.rmSync(tempDir, { recursive: true, force: true });
   }
 }
 
@@ -203,17 +202,49 @@ export function determineBumpTypeFromCommits(
   return 'patch';
 }
 
+export function determineNextBumpFromCommits(commits: string[]): 'patch' | 'minor' | 'major' {
+  const filtered = commits
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0 && !c.startsWith('Merge branch') && !c.startsWith('Merge pull'));
+
+  if (filtered.length === 0) return 'patch';
+
+  const isMajor = filtered.some(
+    (c) =>
+      /^[a-z0-9_-]+(\([a-z0-9_-]+\))?!:/i.test(c) ||
+      /\bBREAKING CHANGE\b/i.test(c) ||
+      /^BREAKING-CHANGE:/i.test(c)
+  );
+  if (isMajor) return 'major';
+
+  const isMinor = filtered.some((c) => /^feat(\([a-z0-9_-]+\))?:/i.test(c));
+  if (isMinor) return 'minor';
+
+  return 'patch';
+}
+
+function execute(
+  command: string,
+  args: string[],
+  options?: Parameters<typeof execFileSync>[2]
+): string {
+  const result = execFileSync(command, args, options);
+  return result ? result.toString() : '';
+}
+
 export function getCommitsSinceLastTag(): string[] {
   let range = '';
   try {
-    const latestTag = execSync('git describe --tags --abbrev=0 2>/dev/null', {
+    const latestTag = execute('git', ['describe', '--tags', '--abbrev=0'], {
       encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore'],
     }).trim();
     if (latestTag) range = `${latestTag}..HEAD`;
   } catch {
     // initial repo commit range
   }
-  const log = execSync(`git log ${range} --format=%s`, { encoding: 'utf8' }).trim();
+  const args = range ? ['log', range, '--format=%s'] : ['log', '--format=%s'];
+  const log = execute('git', args, { encoding: 'utf8' }).trim();
   return log ? log.split('\n') : [];
 }
 
@@ -242,7 +273,7 @@ export function parseReleaseOptions(argv: string[]): ReleaseOptions {
 
 export function assertCleanWorkingTree(allowDirty = false): void {
   if (allowDirty) return;
-  const status = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
+  const status = execute('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim();
   if (status.length > 0) {
     throw new Error('Working tree has uncommitted changes. Commit or stash them first.');
   }
@@ -250,17 +281,19 @@ export function assertCleanWorkingTree(allowDirty = false): void {
 
 export function buildAndValidateRelease(): void {
   console.log(`[build] Building assets and MCP server...`);
-  execSync('pnpm run build', { stdio: 'inherit' });
+  execute('pnpm', ['run', 'build'], { stdio: 'inherit' });
 
   console.log(`[test] Running test suite and validations...`);
-  execSync('pnpm test', { stdio: 'inherit' });
-  execSync('pnpm run validate', { stdio: 'inherit' });
+  execute('pnpm', ['test'], { stdio: 'inherit' });
+  execute('pnpm', ['run', 'validate'], { stdio: 'inherit' });
   validateReleasePackage();
 }
 
 export function pushTagAndRelease(version: string): void {
   try {
-    const existing = execSync(`git tag -l "v${version}"`, { encoding: 'utf8' }).trim();
+    const existing = execute('git', ['tag', '-l', `v${version}`], {
+      encoding: 'utf8',
+    }).trim();
     if (existing) {
       console.log(`[info] Tag v${version} already exists. Skipping tag creation.`);
       return;
@@ -270,31 +303,38 @@ export function pushTagAndRelease(version: string): void {
   }
 
   console.log(`[doc] Creating git tag v${version}...`);
-  execSync(`git tag -a "v${version}" -m "Release v${version}"`, { stdio: 'inherit' });
+  execute('git', ['tag', '-a', `v${version}`, '-m', `Release v${version}`], {
+    stdio: 'inherit',
+  });
   console.log(`[git] Pushing tag to origin...`);
-  execSync(`git push origin "v${version}"`, { stdio: 'inherit' });
+  execute('git', ['push', 'origin', `v${version}`], { stdio: 'inherit' });
   publishGitHubRelease(version);
 }
 
 export function commitAndTagRelease(version: string): void {
   console.log(`\n[doc] Creating release commit and git tag...`);
-  execSync(`git add package.json plugin.json servers/package.json`, { stdio: 'inherit' });
-  execSync(`git commit -m "chore(release): bump version to ${version}"`, { stdio: 'inherit' });
+  execute('git', ['add', 'package.json', 'plugin.json', 'servers/package.json'], {
+    stdio: 'inherit',
+  });
+  execute('git', ['commit', '-m', `chore(release): bump version to ${version}`], {
+    stdio: 'inherit',
+  });
   pushTagAndRelease(version);
 }
 
 export function publishGitHubRelease(version: string): void {
   console.log(`[release] Creating GitHub Release with gh CLI...`);
   try {
-    execSync(`gh release create "v${version}" --title "v${version}" --generate-notes`, {
-      stdio: 'inherit',
-    });
-    console.log(`\n[success] Successfully published GitHub Release v${version}!`);
-  } catch (error) {
-    console.error(
-      '[warn] Warning: Failed to create GitHub Release via gh CLI. Tag was pushed to remote.',
-      error
+    execute(
+      'gh',
+      ['release', 'create', `v${version}`, '--title', `v${version}`, '--generate-notes'],
+      {
+        stdio: 'inherit',
+      }
     );
+    console.log(`[release] Published release v${version} to GitHub.`);
+  } catch (err) {
+    console.warn(`[warning] Failed to publish GitHub Release via gh CLI: ${String(err)}`);
   }
 }
 
