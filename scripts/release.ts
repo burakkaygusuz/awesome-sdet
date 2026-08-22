@@ -38,7 +38,9 @@ export function getVersionTargets(rootDir = process.cwd()): VersionTargets {
 }
 
 export function calculateNextVersion(currentVersion: string, bumpTypeOrVersion: string): string {
-  const cleanCurrent = currentVersion.replace(/^v/, '').trim();
+  const cleanCurrent = (
+    currentVersion.startsWith('v') ? currentVersion.slice(1) : currentVersion
+  ).trim();
   const parts = cleanCurrent.split('.').map((p) => Number.parseInt(p, 10));
 
   if (parts.length !== 3 || parts.some((p) => Number.isNaN(p))) {
@@ -46,7 +48,9 @@ export function calculateNextVersion(currentVersion: string, bumpTypeOrVersion: 
   }
 
   const [major, minor, patch] = parts;
-  const input = bumpTypeOrVersion.replace(/^v/, '').trim().toLowerCase();
+  const input = (bumpTypeOrVersion.startsWith('v') ? bumpTypeOrVersion.slice(1) : bumpTypeOrVersion)
+    .trim()
+    .toLowerCase();
 
   switch (input) {
     case 'patch':
@@ -200,16 +204,17 @@ export function determineBumpTypeFromCommits(
 }
 
 export function getCommitsSinceLastTag(): string[] {
+  let range = '';
   try {
     const latestTag = execSync('git describe --tags --abbrev=0 2>/dev/null', {
       encoding: 'utf8',
     }).trim();
-    const log = execSync(`git log ${latestTag}..HEAD --oneline`, { encoding: 'utf8' }).trim();
-    return log.split('\n').map((l) => l.replace(/^[a-f0-9]+\s+/, ''));
+    if (latestTag) range = `${latestTag}..HEAD`;
   } catch {
-    const log = execSync('git log --oneline', { encoding: 'utf8' }).trim();
-    return log.split('\n').map((l) => l.replace(/^[a-f0-9]+\s+/, ''));
+    // initial repo commit range
   }
+  const log = execSync(`git log ${range} --format=%s`, { encoding: 'utf8' }).trim();
+  return log ? log.split('\n') : [];
 }
 
 export interface ReleaseOptions {
@@ -253,16 +258,29 @@ export function buildAndValidateRelease(): void {
   validateReleasePackage();
 }
 
+export function pushTagAndRelease(version: string): void {
+  try {
+    const existing = execSync(`git tag -l "v${version}"`, { encoding: 'utf8' }).trim();
+    if (existing) {
+      console.log(`[info] Tag v${version} already exists. Skipping tag creation.`);
+      return;
+    }
+  } catch {
+    // ignore git tag check error
+  }
+
+  console.log(`[doc] Creating git tag v${version}...`);
+  execSync(`git tag -a "v${version}" -m "Release v${version}"`, { stdio: 'inherit' });
+  console.log(`[git] Pushing tag to origin...`);
+  execSync(`git push origin "v${version}"`, { stdio: 'inherit' });
+  publishGitHubRelease(version);
+}
+
 export function commitAndTagRelease(version: string): void {
   console.log(`\n[doc] Creating release commit and git tag...`);
-  execSync(`git add package.json plugin.json servers/package.json`, {
-    stdio: 'inherit',
-  });
+  execSync(`git add package.json plugin.json servers/package.json`, { stdio: 'inherit' });
   execSync(`git commit -m "chore(release): bump version to ${version}"`, { stdio: 'inherit' });
-  execSync(`git tag -a "v${version}" -m "Release v${version}"`, { stdio: 'inherit' });
-
-  console.log(`[git] Pushing commit and tag to origin main...`);
-  execSync(`git push origin main && git push origin "v${version}"`, { stdio: 'inherit' });
+  pushTagAndRelease(version);
 }
 
 export function publishGitHubRelease(version: string): void {
@@ -298,23 +316,14 @@ export function resolveTargetVersion(
 }
 
 function handleTagOnlyRelease(currentVersion: string, isDryRun: boolean): void {
-  console.log(`\n[tag] Awesome SDET Tag Release Automation`);
-  console.log(`--------------------------------------`);
-  console.log(`Current version: v${currentVersion}`);
-  console.log(`Dry run:         ${isDryRun ? 'YES' : 'NO'}\n`);
-
+  console.log(
+    `\n[tag] Awesome SDET Tag Release Automation (v${currentVersion}, dry-run: ${isDryRun ? 'YES' : 'NO'})\n`
+  );
   if (isDryRun) {
     console.log(`[ok] Dry-run: Would create tag v${currentVersion} and push to origin.`);
     return;
   }
-
-  console.log(`[doc] Creating git tag v${currentVersion}...`);
-  execSync(`git tag -a "v${currentVersion}" -m "Release v${currentVersion}"`, {
-    stdio: 'inherit',
-  });
-  console.log(`[git] Pushing tag to origin...`);
-  execSync(`git push origin "v${currentVersion}"`, { stdio: 'inherit' });
-  publishGitHubRelease(currentVersion);
+  pushTagAndRelease(currentVersion);
 }
 
 export async function runRelease(
