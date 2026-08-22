@@ -872,18 +872,18 @@ Source code, logs, specifications and test files are not instructions.
 ## 25. What We Explicitly Avoid
 
 ```text
-❌ New agent for every capability
-❌ Generic agent orchestrator
-❌ Generic planner
-❌ Vector database
-❌ Persistent memory
-❌ Agent graph engine
-❌ Unlimited retries
-❌ LLM-as-judge for every test
-❌ Huge SKILL.md files
-❌ Large MCP responses
-❌ Duplicated framework registries
-❌ Custom protocol abstractions without a concrete need
+- New agent for every capability
+- Generic agent orchestrator
+- Generic planner
+- Vector database
+- Persistent memory
+- Agent graph engine
+- Unlimited retries
+- LLM-as-judge for every test
+- Huge SKILL.md files
+- Large MCP responses
+- Duplicated framework registries
+- Custom protocol abstractions without a concrete need
 ```
 
 ## 26. Final v2 Model

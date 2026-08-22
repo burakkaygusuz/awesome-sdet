@@ -56,8 +56,8 @@ Always consult the repository skills and dedicated `sdet-mcp` server tools befor
 
 ## 4. Strict Negative Constraints (Anti-Patterns Prohibited)
 
-1. ❌ **NEVER use arbitrary sleeps (`page.waitForTimeout()`, `Thread.sleep()`, `time.sleep()`).** Always rely on auto-waiting actions and web-first assertions.
-2. ❌ **NEVER use deprecated ElementHandle API (`page.$()`, `page.$$()`).** Always use `Locator` objects (`page.locator()`, `page.getBy*()`).
-3. ❌ **NEVER use brittle CSS hierarchies or absolute XPath selectors.** Prioritize accessible roles and labels.
-4. ❌ **NEVER perform repetitive UI logins in every test.** Cache authentication via `storageState` and inject into `BrowserContext`.
-5. ❌ **NEVER share mutable state or single BrowserContext across concurrent test workers.**
+1. - **NEVER use arbitrary sleeps (`page.waitForTimeout()`, `Thread.sleep()`, `time.sleep()`).** Always rely on auto-waiting actions and web-first assertions.
+2. - **NEVER use deprecated ElementHandle API (`page.$()`, `page.$$()`).** Always use `Locator` objects (`page.locator()`, `page.getBy*()`).
+3. - **NEVER use brittle CSS hierarchies or absolute XPath selectors.** Prioritize accessible roles and labels.
+4. - **NEVER perform repetitive UI logins in every test.** Cache authentication via `storageState` and inject into `BrowserContext`.
+5. - **NEVER share mutable state or single BrowserContext across concurrent test workers.**

@@ -22,8 +22,8 @@ export function registerVerifyTool(server: McpServer): void {
       const result = await verifyTestArtifact(args);
       const formattedHints = result.actionableHints.map((h) => '- ' + h).join('\n');
       const summaryText = result.passed
-        ? `✅ Test artifact verification PASSED (Compliance: ${result.complianceScore}/100, Quality: ${result.qualityScore}/100)`
-        : `❌ Test artifact verification FAILED (Compliance: ${result.complianceScore}/100, Quality: ${result.qualityScore}/100)\n\nActionable Hints:\n${formattedHints}`;
+        ? `[ok] Test artifact verification PASSED (Compliance: ${result.complianceScore}/100, Quality: ${result.qualityScore}/100)`
+        : `- Test artifact verification FAILED (Compliance: ${result.complianceScore}/100, Quality: ${result.qualityScore}/100)\n\nActionable Hints:\n${formattedHints}`;
 
       return {
         content: [{ type: 'text', text: summaryText }],

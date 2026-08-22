@@ -64,8 +64,8 @@ Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mc
 
 ## 4. Strict Negative Constraints (Anti-Patterns Prohibited)
 
-1. ❌ **NEVER use deprecated Appium 1.x capabilities or TouchAction APIs:** Always use W3C `appium:` prefixed capabilities and W3C Actions (`PointerInput`).
-2. ❌ **NEVER write brittle full-tree absolute XPaths on mobile accessibility trees:** Prioritize Accessibility IDs, Class Chains, Predicates, and UiAutomator queries.
-3. ❌ **NEVER use hardcoded arbitrary sleep timers:** Rely on explicit dynamic wait conditions (`WebDriverWait`, `driver.waitUntil()`).
-4. ❌ **NEVER leave execution trapped inside a WebView context:** Always restore `NATIVE_APP` context after webview interactions.
-5. ❌ **NEVER hardcode absolute screen pixel coordinates for gestures:** Calculate relative percentage positions from element rectangles or window dimensions.
+1. - **NEVER use deprecated Appium 1.x capabilities or TouchAction APIs:** Always use W3C `appium:` prefixed capabilities and W3C Actions (`PointerInput`).
+2. - **NEVER write brittle full-tree absolute XPaths on mobile accessibility trees:** Prioritize Accessibility IDs, Class Chains, Predicates, and UiAutomator queries.
+3. - **NEVER use hardcoded arbitrary sleep timers:** Rely on explicit dynamic wait conditions (`WebDriverWait`, `driver.waitUntil()`).
+4. - **NEVER leave execution trapped inside a WebView context:** Always restore `NATIVE_APP` context after webview interactions.
+5. - **NEVER hardcode absolute screen pixel coordinates for gestures:** Calculate relative percentage positions from element rectangles or window dimensions.

@@ -27,10 +27,10 @@ export const UNIVERSAL_SDET_RESOURCES = {
       'Negative constraints, forbidden anti-patterns, and deterministic execution rules.',
     content: `# Universal SDET Invariants & Prohibited Anti-Patterns
 
-1. ❌ **Zero Arbitrary Sleeps:** Never generate hardcoded sleep/pause timeouts (\`Thread.sleep\`, \`cy.wait(ms)\`, \`page.waitForTimeout()\`). Always enforce condition-based polling or event listening.
-2. ❌ **Zero Shared Mutable State:** Never share browser contexts, singletons, or global test state across parallel execution threads.
-3. ❌ **Zero Brittle DOM Selectors:** Never anchor tests to full-tree XPath chains or fragile styling classes that break on redesigns.
-4. ❌ **Zero Repetitive UI Logins:** Cache sessions, cookies, and tokens via storage snapshots and fast API seeding.`,
+1. - **Zero Arbitrary Sleeps:** Never generate hardcoded sleep/pause timeouts (\`Thread.sleep\`, \`cy.wait(ms)\`, \`page.waitForTimeout()\`). Always enforce condition-based polling or event listening.
+2. - **Zero Shared Mutable State:** Never share browser contexts, singletons, or global test state across parallel execution threads.
+3. - **Zero Brittle DOM Selectors:** Never anchor tests to full-tree XPath chains or fragile styling classes that break on redesigns.
+4. - **Zero Repetitive UI Logins:** Cache sessions, cookies, and tokens via storage snapshots and fast API seeding.`,
   },
   migrationMatrix: {
     name: 'sdet-migration-matrix',

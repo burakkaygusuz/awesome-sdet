@@ -27,7 +27,7 @@ v2 introduces the **Deterministic Static Invariant Scanner & Bounded Repair Loop
                                                   │
                                          ┌────────┴────────┐
                                          │                 │
-                                      ✅ PASS           ❌ FAIL
+                                      PASS           FAIL
                                          │                 │
                                          ▼                 ▼
                                   [ Return Code ]   [ Actionable Hints ]
@@ -80,7 +80,8 @@ export const VerificationRequestSchema = z.strictObject({
 ```typescript
 export const VerificationResultSchema = z.strictObject({
   passed: z.boolean(),
-  score: z.number().min(0).max(100),
+  complianceScore: z.number().min(0).max(100),
+  qualityScore: z.number().min(0).max(100),
   checks: z.array(VerificationCheckSchema),
   actionableHints: z.array(z.string()).default([]),
 });
@@ -111,9 +112,9 @@ To eliminate the risk of runaway agent loops and unbounded token consumption whi
 
 The evaluation suite runs deterministically in CI (`pnpm run test:evals`) without external LLM API costs or network latency:
 
-- **`evals/routing/framework-routing.eval.ts`:** 38 diverse developer query fixtures evaluating confident single-framework matching, ambiguous multi-framework detection, and generic test query handling.
-- **`evals/anti-patterns/anti-patterns.eval.ts`:** 32 synthetic test fixtures evaluating rule conformity and anti-pattern detection across the 4 static invariant rules on the benchmark dataset.
-- **`evals/security/prompt-injection.eval.ts`:** 25 attack vectors evaluating structural prompt boundary containment (`containmentScore: 1.0`).
+- **`evals/routing/framework-routing.eval.ts`:** 37 diverse developer query fixtures evaluating confident single-framework matching, ambiguous multi-framework detection, and generic test query handling.
+- **`evals/anti-patterns/anti-patterns.eval.ts`:** 22 synthetic test fixtures evaluating rule conformity and anti-pattern detection across the 4 static invariant rules on the benchmark dataset.
+- **`evals/security/prompt-injection.eval.ts`:** 22 attack vectors evaluating structural prompt boundary containment (`containmentScore: 1.0`).
 
 ### 6.1 Two-Layer Prompt Security Model
 

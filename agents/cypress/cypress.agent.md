@@ -54,7 +54,7 @@ Always consult the repository skills and dedicated `sdet-mcp` server tools befor
 
 ## 4. Strict Negative Constraints (Anti-Patterns Prohibited)
 
-1. ❌ **NEVER use `async/await` on Cypress commands.** Cypress commands return Chainables, not standard Promises.
-2. ❌ **NEVER use `cy.wait(5000)` arbitrary sleep.** Always wait for DOM element visibility, route aliases (`@routeAlias`), or custom assertions.
-3. ❌ **NEVER store Cypress return values in JavaScript variables.**
-4. ❌ **NEVER write flaky conditional logic on dynamic DOM elements (`if ($body.find(...))`):** Force deterministic test state via `cy.intercept()` or `cy.task()`.
+1. - **NEVER use `async/await` on Cypress commands.** Cypress commands return Chainables, not standard Promises.
+2. - **NEVER use `cy.wait(5000)` arbitrary sleep.** Always wait for DOM element visibility, route aliases (`@routeAlias`), or custom assertions.
+3. - **NEVER store Cypress return values in JavaScript variables.**
+4. - **NEVER write flaky conditional logic on dynamic DOM elements (`if ($body.find(...))`):** Force deterministic test state via `cy.intercept()` or `cy.task()`.

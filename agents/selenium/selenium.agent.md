@@ -53,6 +53,6 @@ Always consult the repository skills and `sdet-mcp` server tools before generati
 
 ## 4. Strict Negative Constraints (Anti-Patterns Prohibited)
 
-1. ❌ **NEVER use `Thread.sleep(ms)`.** Always use dynamic `WebDriverWait` and `ExpectedConditions`.
-2. ❌ **NEVER share non-thread-safe static `WebDriver` instances across concurrent test threads.**
-3. ❌ **NEVER put test assertions inside Page Object methods.** Page Objects should model user interactions and return element state.
+1. - **NEVER use `Thread.sleep(ms)`.** Always use dynamic `WebDriverWait` and `ExpectedConditions`.
+2. - **NEVER share non-thread-safe static `WebDriver` instances across concurrent test threads.**
+3. - **NEVER put test assertions inside Page Object methods.** Page Objects should model user interactions and return element state.

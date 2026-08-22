@@ -1,4 +1,4 @@
-# Awesome SDET — Agent Plugin 🚀
+# Awesome SDET — Agent Plugin [release]
 
 Enterprise SDET Agent Plugin & MCP Server featuring deterministic AST test verification and policy-bounded repair.
 
@@ -6,7 +6,7 @@ Compliant with the [Agent Plugins Specification (v1.0.0)](https://agent-plugins.
 
 ---
 
-## ⚡ Quick Start & Installation
+## Quick Start & Installation
 
 Install `awesome-sdet` into your AI assistant or agentic coding environment:
 
@@ -111,7 +111,7 @@ pnpm install
 
 ---
 
-## 📦 What's Included?
+## [pkg] What's Included?
 
 - **8 Canonical Capability-First Skills (`skills/sdet-*`):**
   - Universal SDET workflows, anti-pattern guides, and verification checklists following `agentskills.io` standards (`sdet-locators`, `sdet-actions`, `sdet-assertions`, `sdet-network`, `sdet-storage-state`, `sdet-observability`, `sdet-mobile`, and `sdet-authoring`).
@@ -130,7 +130,7 @@ pnpm install
 
 ---
 
-## 🛠️ Development & Validation
+## ️ Development & Validation
 
 **Prerequisites:** Node.js `>=22.0.0`, pnpm `>=11.0.0`
 
@@ -162,6 +162,6 @@ pnpm run audit:all
 
 ---
 
-## 📄 License
+## License
 
-MIT © [Burak Kaygusuz](https://github.com/burakkaygusuz)
+MIT [Burak Kaygusuz](https://github.com/burakkaygusuz)

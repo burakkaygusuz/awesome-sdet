@@ -200,7 +200,7 @@ Strict actionable checklist to confirm before artifact delivery.
 In v2, the MCP server consolidates all documentation and verification capabilities into strictly **2 high-performance tools**:
 
 1. **`read_sdet_docs` (Universal Documentation Gateway):** An $O(1)$ tool footprint gateway that dynamically routes documentation requests across any number of frameworks (Playwright, Cypress, Selenium, Vibium, Appium, and future additions) with runtime domain/language validation, heading AST extraction, and SEP-1303 error guidance.
-2. **`verify_test_artifact` (Deterministic Invariant Engine):** Real-time static invariant scanner executing 4 core rules (`no-arbitrary-waits`, `meaningful-assertions`, `semantic-locators`, `state-isolation`) in <5ms.
+2. **`verify_test_artifact` (Deterministic Invariant Engine):** Real-time static invariant scanner executing 4 core rules (`no-arbitrary-waits`, `meaningful-assertions`, `resilient-accessibility-locators`, `thread-isolated-state`) in <5ms.
 
 Metadata drift across tools, skills, and agents is eliminated by defining a single source of truth:
 
@@ -304,8 +304,8 @@ Rather than relying on expensive and non-deterministic LLM-as-a-judge prompts, t
 
 1. **`no-arbitrary-waits`**: Prohibits explicit hardcoded sleeps (`page.waitForTimeout`, `Thread.sleep`, `cy.wait(1000)`). Requires native dynamic condition waiters. _(Note: Does not evaluate complex runtime network latency)._
 2. **`meaningful-assertions`**: Flags tests that perform actions without assertions (`expect()`, `Assert.`, `cy.should()`). _(Note: Enforces syntactic presence of assertions; does not evaluate semantic business correctness)._
-3. **`semantic-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`). _(Note: Cannot inspect live DOM or detect unstable hashed CSS classes)._
-4. **`state-isolation`**: Flags explicit shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation. _(Note: Does not verify external database sandbox isolation)._
+3. **`resilient-accessibility-locators`**: Prohibits brittle XPath/DOM index paths (`//div[1]/table/tbody/tr[2]`). Recommends accessible locators (`getByRole`, `getByLabel`). _(Note: Cannot inspect live DOM or detect unstable hashed CSS classes)._
+4. **`thread-isolated-state`**: Flags explicit shared mutable global driver instances (`public static WebDriver`). Enforces clean lifecycle isolation. _(Note: Does not verify external database sandbox isolation)._
 
 ### 5.3 Bounded Repair: Agent Workflow Policy vs. Stateless MCP Server
 
@@ -348,7 +348,7 @@ To avoid turning the stateless MCP server into a heavy, stateful orchestration d
                                        │
                          ┌─────────────┴─────────────┐
                          ▼                           ▼
-                   ✅ PASS (100)               ❌ FAIL (<100)
+                   PASS (100)               FAIL (<100)
                     Deliver Code                Bounded Repair (<=2)
 ```
 
@@ -360,9 +360,9 @@ To avoid turning the stateless MCP server into a heavy, stateful orchestration d
 
 The repository includes offline eval suites run via `pnpm run test:evals` and integrated directly into the CI quality gate:
 
-1. **`evals/anti-patterns/anti-patterns.eval.ts`**: Evaluates static rule conformity across 32 synthetic test fixtures on the benchmark dataset.
-2. **`evals/routing/framework-routing.eval.ts`**: Evaluates query-to-framework routing and ambiguity detection across 38 developer queries.
-3. **`evals/security/prompt-injection.eval.ts`**: Evaluates XML boundary containment across 25 attack vectors (`containmentScore: 1.0`).
+1. **`evals/anti-patterns/anti-patterns.eval.ts`**: Evaluates static rule conformity across 22 synthetic test fixtures on the benchmark dataset.
+2. **`evals/routing/framework-routing.eval.ts`**: Evaluates query-to-framework routing and ambiguity detection across 37 developer queries.
+3. **`evals/security/prompt-injection.eval.ts`**: Evaluates XML boundary containment across 22 attack vectors (`containmentScore: 1.0`).
 
 ---
 

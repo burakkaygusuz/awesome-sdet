@@ -86,11 +86,11 @@ export async function handleElementLists(page: Page): Promise<void> {
 
 ## 4. Locator Priority Hierarchy
 
-| Priority     | Locator Strategy                 | Best Practice                                          |
-| :----------- | :------------------------------- | :----------------------------------------------------- |
-| 🥇 **1**     | `page.getByRole(role, { name })` | Matches user accessibility semantics (ARIA).           |
-| 🥈 **2**     | `page.getByLabel('Text')`        | Form control inputs paired with labels.                |
-| 🥉 **3**     | `page.getByPlaceholder('Text')`  | Search or input fields lacking explicit labels.        |
-| 🏅 **4**     | `page.getByTestId('id')`         | Dedicated test attributes (`data-testid`).             |
-| 🏅 **5**     | `page.getByText('Text')`         | Non-interactive text assertions.                       |
-| ⚠️ **Avoid** | XPath / CSS hierarchies          | Brittle against DOM restructuring and styling changes. |
+| Priority         | Locator Strategy                 | Best Practice                                          |
+| :--------------- | :------------------------------- | :----------------------------------------------------- |
+| 1 **1**          | `page.getByRole(role, { name })` | Matches user accessibility semantics (ARIA).           |
+| 2 **2**          | `page.getByLabel('Text')`        | Form control inputs paired with labels.                |
+| 3 **3**          | `page.getByPlaceholder('Text')`  | Search or input fields lacking explicit labels.        |
+| 4 **4**          | `page.getByTestId('id')`         | Dedicated test attributes (`data-testid`).             |
+| 4 **5**          | `page.getByText('Text')`         | Non-interactive text assertions.                       |
+| [warn] **Avoid** | XPath / CSS hierarchies          | Brittle against DOM restructuring and styling changes. |

@@ -58,7 +58,7 @@ Always consult canonical capability skills (`skills/sdet-*`) and native `sdet-mc
 
 ## 4. Strict Negative Constraints (Anti-Patterns Prohibited)
 
-1. ❌ **NEVER use hardcoded sleep intervals (`sleep()`, `time.sleep()`, `Thread.sleep()`, `setTimeout()`):** Always rely on auto-waiting actionability or explicit locator conditions.
-2. ❌ **NEVER reuse stale element references across page navigations without re-mapping:** Always issue a fresh `vibium map` or `vibe.find()` after navigating to a new URL.
-3. ❌ **NEVER write brittle CSS or absolute XPath locators:** Prioritize ARIA roles (`find({ role, text })`), labels (`find({ label })`), test IDs (`find({ testid })`), and native open Shadow DOM combinators (`>>`, `>>>`).
-4. ❌ **NEVER leave network routes or BiDi event listeners uncleaned during teardown:** Always ensure browser instances are terminated via `bro.stop()` in `finally` blocks to prevent zombie daemon processes.
+1. - **NEVER use hardcoded sleep intervals (`sleep()`, `time.sleep()`, `Thread.sleep()`, `setTimeout()`):** Always rely on auto-waiting actionability or explicit locator conditions.
+2. - **NEVER reuse stale element references across page navigations without re-mapping:** Always issue a fresh `vibium map` or `vibe.find()` after navigating to a new URL.
+3. - **NEVER write brittle CSS or absolute XPath locators:** Prioritize ARIA roles (`find({ role, text })`), labels (`find({ label })`), test IDs (`find({ testid })`), and native open Shadow DOM combinators (`>>`, `>>>`).
+4. - **NEVER leave network routes or BiDi event listeners uncleaned during teardown:** Always ensure browser instances are terminated via `bro.stop()` in `finally` blocks to prevent zombie daemon processes.
