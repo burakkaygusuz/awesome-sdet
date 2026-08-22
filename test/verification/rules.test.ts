@@ -358,6 +358,25 @@ describe('Invariant Rules Engine', () => {
       const check = checkLocators(code, 'appium', await parse(code, 'java'));
       expect(check.passed).toBe(true);
     });
+
+    it('does not falsely flag navigation URL paths as brittle XPath locators', async () => {
+      const code = `
+        await page.goto('/api/v1/users/profile');
+        cy.visit('/dashboard/settings/account');
+        await expect(page.getByRole('button')).toBeVisible();
+      `;
+      const check = checkLocators(code, 'playwright', await parse(code, 'typescript'));
+      expect(check.passed).toBe(true);
+    });
+
+    it('does not falsely flag BEM classes or structured test-ids as hashed CSS', async () => {
+      const code = `
+        await page.getByTestId('user__profile_edit').click();
+        cy.get('.nav__menu_item--active').should('be.visible');
+      `;
+      const check = checkLocators(code, 'playwright', await parse(code, 'typescript'));
+      expect(check.passed).toBe(true);
+    });
   });
 
   describe('checkStateIsolation', () => {

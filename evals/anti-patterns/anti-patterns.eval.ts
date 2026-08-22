@@ -805,12 +805,12 @@ describe('Anti-Pattern Deterministic Evaluation Benchmark Suite', () => {
 
         if (testCase.expectedPassed) {
           expect(result.passed).toBe(true);
-          expect(result.score).toBe(100);
+          expect(result.complianceScore).toBe(100);
           expect(result.actionableHints).toEqual([]);
           expect(result.checks.every((c) => c.passed)).toBe(true);
         } else {
           expect(result.passed).toBe(false);
-          expect(result.score).toBeLessThan(100);
+          expect(result.complianceScore).toBeLessThan(100);
           expect(result.actionableHints.length).toBeGreaterThanOrEqual(1);
 
           if (testCase.expectedFailedRuleId) {

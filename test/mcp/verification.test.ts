@@ -57,10 +57,14 @@ describe('MCP verify_test_artifact Tool', () => {
     const data = await parseMcpResponse(res);
     expect.soft(data.result?.isError).toBeUndefined();
 
-    const structured = data.result?.structuredContent as { passed: boolean; score: number };
+    const structured = data.result?.structuredContent as {
+      passed: boolean;
+      complianceScore: number;
+      qualityScore: number;
+    };
     expect(structured).toBeDefined();
     expect(structured.passed).toBe(true);
-    expect(structured.score).toBe(100);
+    expect(structured.complianceScore).toBe(100);
   });
 
   it('executes verify_test_artifact with flawed code and returns failing score with actionable hints', async () => {
@@ -90,11 +94,12 @@ describe('MCP verify_test_artifact Tool', () => {
 
     const structured = data.result?.structuredContent as {
       passed: boolean;
-      score: number;
+      complianceScore: number;
+      qualityScore: number;
       actionableHints: string[];
     };
     expect(structured.passed).toBe(false);
-    expect(structured.score).toBeLessThan(100);
+    expect(structured.complianceScore).toBeLessThan(100);
     expect(structured.actionableHints.some((h) => h.includes('[no-arbitrary-waits]'))).toBe(true);
   });
 

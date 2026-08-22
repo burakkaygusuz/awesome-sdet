@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 export type SupportedGrammar =
   'tsx' | 'typescript' | 'javascript' | 'python' | 'java' | 'csharp' | 'ruby';
 
-const WASM_FILE_BY_GRAMMAR: Record<SupportedGrammar, string> = {
+export const WASM_FILE_BY_GRAMMAR: Record<SupportedGrammar, string> = {
   tsx: 'tree-sitter-tsx.wasm',
   typescript: 'tree-sitter-typescript.wasm',
   javascript: 'tree-sitter-javascript.wasm',
@@ -17,7 +17,7 @@ const WASM_FILE_BY_GRAMMAR: Record<SupportedGrammar, string> = {
   ruby: 'tree-sitter-ruby.wasm',
 };
 
-const GRAMMAR_BY_LANG: Record<string, SupportedGrammar> = {
+export const GRAMMAR_BY_LANG: Record<string, SupportedGrammar> = {
   typescript: 'tsx',
   ts: 'tsx',
   tsx: 'tsx',
@@ -33,6 +33,10 @@ const GRAMMAR_BY_LANG: Record<string, SupportedGrammar> = {
   ruby: 'ruby',
   rb: 'ruby',
 };
+
+export function resolveGrammar(lang: string): SupportedGrammar | null {
+  return GRAMMAR_BY_LANG[lang.trim().toLowerCase()] ?? null;
+}
 
 const LITERAL_NODE_TYPES = new Set([
   'true',
@@ -61,14 +65,12 @@ let initPromise: Promise<void> | null = null;
 const loadedLanguages = new Map<SupportedGrammar, Language>();
 const inFlightGrammarLoads = new Map<SupportedGrammar, Promise<Language>>();
 
-async function ensureParserInitialized(): Promise<void> {
-  if (!initPromise) {
-    initPromise = Parser.init();
-  }
+export async function ensureParserInitialized(): Promise<void> {
+  initPromise ??= Parser.init();
   return initPromise;
 }
 
-async function loadGrammarLanguage(grammarKey: SupportedGrammar): Promise<Language> {
+export async function loadGrammarLanguage(grammarKey: SupportedGrammar): Promise<Language> {
   const cached = loadedLanguages.get(grammarKey);
   if (cached) return cached;
 
@@ -76,11 +78,14 @@ async function loadGrammarLanguage(grammarKey: SupportedGrammar): Promise<Langua
   if (!inFlight) {
     const wasmPkg = require.resolve('@repomix/tree-sitter-wasms/package.json');
     const wasmPath = path.join(path.dirname(wasmPkg), 'out', WASM_FILE_BY_GRAMMAR[grammarKey]);
-    inFlight = Language.load(wasmPath).then((lang) => {
-      loadedLanguages.set(grammarKey, lang);
-      inFlightGrammarLoads.delete(grammarKey);
-      return lang;
-    });
+    inFlight = Language.load(wasmPath)
+      .then((lang) => {
+        loadedLanguages.set(grammarKey, lang);
+        return lang;
+      })
+      .finally(() => {
+        inFlightGrammarLoads.delete(grammarKey);
+      });
     inFlightGrammarLoads.set(grammarKey, inFlight);
   }
   return inFlight;
@@ -91,10 +96,14 @@ export async function getTreeSitterParser(languageName?: string): Promise<{
   language: Language | null;
 }> {
   await ensureParserInitialized();
-  const grammarKey = languageName ? (GRAMMAR_BY_LANG[languageName.toLowerCase()] ?? 'tsx') : 'tsx';
-  const lang = await loadGrammarLanguage(grammarKey);
-
+  const grammarKey = languageName ? resolveGrammar(languageName) : 'tsx';
   const parser = new Parser();
+
+  if (!grammarKey) {
+    return { parser, language: null };
+  }
+
+  const lang = await loadGrammarLanguage(grammarKey);
   if (lang) {
     parser.setLanguage(lang);
   }

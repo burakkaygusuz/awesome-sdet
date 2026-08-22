@@ -12,9 +12,24 @@ const FORBIDDEN_FUNCTION_NAMES = new Set([
 const FORBIDDEN_OBJECT_METHODS: Record<string, Set<string>> = {
   Thread: new Set(['sleep', 'Sleep']),
   time: new Set(['sleep']),
-  Task: new Set(['Delay']),
+  asyncio: new Set(['sleep']),
+  TimeUnit: new Set(['sleep']),
+  Task: new Set(['Delay', 'delay']),
   page: new Set(['waitForTimeout', 'wait']),
   cy: new Set(['wait']),
+};
+
+const SUGGESTIONS: Record<string, string> = {
+  playwright:
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).',
+  cypress:
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. cy.wait("@alias") or .should("be.visible")).',
+  selenium:
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. WebDriverWait and ExpectedConditions).',
+  appium:
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. WebDriverWait or dynamic polling).',
+  vibium:
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. auto-waiting actions or condition assertions).',
 };
 
 function isRouteAlias(firstArg?: SyntaxNode): boolean {
@@ -45,14 +60,20 @@ function detectForbiddenWait(node: SyntaxNode): string | null {
 
 export function checkArbitraryWaits(
   code: string,
-  _framework: string,
+  framework: string,
   rootNode?: SyntaxNode
 ): VerificationCheck {
+  const defaultSuggestion =
+    SUGGESTIONS[framework] ??
+    'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).';
+
   if (!rootNode) {
     const hasForbidden =
       code.includes('waitForTimeout(') ||
       code.includes('Thread.sleep(') ||
       code.includes('time.sleep(') ||
+      code.includes('asyncio.sleep(') ||
+      code.includes('Task.Delay(') ||
       code.includes('setTimeout(');
 
     return {
@@ -61,9 +82,7 @@ export function checkArbitraryWaits(
       passed: !hasForbidden,
       severity: 'error',
       evidence: hasForbidden ? 'arbitrary delay call' : undefined,
-      suggestion: hasForbidden
-        ? 'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).'
-        : undefined,
+      suggestion: hasForbidden ? defaultSuggestion : undefined,
     };
   }
 
@@ -83,8 +102,6 @@ export function checkArbitraryWaits(
     passed: !forbiddenMatch,
     severity: 'error',
     evidence: forbiddenMatch ?? undefined,
-    suggestion: forbiddenMatch
-      ? 'Replace arbitrary sleep with framework-native dynamic condition waiter (e.g. expect(locator).toBeVisible()).'
-      : undefined,
+    suggestion: forbiddenMatch ? defaultSuggestion : undefined,
   };
 }

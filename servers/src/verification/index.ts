@@ -68,7 +68,6 @@ export async function verifyTestArtifact(rawRequest: unknown): Promise<Verificat
 
     return await VerificationResultSchema.parseAsync({
       passed,
-      score: complianceScore,
       complianceScore,
       qualityScore,
       checks,

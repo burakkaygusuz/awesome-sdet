@@ -21,7 +21,6 @@ describe('Unified Verification Engine', () => {
 
     const result = await verifyTestArtifact(request);
     expect(result.passed).toBe(true);
-    expect(result.score).toBe(100);
     expect(result.complianceScore).toBe(100);
     expect(result.qualityScore).toBe(100);
     expect(result.actionableHints).toEqual([]);
@@ -43,7 +42,7 @@ describe('Unified Verification Engine', () => {
 
     const result = await verifyTestArtifact(request);
     expect(result.passed).toBe(false);
-    expect(result.score).toBe(25);
+    expect(result.complianceScore).toBe(25);
     expect(result.actionableHints).toHaveLength(3);
     expect(result.actionableHints.some((h) => h.includes('[no-arbitrary-waits]'))).toBe(true);
     expect(result.actionableHints.some((h) => h.includes('[meaningful-assertions]'))).toBe(true);
@@ -68,7 +67,6 @@ describe('Unified Verification Engine', () => {
 
     const result = await verifyTestArtifact(request);
     expect(result.passed).toBe(false);
-    expect(result.score).toBe(0);
     expect(result.complianceScore).toBe(0);
     expect(result.checks.every((c) => !c.passed)).toBe(true);
   });
@@ -90,7 +88,6 @@ describe('Unified Verification Engine', () => {
     expect(result.passed).toBe(true);
     expect(result.complianceScore).toBe(100);
     expect(result.qualityScore).toBe(90);
-    expect(result.score).toBe(100);
   });
 
   it('validates input boundaries and rejects invalid or empty requests', async () => {

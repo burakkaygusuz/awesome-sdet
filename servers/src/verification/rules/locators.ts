@@ -24,19 +24,27 @@ function isBrittleXpath(raw: string): boolean {
   ) {
     return true;
   }
-  if (clean.startsWith('//') || clean.startsWith('/')) {
+  if (clean.startsWith('//')) {
     const parts = clean.split('/').filter(Boolean);
-    return parts.length >= 3 || parts.some((p) => p.includes('[') && p.includes(']'));
+    return parts.length >= 2 || parts.some((p) => p.includes('[') && p.includes(']'));
+  }
+  if (
+    clean.startsWith('/') &&
+    (clean.includes('/div[') ||
+      clean.includes('/table[') ||
+      clean.includes('/tbody/') ||
+      clean.includes('/span['))
+  ) {
+    return true;
   }
   return false;
 }
 
+const HASHED_CSS_PATTERNS = [/\.css-[a-z0-9]{4,}/i, /\.sc-[a-z0-9]{4,}/i, /\.styled-[a-z0-9]{4,}/i];
+
 function isHashedCss(raw: string): boolean {
   const clean = raw.replace(/^['"`]|['"`]$/g, '').trim();
-  if (clean.includes('.css-') || clean.includes('.sc-') || clean.includes('.styled-')) {
-    return true;
-  }
-  if (clean.includes('__') && clean.includes('_')) {
+  if (HASHED_CSS_PATTERNS.some((p) => p.test(clean))) {
     return true;
   }
   return clean.split(':nth-child').length > 2 || clean.split(':nth-of-type').length > 2;

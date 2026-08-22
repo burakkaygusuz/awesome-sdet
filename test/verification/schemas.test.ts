@@ -140,7 +140,6 @@ describe('Server Domain Schemas', () => {
     it('validates score boundaries and structure', () => {
       const valid = VerificationResultSchema.safeParse({
         passed: true,
-        score: 100,
         complianceScore: 100,
         qualityScore: 100,
         checks: [],
@@ -150,8 +149,7 @@ describe('Server Domain Schemas', () => {
 
       const outOfBounds = VerificationResultSchema.safeParse({
         passed: false,
-        score: 105,
-        complianceScore: 100,
+        complianceScore: 105,
         qualityScore: 100,
         checks: [],
       });

@@ -27,7 +27,6 @@ export type VerificationRequest = z.infer<typeof VerificationRequestSchema>;
 
 export const VerificationResultSchema = z.strictObject({
   passed: z.boolean(),
-  score: z.number().int().min(0).max(100),
   complianceScore: z.number().int().min(0).max(100),
   qualityScore: z.number().int().min(0).max(100),
   checks: z.array(VerificationCheckSchema),

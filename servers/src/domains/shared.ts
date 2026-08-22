@@ -321,21 +321,24 @@ export async function loadCachedReferenceMarkdown(
   let inFlight = inFlightReferenceReads.get(cacheKey);
   if (!inFlight) {
     inFlight = (async () => {
-      const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
-        ? fileURLToPath(referencesDirOrUrl)
-        : path.resolve(referencesDirOrUrl);
+      try {
+        const baseReferencesDir = referencesDirOrUrl.startsWith('file://')
+          ? fileURLToPath(referencesDirOrUrl)
+          : path.resolve(referencesDirOrUrl);
 
-      const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
-      const content = await fs.readFile(filePath, 'utf8');
+        const filePath = resolveSafePath(baseReferencesDir, `${language}.md`);
+        const content = await fs.readFile(filePath, 'utf8');
 
-      if (referenceCache.size >= MAX_REFERENCE_CACHE_ENTRIES) {
-        const oldestKey = referenceCache.keys().next().value;
-        if (oldestKey) referenceCache.delete(oldestKey);
+        if (referenceCache.size >= MAX_REFERENCE_CACHE_ENTRIES) {
+          const oldestKey = referenceCache.keys().next().value;
+          if (oldestKey) referenceCache.delete(oldestKey);
+        }
+
+        referenceCache.set(cacheKey, content);
+        return content;
+      } finally {
+        inFlightReferenceReads.delete(cacheKey);
       }
-
-      referenceCache.set(cacheKey, content);
-      inFlightReferenceReads.delete(cacheKey);
-      return content;
     })();
     inFlightReferenceReads.set(cacheKey, inFlight);
   }
