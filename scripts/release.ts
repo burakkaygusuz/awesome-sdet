@@ -202,27 +202,6 @@ export function determineBumpTypeFromCommits(
   return 'patch';
 }
 
-export function determineNextBumpFromCommits(commits: string[]): 'patch' | 'minor' | 'major' {
-  const filtered = commits
-    .map((c) => c.trim())
-    .filter((c) => c.length > 0 && !c.startsWith('Merge branch') && !c.startsWith('Merge pull'));
-
-  if (filtered.length === 0) return 'patch';
-
-  const isMajor = filtered.some(
-    (c) =>
-      /^[a-z0-9_-]+(\([a-z0-9_-]+\))?!:/i.test(c) ||
-      /\bBREAKING CHANGE\b/i.test(c) ||
-      /^BREAKING-CHANGE:/i.test(c)
-  );
-  if (isMajor) return 'major';
-
-  const isMinor = filtered.some((c) => /^feat(\([a-z0-9_-]+\))?:/i.test(c));
-  if (isMinor) return 'minor';
-
-  return 'patch';
-}
-
 function execute(
   command: string,
   args: string[],
