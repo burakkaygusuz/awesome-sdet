@@ -129,7 +129,7 @@ function isMeaningfulAssertion(node: SyntaxNode): boolean {
   return false;
 }
 
-export function isPageObjectCode(code: string): boolean {
+function isPageObjectCode(code: string): boolean {
   const isExplicitTestClassOrBlock =
     /\bclass\s+\w*(?:Test|Tests|Spec|Specs|Scenario|TestSuite)\b/i.test(code) ||
     /\b(?:void|async|public|private|protected|def)\s+test\w*\s*\(/.test(code) ||

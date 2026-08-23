@@ -128,7 +128,7 @@ function isBrittleXpath(raw: string): boolean {
 
 const HASHED_CSS_PATTERNS = [/\.css-[a-z0-9]{4,}/i, /\.sc-[a-z0-9]{4,}/i, /\.styled-[a-z0-9]{4,}/i];
 
-export function isHashedCss(raw: string): boolean {
+function isHashedCss(raw: string): boolean {
   const clean = unquote(raw);
   if (HASHED_CSS_PATTERNS.some((p) => p.test(clean))) {
     return true;
