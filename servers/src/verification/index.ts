@@ -48,7 +48,7 @@ export async function verifyTestArtifact(rawRequest: unknown): Promise<Verificat
   try {
     const checks: VerificationCheck[] = [
       checkArbitraryWaits(code, framework, rootNode),
-      checkAssertions(code, framework, rootNode),
+      checkAssertions(code, framework, rootNode, request.artifactType),
       checkLocators(code, framework, rootNode),
       checkStateIsolation(code, framework, rootNode),
     ];
