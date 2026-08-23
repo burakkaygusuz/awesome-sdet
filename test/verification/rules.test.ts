@@ -561,5 +561,118 @@ describe('Invariant Rules Engine', () => {
       expect(check.passed).toBe(false);
       expect(check.evidence).toContain('.css-1a2b3c4d');
     });
+
+    it('detects chained and negated tautological assertions expect(true).not.toBe(false)', async () => {
+      const code = `
+        test('negated dummy test', async ({ page }) => {
+          await page.goto('/home');
+          expect(true).not.toBe(false);
+        });
+      `;
+      const check = checkAssertions(code, 'playwright', await parse(code, 'typescript'));
+      expect(check.passed).toBe(false);
+      expect(check.evidence).toContain('expect(true)');
+    });
+
+    it('detects concatenated and interpolated brittle XPath and CSS locators', async () => {
+      const codeConcatenated = `
+        const tag = 'table';
+        const idx = 2;
+        page.locator('//' + tag + '[' + idx + ']').click();
+      `;
+      const checkConcat = checkLocators(
+        codeConcatenated,
+        'playwright',
+        await parse(codeConcatenated, 'typescript')
+      );
+      expect(checkConcat.passed).toBe(false);
+
+      const codeTemplate = `
+        const base = '//body';
+        page.locator(\`\${base}/div[1]/button\`).click();
+      `;
+      const checkTemplate = checkLocators(
+        codeTemplate,
+        'playwright',
+        await parse(codeTemplate, 'typescript')
+      );
+      expect(checkTemplate.passed).toBe(false);
+    });
+
+    it('allows clean Page Object classes without assertions', async () => {
+      const code = `
+        import { Page, Locator } from '@playwright/test';
+
+        export class LoginPage {
+          readonly page: Page;
+          readonly usernameInput: Locator;
+          readonly submitButton: Locator;
+
+          constructor(page: Page) {
+            this.page = page;
+            this.usernameInput = page.getByLabel('Username');
+            this.submitButton = page.getByRole('button', { name: 'Log in' });
+          }
+
+          async login(username: string) {
+            await this.usernameInput.fill(username);
+            await this.submitButton.click();
+          }
+        }
+      `;
+      const check = checkAssertions(code, 'playwright', await parse(code, 'typescript'));
+      expect(check.passed).toBe(true);
+    });
+
+    it('flags Page Object classes with embedded assertions', async () => {
+      const code = `
+        export class DashboardPage {
+          constructor(private page: Page) {}
+
+          async verifyLoaded() {
+            await expect(this.page.getByRole('heading')).toBeVisible();
+          }
+        }
+      `;
+      const check = checkAssertions(code, 'playwright', await parse(code, 'typescript'));
+      expect(check.passed).toBe(false);
+      expect(check.evidence).toContain('assertions in Page Object');
+      expect(check.suggestion).toContain('Remove assertions from Page Object');
+    });
+
+    it('detects generalized positional XPaths across HTML5, web components, and functions', async () => {
+      const cases = [
+        `const input = page.locator('//form[1]/input[2]');`,
+        `const section = page.locator('//section[2]/article[1]');`,
+        `const card = page.locator('//app-root/mat-card[2]');`,
+        `const btn = page.locator('//button[last()]');`,
+        `const mobile = page.locator('//android.widget.TextView[1]');`,
+      ];
+
+      for (const snippet of cases) {
+        const check = checkLocators(snippet, 'playwright', await parse(snippet, 'typescript'));
+        expect(check.passed).toBe(false);
+      }
+    });
+
+    it('allows valid semantic attribute XPaths and basic CSS selectors', async () => {
+      const validCases = [
+        `const btn = page.locator("//button[@data-testid='submit']");`,
+        `const appiumBtn = page.locator("//android.widget.Button[@text='OK']");`,
+        `const link = page.locator("//a[@href='/dashboard/settings']");`,
+        `const body = page.locator('body');`,
+      ];
+
+      for (const snippet of validCases) {
+        const check = checkLocators(snippet, 'playwright', await parse(snippet, 'typescript'));
+        expect(check.passed).toBe(true);
+      }
+    });
+
+    it('detects mixed pseudo-class CSS combinations', async () => {
+      const mixedCss = `const el = page.locator('div:nth-child(1) > ul > li:nth-of-type(2)');`;
+      const check = checkLocators(mixedCss, 'playwright', await parse(mixedCss, 'typescript'));
+      expect(check.passed).toBe(false);
+    });
   });
 });
