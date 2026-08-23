@@ -54,6 +54,12 @@ export function handleCorsPreflight(
   return true;
 }
 
+export function getSingleHeader(header: string | string[] | undefined): string | undefined {
+  if (Array.isArray(header)) return header[0]?.trim();
+  if (typeof header === 'string') return header.trim();
+  return undefined;
+}
+
 const BASE64_SENTINEL = /^=\?base64\?([A-Za-z0-9+/=]+)\?=$/;
 
 /**

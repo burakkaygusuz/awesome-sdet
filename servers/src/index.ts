@@ -20,8 +20,8 @@ import {
 } from './http/security.js';
 import { handleServerDiscover, validateMcpRequest } from './http/request-guards.js';
 
-export const rawPort = process.env.PORT || '3000';
-export const PORT = Number.parseInt(rawPort, 10);
+const rawPort = process.env.PORT || '3000';
+const PORT = Number.parseInt(rawPort, 10);
 
 export const mcpServer = createMcpServer();
 
