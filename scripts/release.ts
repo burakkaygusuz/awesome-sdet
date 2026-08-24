@@ -298,11 +298,19 @@ export function commitAndTagRelease(version: string): void {
   execute('git', ['commit', '-m', `chore(release): bump version to ${version}`], {
     stdio: 'inherit',
   });
-  console.log(`[git] Pushing release commit to origin HEAD...`);
+  console.log(`[git] Pushing release commit to origin...`);
   try {
     execute('git', ['push', 'origin', 'HEAD'], { stdio: 'inherit' });
   } catch (err) {
-    console.warn(`[warning] Failed to push HEAD commit: ${String(err)}`);
+    console.warn(
+      `[warning] Direct push to origin HEAD was declined (e.g. branch protection): ${String(err)}`
+    );
+  }
+  try {
+    execute('git', ['push', 'origin', 'HEAD:refs/heads/develop'], { stdio: 'inherit' });
+    console.log(`[git] Synchronized release commit to origin/develop.`);
+  } catch (err) {
+    console.warn(`[warning] Could not push release commit to develop: ${String(err)}`);
   }
   pushTagAndRelease(version);
 }

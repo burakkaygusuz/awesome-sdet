@@ -46,11 +46,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm run release -- --auto
 
-      - name: Sync Release & Tags to Develop Branch
+      - name: Push Tags and Sync Develop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch origin develop:develop || true
-          git checkout develop || true
-          git merge origin/main -m "chore(release): sync main release to develop [skip ci]" || git rebase origin/main || true
-          git push origin develop --tags || true
+          git push origin --tags || true
+          git push origin HEAD:refs/heads/develop || true
