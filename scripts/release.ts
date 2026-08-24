@@ -298,6 +298,12 @@ export function commitAndTagRelease(version: string): void {
   execute('git', ['commit', '-m', `chore(release): bump version to ${version}`], {
     stdio: 'inherit',
   });
+  console.log(`[git] Pushing release commit to origin HEAD...`);
+  try {
+    execute('git', ['push', 'origin', 'HEAD'], { stdio: 'inherit' });
+  } catch (err) {
+    console.warn(`[warning] Failed to push HEAD commit: ${String(err)}`);
+  }
   pushTagAndRelease(version);
 }
 
