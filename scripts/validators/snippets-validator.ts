@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Language, Parser } from 'web-tree-sitter';
-
 import {
   ensureParserInitialized,
+  Language,
   loadGrammarLanguage,
+  Parser,
   resolveGrammar,
   type SupportedGrammar,
   WASM_FILE_BY_GRAMMAR,

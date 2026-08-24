@@ -204,3 +204,4 @@ export function walkAst(rootNode: Node, visitor: (node: Node) => boolean | void)
 
 export type SyntaxNode = Node;
 export type { Tree };
+export { Language, Parser };
