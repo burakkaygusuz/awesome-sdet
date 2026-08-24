@@ -1,231 +1,30 @@
 import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import {
+  calculateNextVersion,
+  determineBumpTypeFromCommits,
+  getVersionTargets,
+  syncVersions,
+} from './release/semver.js';
+import {
+  assertCleanWorkingTree,
+  commitAndTagRelease,
+  execute,
+  getCommitsSinceLastTag,
+  pushTagAndRelease,
+} from './release/git-operations.js';
+import { validateReleasePackage } from './release/package-stage.js';
 
-const RELEASE_RUNTIME_DEPENDENCIES = [
-  '@modelcontextprotocol/node',
-  '@modelcontextprotocol/server',
-  'zod',
-] as const;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function readJsonRecord(filePath: string): Record<string, unknown> {
-  const parsed: unknown = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-  if (!isRecord(parsed)) {
-    throw new Error(`Expected a JSON object in "${filePath}"`);
-  }
-
-  return parsed;
-}
-
-export interface VersionTargets {
-  rootPkgPath: string;
-  pluginJsonPath: string;
-  serversPkgPath: string;
-}
-
-export function getVersionTargets(rootDir = process.cwd()): VersionTargets {
-  return {
-    rootPkgPath: path.resolve(rootDir, 'package.json'),
-    pluginJsonPath: path.resolve(rootDir, 'plugin.json'),
-    serversPkgPath: path.resolve(rootDir, 'servers/package.json'),
-  };
-}
-
-export function calculateNextVersion(currentVersion: string, bumpTypeOrVersion: string): string {
-  const cleanCurrent = (
-    currentVersion.startsWith('v') ? currentVersion.slice(1) : currentVersion
-  ).trim();
-  const parts = cleanCurrent.split('.').map((p) => Number.parseInt(p, 10));
-
-  if (parts.length !== 3 || parts.some((p) => Number.isNaN(p))) {
-    throw new Error(`Invalid current SemVer version: "${currentVersion}"`);
-  }
-
-  const [major, minor, patch] = parts;
-  const input = (bumpTypeOrVersion.startsWith('v') ? bumpTypeOrVersion.slice(1) : bumpTypeOrVersion)
-    .trim()
-    .toLowerCase();
-
-  switch (input) {
-    case 'patch':
-      return `${major}.${minor}.${patch + 1}`;
-    case 'minor':
-      return `${major}.${minor + 1}.0`;
-    case 'major':
-      return `${major + 1}.0.0`;
-    default: {
-      const explicitParts = input.split('.').map((p) => Number.parseInt(p, 10));
-      if (explicitParts.length !== 3 || explicitParts.some((p) => Number.isNaN(p))) {
-        throw new Error(
-          `Invalid bump type or SemVer version: "${bumpTypeOrVersion}". Expected "patch", "minor", "major", or "X.Y.Z".`
-        );
-      }
-      return input;
-    }
-  }
-}
-
-export function syncVersions(
-  newVersion: string,
-  targets: VersionTargets = getVersionTargets()
-): { previousVersion: string; newVersion: string } {
-  const rootPkg = JSON.parse(fs.readFileSync(targets.rootPkgPath, 'utf8'));
-  const previousVersion = rootPkg.version;
-
-  rootPkg.version = newVersion;
-  fs.writeFileSync(targets.rootPkgPath, JSON.stringify(rootPkg, null, 2) + '\n', 'utf8');
-
-  if (fs.existsSync(targets.pluginJsonPath)) {
-    const pluginJson = JSON.parse(fs.readFileSync(targets.pluginJsonPath, 'utf8'));
-    pluginJson.version = newVersion;
-    fs.writeFileSync(targets.pluginJsonPath, JSON.stringify(pluginJson, null, 2) + '\n', 'utf8');
-  }
-
-  if (fs.existsSync(targets.serversPkgPath)) {
-    const serversPkg = JSON.parse(fs.readFileSync(targets.serversPkgPath, 'utf8'));
-    serversPkg.version = newVersion;
-    fs.writeFileSync(targets.serversPkgPath, JSON.stringify(serversPkg, null, 2) + '\n', 'utf8');
-  }
-
-  return { previousVersion, newVersion };
-}
-
-export function stageReleasePackage(rootDir: string, stagingDir: string): string {
-  const rootPackage = readJsonRecord(path.resolve(rootDir, 'package.json'));
-  const declaredFiles = rootPackage.files;
-
-  if (
-    !Array.isArray(declaredFiles) ||
-    !declaredFiles.every((file): file is string => typeof file === 'string' && file.length > 0)
-  ) {
-    throw new Error('package.json must declare a non-empty string "files" array');
-  }
-
-  const packageDir = path.resolve(stagingDir, 'package');
-  fs.mkdirSync(packageDir, { recursive: true });
-
-  for (const relativePath of new Set(['package.json', ...declaredFiles])) {
-    const sourcePath = path.resolve(rootDir, relativePath);
-    const sourceRelativePath = path.relative(path.resolve(rootDir), sourcePath);
-    const destinationPath = path.resolve(packageDir, relativePath);
-    const destinationRelativePath = path.relative(packageDir, destinationPath);
-
-    if (
-      sourceRelativePath.startsWith('..') ||
-      path.isAbsolute(sourceRelativePath) ||
-      destinationRelativePath.startsWith('..') ||
-      path.isAbsolute(destinationRelativePath)
-    ) {
-      throw new Error(`Release file path escapes its package root: "${relativePath}"`);
-    }
-
-    if (!fs.existsSync(sourcePath)) {
-      throw new Error(`Release artifact is missing "${relativePath}"`);
-    }
-
-    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
-    fs.cpSync(sourcePath, destinationPath, { recursive: true });
-  }
-
-  return packageDir;
-}
-
-export function verifyReleasePackage(packageDir: string): void {
-  const entrypoint = path.join(packageDir, 'servers/dist/index.js');
-  if (!fs.existsSync(entrypoint) || !fs.statSync(entrypoint).isFile()) {
-    throw new Error('Release artifact is missing "servers/dist/index.js"');
-  }
-
-  const packageJson = readJsonRecord(path.join(packageDir, 'package.json'));
-  const dependencies = packageJson.dependencies;
-  if (
-    !isRecord(dependencies) ||
-    RELEASE_RUNTIME_DEPENDENCIES.some((dependency) => typeof dependencies[dependency] !== 'string')
-  ) {
-    throw new Error('Release artifact is missing MCP runtime dependencies');
-  }
-
-  const manifest = readJsonRecord(path.join(packageDir, 'mcp.json'));
-  const servers = manifest.mcpServers;
-  const stdioServer = isRecord(servers) ? servers['sdet-mcp'] : undefined;
-  const args = isRecord(stdioServer) ? stdioServer.args : undefined;
-
-  if (
-    !isRecord(stdioServer) ||
-    stdioServer.command !== 'node' ||
-    !Array.isArray(args) ||
-    args[0] !== '${PLUGIN_ROOT}/servers/dist/index.js'
-  ) {
-    throw new Error('mcp.json does not target the packaged MCP entrypoint');
-  }
-}
-
-export function validateReleasePackage(rootDir = process.cwd()): void {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awesome-sdet-release-'));
-  try {
-    const packageDir = stageReleasePackage(rootDir, tempDir);
-    verifyReleasePackage(packageDir);
-    console.log(`[verify] Staged release package structure verified successfully.`);
-  } finally {
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  }
-}
-
-export function determineBumpTypeFromCommits(
-  commits: string[]
-): 'major' | 'minor' | 'patch' | null {
-  const filtered = commits
-    .map((c) => c.trim())
-    .filter((c) => c.length > 0 && !c.startsWith('chore(release):') && !c.includes('[skip ci]'));
-
-  if (filtered.length === 0) {
-    return null;
-  }
-
-  const isMajor = filtered.some(
-    (c) =>
-      /^[a-z0-9_-]+(\([a-z0-9_-]+\))?!:/i.test(c) ||
-      /\bBREAKING CHANGE\b/i.test(c) ||
-      /^BREAKING-CHANGE:/i.test(c)
-  );
-  if (isMajor) return 'major';
-
-  const isMinor = filtered.some((c) => /^feat(\([a-z0-9_-]+\))?:/i.test(c));
-  if (isMinor) return 'minor';
-
-  return 'patch';
-}
-
-function execute(
-  command: string,
-  args: string[],
-  options?: Parameters<typeof execFileSync>[2]
-): string {
-  const result = execFileSync(command, args, options);
-  return result ? result.toString() : '';
-}
-
-export function getCommitsSinceLastTag(): string[] {
-  let range = '';
-  try {
-    const latestTag = execute('git', ['describe', '--tags', '--abbrev=0'], {
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'ignore'],
-    }).trim();
-    if (latestTag) range = `${latestTag}..HEAD`;
-  } catch {
-    // initial repo commit range
-  }
-  const args = range ? ['log', range, '--format=%s'] : ['log', '--format=%s'];
-  const log = execute('git', args, { encoding: 'utf8' }).trim();
-  return log ? log.split('\n') : [];
-}
+export {
+  calculateNextVersion,
+  determineBumpTypeFromCommits,
+  getVersionTargets,
+  syncVersions,
+  assertCleanWorkingTree,
+  commitAndTagRelease,
+  getCommitsSinceLastTag,
+  pushTagAndRelease,
+  validateReleasePackage,
+};
 
 export interface ReleaseOptions {
   bumpTypeOrVersion?: string;
@@ -250,12 +49,19 @@ export function parseReleaseOptions(argv: string[]): ReleaseOptions {
   };
 }
 
-export function assertCleanWorkingTree(allowDirty = false): void {
-  if (allowDirty) return;
-  const status = execute('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim();
-  if (status.length > 0) {
-    throw new Error('Working tree has uncommitted changes. Commit or stash them first.');
+export function resolveTargetVersion(
+  currentVersion: string,
+  options: ReleaseOptions
+): string | null {
+  if (options.isAuto) {
+    const commits = getCommitsSinceLastTag();
+    const autoBump = determineBumpTypeFromCommits(commits);
+    if (!autoBump) return null;
+    return calculateNextVersion(currentVersion, autoBump);
   }
+
+  const bump = options.bumpTypeOrVersion || 'patch';
+  return calculateNextVersion(currentVersion, bump);
 }
 
 export function buildAndValidateRelease(): void {
@@ -266,86 +72,6 @@ export function buildAndValidateRelease(): void {
   execute('pnpm', ['test'], { stdio: 'inherit' });
   execute('pnpm', ['run', 'validate'], { stdio: 'inherit' });
   validateReleasePackage();
-}
-
-export function pushTagAndRelease(version: string): void {
-  try {
-    const existing = execute('git', ['tag', '-l', `v${version}`], {
-      encoding: 'utf8',
-    }).trim();
-    if (existing) {
-      console.log(`[info] Tag v${version} already exists. Skipping tag creation.`);
-      return;
-    }
-  } catch {
-    // ignore git tag check error
-  }
-
-  console.log(`[doc] Creating git tag v${version}...`);
-  execute('git', ['tag', '-a', `v${version}`, '-m', `Release v${version}`], {
-    stdio: 'inherit',
-  });
-  console.log(`[git] Pushing tag to origin...`);
-  execute('git', ['push', 'origin', `v${version}`], { stdio: 'inherit' });
-  publishGitHubRelease(version);
-}
-
-export function commitAndTagRelease(version: string): void {
-  console.log(`\n[doc] Creating release commit and git tag...`);
-  execute('git', ['add', 'package.json', 'plugin.json', 'servers/package.json'], {
-    stdio: 'inherit',
-  });
-  execute('git', ['commit', '-m', `chore(release): bump version to ${version}`], {
-    stdio: 'inherit',
-  });
-  console.log(`[git] Pushing release commit to origin...`);
-  try {
-    execute('git', ['push', 'origin', 'HEAD'], { stdio: 'inherit' });
-  } catch (err) {
-    console.warn(
-      `[warning] Direct push to origin HEAD was declined (e.g. branch protection): ${String(err)}`
-    );
-  }
-  try {
-    execute('git', ['push', 'origin', 'HEAD:refs/heads/develop'], { stdio: 'inherit' });
-    console.log(`[git] Synchronized release commit to origin/develop.`);
-  } catch (err) {
-    console.warn(`[warning] Could not push release commit to develop: ${String(err)}`);
-  }
-  pushTagAndRelease(version);
-}
-
-export function publishGitHubRelease(version: string): void {
-  console.log(`[release] Creating GitHub Release with gh CLI...`);
-  try {
-    execute(
-      'gh',
-      ['release', 'create', `v${version}`, '--title', `v${version}`, '--generate-notes'],
-      {
-        stdio: 'inherit',
-      }
-    );
-    console.log(`[release] Published release v${version} to GitHub.`);
-  } catch (err) {
-    console.warn(`[warning] Failed to publish GitHub Release via gh CLI: ${String(err)}`);
-  }
-}
-
-export function resolveTargetVersion(
-  currentVersion: string,
-  options: ReleaseOptions
-): string | null {
-  if (options.isAuto) {
-    const commits = getCommitsSinceLastTag();
-    const autoBump = determineBumpTypeFromCommits(commits);
-    if (!autoBump) {
-      return null;
-    }
-    return calculateNextVersion(currentVersion, autoBump);
-  }
-
-  const bump = options.bumpTypeOrVersion || 'patch';
-  return calculateNextVersion(currentVersion, bump);
 }
 
 function handleTagOnlyRelease(currentVersion: string, isDryRun: boolean): void {
@@ -408,7 +134,6 @@ export async function runRelease(
   }
 
   commitAndTagRelease(newVersion);
-  publishGitHubRelease(newVersion);
 }
 
 const isDirectExecution =
@@ -421,3 +146,8 @@ if (isDirectExecution) {
     process.exit(1);
   });
 }
+
+export { type VersionTargets } from './release/semver.js';
+export { verifyReleasePackage, stageReleasePackage } from './release/package-stage.js';
+
+export { publishGitHubRelease } from './release/git-operations.js';
