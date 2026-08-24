@@ -24,29 +24,105 @@ function unquote(raw: string): string {
   return trimmed;
 }
 
+const BRITTLE_ROOT_XPATH_PATTERN = /^\/(?:\/)?(?:html|body)(?:\/|$)/i;
+const BRITTLE_STRUCTURAL_PATTERN = /\/(?:tbody|thead|tfoot)\//i;
+
+function isBrittlePredicate(content: string): boolean {
+  const trimmed = content.trim();
+  return !(
+    trimmed.startsWith('@') ||
+    trimmed.includes('=') ||
+    trimmed.startsWith('contains(') ||
+    trimmed.startsWith('starts-with(') ||
+    trimmed.startsWith('normalize-space(') ||
+    trimmed.startsWith('text(') ||
+    trimmed.startsWith('not(')
+  );
+}
+
+function hasBrittlePredicate(xpath: string): boolean {
+  let start = -1;
+  for (let i = 0; i < xpath.length; i++) {
+    if (xpath[i] === '[') {
+      start = i + 1;
+    } else if (xpath[i] === ']' && start !== -1) {
+      const pred = xpath.slice(start, i);
+      if (isBrittlePredicate(pred)) {
+        return true;
+      }
+      start = -1;
+    }
+  }
+  return false;
+}
+
+function stripBrackets(input: string): string {
+  let result = '';
+  let depth = 0;
+  for (const ch of input) {
+    if (ch === '[') {
+      depth++;
+    } else if (ch === ']') {
+      depth = Math.max(0, depth - 1);
+    } else if (depth === 0) {
+      result += ch;
+    }
+  }
+  return result;
+}
+
+function sanitizeTemplateString(raw: string): string {
+  let result = '';
+  let depth = 0;
+  for (const ch of raw) {
+    if (ch === '{') {
+      depth++;
+      if (depth === 1) result += 'var';
+    } else if (ch === '}') {
+      depth = Math.max(0, depth - 1);
+    } else if (depth === 0 && ch !== '$') {
+      result += ch;
+    }
+  }
+  return result;
+}
+
 function isBrittleXpath(raw: string): boolean {
-  const clean = unquote(raw);
-  if (
-    clean.startsWith('//html') ||
-    clean.startsWith('/html') ||
-    clean.startsWith('//body') ||
-    clean.startsWith('/body')
-  ) {
+  const clean = unquote(raw).trim();
+  if (!clean) return false;
+
+  if (BRITTLE_ROOT_XPATH_PATTERN.test(clean)) {
     return true;
   }
-  if (clean.startsWith('//')) {
-    const parts = clean.split('/').filter(Boolean);
-    return parts.length >= 2 || parts.some((p) => p.includes('[') && p.includes(']'));
-  }
+
   if (
-    clean.startsWith('/') &&
-    (clean.includes('/div[') ||
-      clean.includes('/table[') ||
-      clean.includes('/tbody/') ||
-      clean.includes('/span['))
+    !clean.startsWith('//') &&
+    !clean.startsWith('.//') &&
+    !clean.includes('[') &&
+    !clean.includes(':') &&
+    !clean.includes('(')
   ) {
+    return false;
+  }
+
+  const unquoted = clean.replace(/'[^']*'|"[^"]*"/g, "''");
+
+  if (hasBrittlePredicate(unquoted)) {
     return true;
   }
+
+  if (BRITTLE_STRUCTURAL_PATTERN.test(unquoted)) {
+    return true;
+  }
+
+  if (unquoted.startsWith('//') || unquoted.startsWith('.//')) {
+    const structural = stripBrackets(unquoted);
+    const parts = structural.split('/').filter(Boolean);
+    if (parts.length >= 3) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -57,17 +133,36 @@ function isHashedCss(raw: string): boolean {
   if (HASHED_CSS_PATTERNS.some((p) => p.test(clean))) {
     return true;
   }
-  return clean.split(':nth-child').length > 2 || clean.split(':nth-of-type').length > 2;
+  const pseudoMatches = clean.match(/:nth-child|:nth-of-type/g);
+  return (pseudoMatches?.length ?? 0) >= 2;
 }
 
-function inspectStringNode(node: SyntaxNode): string | null {
-  const isString =
-    node.type === 'string' || node.type === 'string_literal' || node.type === 'template_string';
-  if (!isString) return null;
+function evaluateStringExpression(node: SyntaxNode): string | null {
+  if (node.type === 'string' || node.type === 'string_literal' || node.type === 'template_string') {
+    return sanitizeTemplateString(unquote(node.text));
+  }
 
-  const text = node.text;
-  if (isHashedCss(text) || isBrittleXpath(text)) {
-    return text;
+  if (
+    node.type === 'binary_expression' ||
+    node.type === 'binary_operator' ||
+    node.type === 'binary'
+  ) {
+    const left = node.childForFieldName('left') ?? node.namedChildren[0];
+    const right = node.childForFieldName('right') ?? node.namedChildren[1];
+    if (left && right) {
+      const leftStr = evaluateStringExpression(left) ?? unquote(left.text);
+      const rightStr = evaluateStringExpression(right) ?? unquote(right.text);
+      return leftStr + rightStr;
+    }
+  }
+
+  return null;
+}
+
+function inspectLocatorNode(node: SyntaxNode): string | null {
+  const evalStr = evaluateStringExpression(node);
+  if (evalStr && (isHashedCss(evalStr) || isBrittleXpath(evalStr))) {
+    return node.text;
   }
   return null;
 }
@@ -95,7 +190,7 @@ export function checkLocators(
   let evidence: string | null = null;
 
   walkAst(rootNode, (node) => {
-    const match = inspectStringNode(node);
+    const match = inspectLocatorNode(node);
     if (match) {
       evidence = match;
       return false;

@@ -26,8 +26,7 @@ function computeQualityScore(code: string, checks: VerificationCheck[]): number 
     penalty += 10;
   }
 
-  const warningChecks = checks.filter((c) => c.severity === 'warning');
-  const failedWarnings = warningChecks.filter((c) => !c.passed).length;
+  const failedWarnings = checks.filter((c) => c.severity === 'warning' && !c.passed).length;
   penalty += failedWarnings * 10;
 
   const passedChecks = checks.filter((c) => c.passed).length;
@@ -48,7 +47,7 @@ export async function verifyTestArtifact(rawRequest: unknown): Promise<Verificat
   try {
     const checks: VerificationCheck[] = [
       checkArbitraryWaits(code, framework, rootNode),
-      checkAssertions(code, framework, rootNode),
+      checkAssertions(code, framework, rootNode, request.artifactType),
       checkLocators(code, framework, rootNode),
       checkStateIsolation(code, framework, rootNode),
     ];

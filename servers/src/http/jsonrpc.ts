@@ -48,21 +48,16 @@ export function payloadTooLargeReply(): JsonRpcErrorReply {
   };
 }
 
-export interface EnvelopeValidationResult {
-  ok: boolean;
-  code?: number;
-  message?: string;
-  protocolVersion?: string;
-}
-
-export function extractBodyProtocolVersion(payload: Record<string, unknown>): string | undefined {
-  if (!isPlainObject(payload?.params)) return undefined;
-  const meta = payload.params._meta;
-  if (!isPlainObject(meta)) return undefined;
-
-  const version = meta[PROTOCOL_VERSION_META_KEY];
-  return typeof version === 'string' && version.trim().length > 0 ? version.trim() : undefined;
-}
+export type EnvelopeValidationResult =
+  | {
+      readonly ok: true;
+      readonly protocolVersion?: string;
+    }
+  | {
+      readonly ok: false;
+      readonly code: number;
+      readonly message: string;
+    };
 
 export function validateRequestEnvelope(
   payload: Record<string, unknown>

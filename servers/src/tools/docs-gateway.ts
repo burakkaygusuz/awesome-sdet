@@ -46,14 +46,14 @@ export function registerUniversalDocsGateway(server: McpServer): void {
 
       const targetDomain = sanitizeDomain(
         domain,
-        frameworkConfig.domains as readonly string[],
+        frameworkConfig.domains,
         frameworkConfig.defaultDomain,
         framework
       );
 
       const targetLanguage = sanitizeLanguage(
         language,
-        frameworkConfig.languages as readonly string[],
+        frameworkConfig.languages,
         frameworkConfig.defaultLanguage,
         framework
       );

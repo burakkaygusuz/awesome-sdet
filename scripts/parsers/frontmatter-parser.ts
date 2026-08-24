@@ -1,12 +1,16 @@
 import YAML from 'yaml';
 import type { z } from 'zod';
 
+export type FrontmatterParseResult<T> =
+  | { readonly hasError: false; readonly frontmatter: T }
+  | { readonly hasError: true; readonly frontmatter: null };
+
 export function parseMarkdownFrontmatter<T>(
   content: string,
   relPath: string,
   schema: z.ZodType<T>,
   entityLabel: string
-): { frontmatter: T | null; hasError: boolean } {
+): FrontmatterParseResult<T> {
   if (!content.startsWith('---')) {
     console.error(`Error: ${relPath}: Missing frontmatter start delimiter '---'`);
     return { frontmatter: null, hasError: true };

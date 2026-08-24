@@ -1,7 +1,13 @@
 import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url);
-const pkg = require('../package.json') as { name: string; version: string; description?: string };
+interface PackageJson {
+  name: string;
+  version: string;
+  description?: string;
+}
+
+const requireModule = createRequire(import.meta.url);
+const pkg: PackageJson = requireModule('../package.json');
 
 export const SERVER_NAME = 'sdet-mcp';
 export const SERVER_VERSION: string = pkg.version;

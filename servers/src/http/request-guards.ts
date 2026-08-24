@@ -7,7 +7,7 @@ import {
   type JsonRpcErrorReply,
   type RpcPayload,
 } from './jsonrpc.js';
-import { decodeHeaderValue } from './security.js';
+import { decodeHeaderValue, getSingleHeader } from './security.js';
 import {
   PROTOCOL_VERSION_2026_07_28,
   SERVER_DESCRIPTION,
@@ -128,9 +128,11 @@ function checkMethodAndHeaders(
   }
 
   if (mcpNameHeader) {
-    const paramTarget = (
-      (jsonPayload.params?.name ?? jsonPayload.params?.uri) as string | undefined
-    )?.trim();
+    const rawName = jsonPayload.params?.name;
+    const rawUri = jsonPayload.params?.uri;
+    const paramName = typeof rawName === 'string' ? rawName : undefined;
+    const paramUri = typeof rawUri === 'string' ? rawUri : undefined;
+    const paramTarget = (paramName ?? paramUri)?.trim();
     if (paramTarget && paramTarget !== mcpNameHeader) {
       return {
         status: 400,
@@ -158,7 +160,7 @@ function checkRequestEnvelope(
     return {
       status: 400,
       id: jsonPayload.id ?? null,
-      error: { code: envelope.code ?? -32602, message: envelope.message ?? 'Invalid params' },
+      error: { code: envelope.code, message: envelope.message },
     };
   }
 
@@ -180,12 +182,11 @@ export function validateMcpRequest(
   reqHeaders: http.IncomingHttpHeaders,
   jsonPayload: RpcPayload
 ): JsonRpcErrorReply | undefined {
-  const protocolVersionHeader = (
-    (reqHeaders['mcp-protocol-version'] as string | undefined)?.split(',')[0] ?? ''
-  ).trim();
-  const mcpMethodHeader = (reqHeaders['mcp-method'] as string | undefined)?.trim();
+  const rawProto = getSingleHeader(reqHeaders['mcp-protocol-version']);
+  const protocolVersionHeader = (rawProto?.split(',')[0] ?? '').trim();
+  const mcpMethodHeader = getSingleHeader(reqHeaders['mcp-method']);
   const effectiveMethod = jsonPayload.method ?? mcpMethodHeader;
-  const rawMcpNameHeader = (reqHeaders['mcp-name'] as string | undefined)?.trim();
+  const rawMcpNameHeader = getSingleHeader(reqHeaders['mcp-name']);
   const mcpNameHeader = rawMcpNameHeader ? decodeHeaderValue(rawMcpNameHeader) : undefined;
 
   return (

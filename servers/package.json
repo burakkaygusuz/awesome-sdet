@@ -18,7 +18,7 @@
     "@modelcontextprotocol/node": "^2.0.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "@repomix/tree-sitter-wasms": "^0.1.17",
-    "web-tree-sitter": "^0.26.12",
+    "web-tree-sitter": "^0.26.13",
     "zod": "^4.4.3"
   },
   "devDependencies": {

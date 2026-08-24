@@ -14,14 +14,15 @@ import {
 import {
   collectBodyWithinLimit,
   extractHostAndOrigin,
+  getSingleHeader,
   handleCorsPreflight,
   isLocalHostAndOrigin,
   MAX_BODY_BYTES,
 } from './http/security.js';
 import { handleServerDiscover, validateMcpRequest } from './http/request-guards.js';
 
-export const rawPort = process.env.PORT || '3000';
-export const PORT = Number.parseInt(rawPort, 10);
+const rawPort = process.env.PORT || '3000';
+const PORT = Number.parseInt(rawPort, 10);
 
 export const mcpServer = createMcpServer();
 
@@ -65,8 +66,7 @@ export async function handleMcpPostRequest(
       return;
     }
 
-    const effectiveMethod =
-      jsonPayload.method ?? (req.headers['mcp-method'] as string | undefined)?.trim();
+    const effectiveMethod = jsonPayload.method ?? getSingleHeader(req.headers['mcp-method']);
     if (effectiveMethod === 'server/discover') {
       handleServerDiscover(res, jsonPayload);
       return;

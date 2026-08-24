@@ -135,15 +135,11 @@ export async function validateAgentFile(
   const relPath = path.relative(rootDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
 
-  const { frontmatter, hasError: parseError } = parseMarkdownFrontmatter(
-    content,
-    relPath,
-    AgentFrontmatterSchema,
-    'Agent'
-  );
-  if (parseError || !frontmatter) {
+  const parseResult = parseMarkdownFrontmatter(content, relPath, AgentFrontmatterSchema, 'Agent');
+  if (parseResult.hasError) {
     return { agent: null, hasError: true };
   }
+  const frontmatter = parseResult.frontmatter;
 
   const metaError = validateAgentMetadata(frontmatter, filePath, relPath);
   const bansError = validateAgentContentBans(content, relPath);

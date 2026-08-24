@@ -36,7 +36,7 @@ export interface ExtractedDocsResult {
 /**
  * Extracts code blocks from a markdown text chunk.
  */
-export function extractCodeBlocksFromChunk(
+function extractCodeBlocksFromChunk(
   text: string,
   fallbackLanguage: string
 ): Array<{ language: string; code: string }> {
@@ -58,10 +58,7 @@ export function extractCodeBlocksFromChunk(
 /**
  * Parses markdown into hierarchical sections based on headings (#, ##, ###).
  */
-export function parseMarkdownSections(
-  markdown: string,
-  defaultLanguage: string
-): MarkdownSection[] {
+function parseMarkdownSections(markdown: string, defaultLanguage: string): MarkdownSection[] {
   const sections: MarkdownSection[] = [];
   const lines = markdown.split('\n');
   let currentHeading = 'Overview';
@@ -112,7 +109,7 @@ export function parseMarkdownSections(
  * Filters sections by a keyword or symbol query.
  * Matches against section heading, content, and code snippet text.
  */
-export function filterMarkdownSections(
+function filterMarkdownSections(
   sections: readonly MarkdownSection[],
   query?: string
 ): MarkdownSection[] {
@@ -155,10 +152,7 @@ export function extractStructuredDocs(
   const filteredSections = filterMarkdownSections(sections, query);
   const matchedHeadings = filteredSections.map((s) => s.heading);
 
-  const codeSnippets: Array<{ language: string; code: string }> = [];
-  for (const section of filteredSections) {
-    codeSnippets.push(...section.codeSnippets);
-  }
+  const codeSnippets = filteredSections.flatMap((s) => s.codeSnippets);
 
   let renderedMarkdown: string;
   if (query) {
@@ -206,7 +200,7 @@ export const SAFE_READONLY_ANNOTATIONS: ToolAnnotations = Object.freeze({
   openWorldHint: false,
 });
 
-export const LANGUAGE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
+const LANGUAGE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   js: 'javascript',
   node: 'javascript',
   ts: 'typescript',
@@ -251,14 +245,21 @@ function validateSafeParam(raw: unknown, paramType: 'language' | 'domain'): void
   }
 }
 
-function resolveSafeOption<const T extends readonly string[]>(
+export function isAllowedOption<T extends string>(
+  value: string,
+  allowed: readonly T[]
+): value is T {
+  return (allowed as readonly string[]).includes(value);
+}
+
+function resolveSafeOption(
   raw: string | undefined | null,
-  allowed: T,
+  allowed: readonly string[],
   paramType: 'language' | 'domain',
-  defaultVal?: T[number],
+  defaultVal?: string,
   frameworkName?: string,
   aliasMap?: Readonly<Record<string, string>>
-): T[number] {
+): string {
   validateSafeParam(raw, paramType);
   const normalized = (raw || '').toLowerCase().trim();
   if (!normalized) {
@@ -267,8 +268,8 @@ function resolveSafeOption<const T extends readonly string[]>(
     throw new Error(`${typeLabel} is required. Allowed ${paramType}s: ${allowed.join(', ')}.`);
   }
 
-  const canonical = (aliasMap?.[normalized] ?? normalized) as T[number];
-  if ((allowed as readonly string[]).includes(canonical)) {
+  const canonical = aliasMap?.[normalized] ?? normalized;
+  if (isAllowedOption(canonical, allowed)) {
     return canonical;
   }
 
@@ -283,12 +284,12 @@ function resolveSafeOption<const T extends readonly string[]>(
  * Validates and normalizes target programming language,
  * rejecting path traversal sequences and unsupported values.
  */
-export function sanitizeLanguage<const T extends readonly string[]>(
+export function sanitizeLanguage(
   rawLanguage: string | undefined | null,
-  allowed: T,
-  defaultLanguage?: T[number],
+  allowed: readonly string[],
+  defaultLanguage?: string,
   frameworkName?: string
-): T[number] {
+): string {
   return resolveSafeOption(
     rawLanguage,
     allowed,
@@ -303,16 +304,16 @@ export function sanitizeLanguage<const T extends readonly string[]>(
  * Validates and normalizes target documentation domain,
  * rejecting path traversal sequences and unsupported values.
  */
-export function sanitizeDomain<const T extends readonly string[]>(
+export function sanitizeDomain(
   rawDomain: string | undefined | null,
-  allowed: T,
-  defaultDomain?: T[number],
+  allowed: readonly string[],
+  defaultDomain?: string,
   frameworkName?: string
-): T[number] {
+): string {
   return resolveSafeOption(rawDomain, allowed, 'domain', defaultDomain, frameworkName);
 }
 
-export const MAX_REFERENCE_CACHE_ENTRIES = 256;
+const MAX_REFERENCE_CACHE_ENTRIES = 256;
 const referenceCache = new Map<string, string>();
 const inFlightReferenceReads = new Map<string, Promise<string>>();
 

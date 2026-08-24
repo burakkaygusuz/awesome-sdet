@@ -17,7 +17,7 @@ export const WASM_FILE_BY_GRAMMAR: Record<SupportedGrammar, string> = {
   ruby: 'tree-sitter-ruby.wasm',
 };
 
-export const GRAMMAR_BY_LANG: Record<string, SupportedGrammar> = {
+const GRAMMAR_BY_LANG: Record<string, SupportedGrammar> = {
   typescript: 'tsx',
   ts: 'tsx',
   tsx: 'tsx',
@@ -204,3 +204,4 @@ export function walkAst(rootNode: Node, visitor: (node: Node) => boolean | void)
 
 export type SyntaxNode = Node;
 export type { Tree };
+export { Language, Parser };

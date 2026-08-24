@@ -7,12 +7,15 @@ import {
   type Skill,
   type SkillFrontmatter,
 } from '../schemas.js';
-import { parseMarkdownFrontmatter } from '../parsers/frontmatter-parser.js';
+import {
+  parseMarkdownFrontmatter,
+  type FrontmatterParseResult,
+} from '../parsers/frontmatter-parser.js';
 
 export function parseFrontmatter(
   content: string,
   relPath: string
-): { frontmatter: SkillFrontmatter | null; hasError: boolean } {
+): FrontmatterParseResult<SkillFrontmatter> {
   return parseMarkdownFrontmatter(content, relPath, SkillFrontmatterSchema, 'Skill');
 }
 
@@ -23,11 +26,12 @@ export async function validateSkillFile(
 ): Promise<{ skill: Skill | null; hasError: boolean; declaredFrameworks?: string[] }> {
   const relPath = path.relative(skillsDir, filePath);
   const content = await fs.readFile(filePath, 'utf8');
-  const { frontmatter, hasError: parseError } = parseFrontmatter(content, relPath);
+  const parseResult = parseFrontmatter(content, relPath);
 
-  if (parseError || !frontmatter) {
+  if (parseResult.hasError) {
     return { skill: null, hasError: true, declaredFrameworks: [] };
   }
+  const frontmatter = parseResult.frontmatter;
 
   let hasError = false;
   const name = frontmatter.name;
@@ -112,7 +116,7 @@ export async function validateSkillFile(
     hasError = true;
   }
 
-  const skill: Skill | null = hasError ? null : (schemaParsed.data as Skill);
+  const skill: Skill | null = hasError || !schemaParsed.success ? null : schemaParsed.data;
 
   return { skill, hasError, declaredFrameworks };
 }
