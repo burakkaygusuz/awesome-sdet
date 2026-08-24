@@ -160,7 +160,7 @@ function checkRequestEnvelope(
     return {
       status: 400,
       id: jsonPayload.id ?? null,
-      error: { code: envelope.code ?? -32602, message: envelope.message ?? 'Invalid params' },
+      error: { code: envelope.code, message: envelope.message },
     };
   }
 

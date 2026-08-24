@@ -48,12 +48,16 @@ export function payloadTooLargeReply(): JsonRpcErrorReply {
   };
 }
 
-export interface EnvelopeValidationResult {
-  ok: boolean;
-  code?: number;
-  message?: string;
-  protocolVersion?: string;
-}
+export type EnvelopeValidationResult =
+  | {
+      readonly ok: true;
+      readonly protocolVersion?: string;
+    }
+  | {
+      readonly ok: false;
+      readonly code: number;
+      readonly message: string;
+    };
 
 export function validateRequestEnvelope(
   payload: Record<string, unknown>

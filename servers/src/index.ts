@@ -14,6 +14,7 @@ import {
 import {
   collectBodyWithinLimit,
   extractHostAndOrigin,
+  getSingleHeader,
   handleCorsPreflight,
   isLocalHostAndOrigin,
   MAX_BODY_BYTES,
@@ -65,8 +66,7 @@ export async function handleMcpPostRequest(
       return;
     }
 
-    const effectiveMethod =
-      jsonPayload.method ?? (req.headers['mcp-method'] as string | undefined)?.trim();
+    const effectiveMethod = jsonPayload.method ?? getSingleHeader(req.headers['mcp-method']);
     if (effectiveMethod === 'server/discover') {
       handleServerDiscover(res, jsonPayload);
       return;

@@ -152,10 +152,7 @@ export function extractStructuredDocs(
   const filteredSections = filterMarkdownSections(sections, query);
   const matchedHeadings = filteredSections.map((s) => s.heading);
 
-  const codeSnippets: Array<{ language: string; code: string }> = [];
-  for (const section of filteredSections) {
-    codeSnippets.push(...section.codeSnippets);
-  }
+  const codeSnippets = filteredSections.flatMap((s) => s.codeSnippets);
 
   let renderedMarkdown: string;
   if (query) {
